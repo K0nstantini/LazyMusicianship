@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">LazyMusicianship</string>
+
+<!--    Titles-->
+    <string name="main_title">Main</string>
+    <string name="pieces_title">Pieces</string>
+    <string name="learning_title">Learning</string>
 </resources>
