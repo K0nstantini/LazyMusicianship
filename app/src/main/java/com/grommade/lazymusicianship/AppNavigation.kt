@@ -7,6 +7,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navigation
+import com.grommade.lazymusicianship.ui_pieces_list.PiecesListUi
 
 sealed class Screen(val route: String) {
     object Main : Screen("mainroot")
@@ -67,7 +68,7 @@ private fun NavGraphBuilder.addMain(navController: NavController) {
 
 private fun NavGraphBuilder.addPieces(navController: NavController) {
     composable(LeafScreen.Pieces.route) {
-//        PiecesUi()
+        PiecesListUi()
     }
 }
 

@@ -9,7 +9,9 @@ import androidx.room.PrimaryKey
 data class Piece(
     @PrimaryKey(autoGenerate = true)
     override val id: Long = 0,
-    val name: String = "",
+    val title: String = "",
+    val author: String = "",
+    val arranger: String = "",
     val beat: Int = 0,
     val description: String = ""
 ) : AppEntity {

@@ -8,4 +8,9 @@
     <string name="main_title">Main</string>
     <string name="pieces_title">Pieces</string>
     <string name="practice_title">Practice</string>
+
+    <!--    Content Descriptions-->
+    <string name="cd_more_vert_icon">More</string>
+    <string name="cd_close_icon">Close</string>
+    <string name="cd_save_icon">Save</string>
 </resources>
