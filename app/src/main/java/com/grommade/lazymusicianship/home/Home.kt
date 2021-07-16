@@ -10,6 +10,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.LibraryMusic
 import androidx.compose.material.icons.filled.School
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.LibraryMusic
+import androidx.compose.material.icons.outlined.School
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
@@ -70,8 +73,8 @@ private fun NavController.currentScreenAsState(): State<Screen> {
                 destination.hierarchy.any { it.route == Screen.Pieces.route } -> {
                     selectedItem.value = Screen.Pieces
                 }
-                destination.hierarchy.any { it.route == Screen.Learning.route } -> {
-                    selectedItem.value = Screen.Learning
+                destination.hierarchy.any { it.route == Screen.Practice.route } -> {
+                    selectedItem.value = Screen.Practice
                 }
             }
         }
@@ -102,8 +105,8 @@ fun HomeBottomNavigation(
             selected = selectedNavigation == Screen.Main,
             onClick = { onNavigationSelected(Screen.Main) },
             contentDescription = stringResource(R.string.main_title),
-            selectedPainter = rememberVectorPainter(Icons.Default.Home),
-            painter = rememberVectorPainter(Icons.Default.Home),
+            selectedPainter = rememberVectorPainter(Icons.Filled.Home),
+            painter = rememberVectorPainter(Icons.Outlined.Home),
         )
 
         HomeBottomNavigationItem(
@@ -111,17 +114,17 @@ fun HomeBottomNavigation(
             selected = selectedNavigation == Screen.Pieces,
             onClick = { onNavigationSelected(Screen.Pieces) },
             contentDescription = stringResource(R.string.pieces_title),
-            selectedPainter = rememberVectorPainter(Icons.Default.LibraryMusic),
-            painter = rememberVectorPainter(Icons.Default.LibraryMusic),
+            selectedPainter = rememberVectorPainter(Icons.Filled.LibraryMusic),
+            painter = rememberVectorPainter(Icons.Outlined.LibraryMusic),
         )
 
         HomeBottomNavigationItem(
-            label = stringResource(R.string.learning_title),
-            selected = selectedNavigation == Screen.Learning,
-            onClick = { onNavigationSelected(Screen.Learning) },
-            contentDescription = stringResource(R.string.learning_title),
-            selectedPainter = rememberVectorPainter(Icons.Default.School),
-            painter = rememberVectorPainter(Icons.Default.School),
+            label = stringResource(R.string.practice_title),
+            selected = selectedNavigation == Screen.Practice,
+            onClick = { onNavigationSelected(Screen.Practice) },
+            contentDescription = stringResource(R.string.practice_title),
+            selectedPainter = rememberVectorPainter(Icons.Filled.School),
+            painter = rememberVectorPainter(Icons.Outlined.School),
         )
 
     }

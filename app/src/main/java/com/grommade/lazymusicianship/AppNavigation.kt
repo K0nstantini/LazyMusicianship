@@ -11,13 +11,13 @@ import androidx.navigation.navigation
 sealed class Screen(val route: String) {
     object Main : Screen("mainroot")
     object Pieces : Screen("piecesroot")
-    object Learning : Screen("learningroot")
+    object Practice : Screen("practiceroot")
 }
 
 private sealed class LeafScreen(val route: String) {
     object Main : LeafScreen("main")
     object Pieces : LeafScreen("pieces")
-    object Learning : LeafScreen("learning")
+    object Practice : LeafScreen("practice")
 }
 
 @Composable
@@ -28,7 +28,7 @@ fun AppNavigation(navController: NavHostController) {
     ) {
         addMainTopLevel(navController)
         addPiecesTopLevel(navController)
-        addLearningTopLevel(navController)
+        addPracticeTopLevel(navController)
     }
 }
 
@@ -50,10 +50,10 @@ private fun NavGraphBuilder.addPiecesTopLevel(navController: NavController) {
     }
 }
 
-private fun NavGraphBuilder.addLearningTopLevel(navController: NavController) {
+private fun NavGraphBuilder.addPracticeTopLevel(navController: NavController) {
     navigation(
-        route = Screen.Learning.route,
-        startDestination = LeafScreen.Learning.route
+        route = Screen.Practice.route,
+        startDestination = LeafScreen.Practice.route
     ) {
         addLearning(navController)
     }
@@ -72,7 +72,7 @@ private fun NavGraphBuilder.addPieces(navController: NavController) {
 }
 
 private fun NavGraphBuilder.addLearning(navController: NavController) {
-    composable(LeafScreen.Learning.route) {
-//        LearningUi()
+    composable(LeafScreen.Practice.route) {
+//        PracticeUi()
     }
 }
