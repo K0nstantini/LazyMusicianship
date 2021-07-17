@@ -4,14 +4,15 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -27,21 +28,25 @@ import com.grommade.lazymusicianship.ui.common.rememberFlowWithLifecycle
 import com.grommade.lazymusicianship.ui.components.MoreVertIcon
 
 @Composable
-fun PiecesListUi() {
-    PiecesListUi(viewModel = hiltViewModel())
+fun PiecesListUi(openPiece: (Long) -> Unit) {
+    PiecesListUi(
+        viewModel = hiltViewModel(),
+        openPiece = openPiece
+    )
 }
 
 @Composable
 fun PiecesListUi(
-    viewModel: PiecesListViewModel
+    viewModel: PiecesListViewModel,
+    openPiece: (Long) -> Unit
 ) {
     val viewState by rememberFlowWithLifecycle(viewModel.state)
         .collectAsState(initial = PiecesListViewState.Empty)
 
     PiecesListUi(viewState) { action ->
         when (action) {
-            PiecesListActions.AddNew -> {
-            }
+            is PiecesListActions.Open -> openPiece(action.pieceId)
+            PiecesListActions.AddNew -> openPiece(-1L)
             else -> viewModel.submitAction(action)
         }
     }
@@ -57,13 +62,19 @@ fun PiecesListUi(
             PiecesListTopBar { actioner(PiecesListActions.PopulateDB) }
         },
         modifier = Modifier.fillMaxSize(),
+        floatingActionButton = { FloatingActionButton { actioner(PiecesListActions.AddNew) } },
     ) { paddingValues ->
         LazyColumn(
             contentPadding = paddingValues,
             modifier = Modifier.fillMaxSize(),
         ) {
             items(viewState.pieces, key = { piece -> piece.id }) { piece ->
-                PieceItem(piece, Modifier.fillParentMaxWidth())
+                PieceItem(
+                    piece = piece,
+                    modifier = Modifier.fillParentMaxWidth()
+                ) {
+                    actioner(PiecesListActions.Open(piece.id))
+                }
             }
         }
     }
@@ -104,16 +115,26 @@ fun PiecesListDropdownMenu(populateDB: () -> Unit) {
     }
 }
 
+@Composable
+fun FloatingActionButton(addNew: () -> Unit) {
+    FloatingActionButton(
+        onClick = addNew,
+        modifier = Modifier.padding(bottom = 48.dp)
+    ) {
+        Icon(Icons.Filled.Add, "")
+    }
+}
 
 @Composable
 fun PieceItem(
     piece: Piece,
-    modifier: Modifier
+    modifier: Modifier,
+    openPiece: () -> Unit
 ) {
     val hasAuthor = piece.author.isNotEmpty()
 
     ConstraintLayout(
-        modifier = Modifier.clickable { /* TODO */ } then modifier
+        modifier = Modifier.clickable(onClick = openPiece) then modifier
     ) {
         val (divider, pieceTitle, authorTitle, overflow) = createRefs()
 
@@ -194,6 +215,7 @@ fun PiecesListUiPreview() {
 fun PieceItemPreview() {
     PieceItem(
         piece = Piece(title = "Sherlock (BBC) Main Theme"),
-        modifier = Modifier
+        modifier = Modifier,
+        openPiece = {}
     )
 }

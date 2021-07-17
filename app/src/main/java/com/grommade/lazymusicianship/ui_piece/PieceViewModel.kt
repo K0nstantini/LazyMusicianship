@@ -17,7 +17,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PieceViewModel @Inject constructor(
-    repoPiece: RepoPiece,
+    private val repoPiece: RepoPiece,
     handle: SavedStateHandle
 ) : ViewModel() {
 
@@ -33,6 +33,9 @@ class PieceViewModel @Inject constructor(
         )
     }
 
+    // FIXME
+    val navigateToBack = MutableSharedFlow<Boolean>()
+
     init {
         viewModelScope.launch {
             repoPiece.getPieceWithSections(pieceId)?.let { piece ->
@@ -40,12 +43,37 @@ class PieceViewModel @Inject constructor(
             }
             pendingActions.collect { action ->
                 when (action) {
-                    PieceActions.Save -> {
-                    }
+                    is PieceActions.ChangeName -> changeName(action.value)
+                    is PieceActions.ChangeAuthor -> changeAuthor(action.value)
+                    is PieceActions.ChangeArranger -> changeArranger(action.value)
+                    PieceActions.Save -> save()
                     else -> {
                     }
                 }
             }
+        }
+    }
+
+    private fun changeName(value: String) {
+        changePiece { currentPiece.value.piece.copy(title = value) }
+    }
+
+    private fun changeAuthor(value: String) {
+        changePiece { currentPiece.value.piece.copy(author = value) }
+    }
+
+    private fun changeArranger(value: String) {
+        changePiece { currentPiece.value.piece.copy(arranger = value) }
+    }
+
+    private fun changePiece(function: () -> Piece) {
+        currentPiece.value = currentPiece.value.copy(piece = function())
+    }
+
+    private fun save() {
+        viewModelScope.launch {
+            repoPiece.save(currentPiece.value)
+            navigateToBack.emit(true)
         }
     }
 

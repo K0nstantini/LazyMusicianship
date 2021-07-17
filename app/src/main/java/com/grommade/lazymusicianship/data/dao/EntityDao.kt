@@ -1,9 +1,6 @@
 package com.grommade.lazymusicianship.data.dao
 
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Update
+import androidx.room.*
 import com.grommade.lazymusicianship.data.entity.AppEntity
 
 abstract class EntityDao<in E : AppEntity> {
@@ -23,6 +20,13 @@ abstract class EntityDao<in E : AppEntity> {
         } else {
             update(entity)
             entity.id
+        }
+    }
+
+    @Transaction
+    open suspend fun insertOrUpdate(entities: List<E>) {
+        entities.forEach {
+            insertOrUpdate(it)
         }
     }
 }

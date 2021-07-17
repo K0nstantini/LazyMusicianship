@@ -1,7 +1,10 @@
 package com.grommade.lazymusicianship.data.repos
 
+import androidx.room.Transaction
 import com.grommade.lazymusicianship.data.dao.PieceDao
+import com.grommade.lazymusicianship.data.dao.SectionDao
 import com.grommade.lazymusicianship.data.entity.Piece
+import com.grommade.lazymusicianship.data.entity.PieceWithSections
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -9,12 +12,19 @@ import javax.inject.Inject
 
 class RepoPiece @Inject constructor(
     private val pieceDao: PieceDao,
+    private val sectionDao: SectionDao,
     private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
     val piecesFlow = pieceDao.getPiecesFlow()
 
     suspend fun save(piece: Piece): Long = withContext(ioDispatcher) {
         pieceDao.insertOrUpdate(piece)
+    }
+
+    @Transaction
+    suspend fun save(pieceWithSections: PieceWithSections) = withContext(ioDispatcher) {
+        pieceDao.insertOrUpdate(pieceWithSections.piece)
+        sectionDao.insertOrUpdate(pieceWithSections.sections)
     }
 
     suspend fun deleteAll() = withContext(ioDispatcher) {

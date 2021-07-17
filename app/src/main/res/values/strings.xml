@@ -9,8 +9,19 @@
     <string name="pieces_title">Pieces</string>
     <string name="practice_title">Practice</string>
 
+    <!--    Piece-->
+    <string name="hint_edit_text_name">Name</string>
+    <string name="hint_edit_text_author">Author</string>
+    <string name="hint_edit_text_arranger">Arranger</string>
+
+    <string name="subtitle_sections">Sections</string>
+
+    <string name="section_item_beat">Beat: %s</string>
+    <string name="section_item_bars">Bars: %s</string>
+
     <!--    Content Descriptions-->
     <string name="cd_more_vert_icon">More</string>
     <string name="cd_close_icon">Close</string>
     <string name="cd_save_icon">Save</string>
+    <string name="cd_add_icon">Add</string>
 </resources>

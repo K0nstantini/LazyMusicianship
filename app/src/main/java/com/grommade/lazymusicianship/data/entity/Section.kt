@@ -12,6 +12,7 @@ data class Section(
     override val id: Long = 0,
     val name: String = "",
     val pieceId: Long = 0L,
+    val isNew: Boolean = true,
     val beat: Int = 0,
     val countBars: Int = 0,
 ): AppEntity {

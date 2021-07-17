@@ -18,7 +18,7 @@ class RepositoryModule {
 
     @Provides
     @Singleton
-    fun provideRepositoryPiece(pieceDao: PieceDao) = RepoPiece(pieceDao)
+    fun provideRepositoryPiece(pieceDao: PieceDao, sectionDao: SectionDao) = RepoPiece(pieceDao, sectionDao)
 
     @Provides
     @Singleton

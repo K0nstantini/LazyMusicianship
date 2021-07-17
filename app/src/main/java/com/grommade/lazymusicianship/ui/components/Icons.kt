@@ -2,7 +2,9 @@ package com.grommade.lazymusicianship.ui.components
 
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Save
@@ -30,6 +32,19 @@ fun NavigationCloseIcon(
         Icon(
             imageVector = Icons.Filled.Close,
             contentDescription = stringResource(R.string.cd_close_icon)
+        )
+    }
+}
+
+@Composable
+fun AddIcon(
+    callback: () -> Unit
+) {
+    IconButton(onClick = callback) {
+        Icon(
+            imageVector = Icons.Filled.Add,
+            contentDescription = stringResource(R.string.cd_close_icon),
+            tint = MaterialTheme.colors.secondaryVariant
         )
     }
 }
