@@ -1,12 +1,15 @@
 package com.grommade.lazymusicianship
 
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.navigation.*
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navArgument
+import com.grommade.lazymusicianship.data.entity.Section
 import com.grommade.lazymusicianship.ui_piece.PieceUi
 import com.grommade.lazymusicianship.ui_pieces_list.PiecesListUi
+import com.grommade.lazymusicianship.ui_section.SectionUi
 import com.grommade.lazymusicianship.util.Keys
 
 sealed class Screen(val route: String) {
@@ -23,8 +26,13 @@ private sealed class LeafScreen(val route: String) {
     object PieceDetails : LeafScreen("piece/{${Keys.PIECE_ID}}") {
         fun createRoute(pieceId: Long): String = "piece/$pieceId"
     }
+
+    object SectionDetails : LeafScreen("piece/{${Keys.PIECE_ID}}/section") {
+        fun createRoute(pieceId: Long): String = "piece/$pieceId/section"
+    }
 }
 
+@ExperimentalMaterialApi
 @Composable
 fun AppNavigation(navController: NavHostController) {
     NavHost(
@@ -46,6 +54,7 @@ private fun NavGraphBuilder.addMainTopLevel(navController: NavController) {
     }
 }
 
+@ExperimentalMaterialApi
 private fun NavGraphBuilder.addPiecesTopLevel(navController: NavController) {
     navigation(
         route = Screen.Pieces.route,
@@ -53,6 +62,7 @@ private fun NavGraphBuilder.addPiecesTopLevel(navController: NavController) {
     ) {
         addPieces(navController)
         addPieceDetails(navController)
+        addSectionDetails(navController)
     }
 }
 
@@ -94,6 +104,29 @@ private fun NavGraphBuilder.addPieceDetails(navController: NavController) {
             navArgument(Keys.PIECE_ID) { type = NavType.LongType }
         )
     ) {
-        PieceUi(close = navController::navigateUp)
+        PieceUi(
+            navController = navController,
+            openSection = { pieceId ->
+                navController.navigate(LeafScreen.SectionDetails.createRoute(pieceId))
+            },
+            close = navController::navigateUp
+        )
+    }
+}
+
+@ExperimentalMaterialApi
+private fun NavGraphBuilder.addSectionDetails(navController: NavController) {
+    composable(
+        route = LeafScreen.SectionDetails.route,
+        arguments = listOf(
+            navArgument(Keys.PIECE_ID) { type = NavType.LongType },
+        )
+    ) {
+        SectionUi(
+            save = { section: Section ->
+                navController.previousBackStackEntry?.savedStateHandle?.set(Keys.SECTION, section)
+            },
+            close = navController::navigateUp
+        )
     }
 }

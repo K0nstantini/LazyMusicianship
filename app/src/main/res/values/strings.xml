@@ -19,9 +19,18 @@
     <string name="section_item_beat">Beat: %s</string>
     <string name="section_item_bars">Bars: %s</string>
 
+    <!--    Section-->
+    <string name="hint_edit_text_beat">Beat</string>
+    <string name="hint_edit_text_count_bars">Bars</string>
+    <string name="title_is_new">New</string>
+
+    <!--    Settings items-->
+    <string name="btn_clear">Clear</string>
+
     <!--    Content Descriptions-->
     <string name="cd_more_vert_icon">More</string>
     <string name="cd_close_icon">Close</string>
     <string name="cd_save_icon">Save</string>
     <string name="cd_add_icon">Add</string>
+
 </resources>

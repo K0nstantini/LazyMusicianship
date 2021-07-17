@@ -30,6 +30,7 @@ import com.grommade.lazymusicianship.AppNavigation
 import com.grommade.lazymusicianship.R
 import com.grommade.lazymusicianship.Screen
 
+@ExperimentalMaterialApi
 @Composable
 fun Home() {
     val navController = rememberNavController()

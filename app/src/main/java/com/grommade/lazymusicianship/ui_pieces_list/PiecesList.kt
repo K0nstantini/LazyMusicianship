@@ -146,7 +146,7 @@ fun PieceItem(
             }
         )
         Text(
-            text = piece.title,
+            text = piece.name,
             maxLines = 2,
             style = MaterialTheme.typography.subtitle1,
             modifier = Modifier.constrainAs(pieceTitle) {
@@ -203,9 +203,9 @@ fun PieceItem(
 @Composable
 fun PiecesListUiPreview() {
     val list = listOf(
-        Piece(id = 1, title = "Sherlock (BBC) Main Theme", author = "David Arnold & Michael Price"),
-        Piece(id = 2, title = "Elfen Lied"),
-        Piece(id = 3, title = "Let It Be", author = "Beatles"),
+        Piece(id = 1, name = "Sherlock (BBC) Main Theme", author = "David Arnold & Michael Price"),
+        Piece(id = 2, name = "Elfen Lied"),
+        Piece(id = 3, name = "Let It Be", author = "Beatles"),
     )
     PiecesListUi(PiecesListViewState(pieces = list)) {}
 }
@@ -214,7 +214,7 @@ fun PiecesListUiPreview() {
 @Composable
 fun PieceItemPreview() {
     PieceItem(
-        piece = Piece(title = "Sherlock (BBC) Main Theme"),
+        piece = Piece(name = "Sherlock (BBC) Main Theme"),
         modifier = Modifier,
         openPiece = {}
     )

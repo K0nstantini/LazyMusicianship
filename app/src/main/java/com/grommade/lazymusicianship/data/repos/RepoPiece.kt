@@ -23,8 +23,11 @@ class RepoPiece @Inject constructor(
 
     @Transaction
     suspend fun save(pieceWithSections: PieceWithSections) = withContext(ioDispatcher) {
-        pieceDao.insertOrUpdate(pieceWithSections.piece)
-        sectionDao.insertOrUpdate(pieceWithSections.sections)
+        val id = pieceDao.insertOrUpdate(pieceWithSections.piece)
+        pieceWithSections.sections.forEach { section ->
+            sectionDao.insertOrUpdate(section.copy(pieceId = id))
+        }
+
     }
 
     suspend fun deleteAll() = withContext(ioDispatcher) {

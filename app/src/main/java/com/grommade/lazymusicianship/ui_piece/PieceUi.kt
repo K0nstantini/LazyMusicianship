@@ -16,6 +16,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.google.accompanist.insets.ui.Scaffold
 import com.google.accompanist.insets.ui.TopAppBar
 import com.grommade.lazymusicianship.R
@@ -25,11 +26,18 @@ import com.grommade.lazymusicianship.ui.common.rememberFlowWithLifecycle
 import com.grommade.lazymusicianship.ui.components.AddIcon
 import com.grommade.lazymusicianship.ui.components.NavigationCloseIcon
 import com.grommade.lazymusicianship.ui.components.SaveIcon
+import com.grommade.lazymusicianship.util.Keys
 
 @Composable
-fun PieceUi(close: () -> Unit) {
+fun PieceUi(
+    navController: NavController,
+    openSection: (Long) -> Unit,
+    close: () -> Unit,
+) {
     PieceUi(
         viewModel = hiltViewModel(),
+        navController = navController,
+        openSection = openSection,
         close = close
     )
 }
@@ -37,16 +45,28 @@ fun PieceUi(close: () -> Unit) {
 @Composable
 fun PieceUi(
     viewModel: PieceViewModel,
+    navController: NavController,
+    openSection: (Long) -> Unit,
     close: () -> Unit
 ) {
 
     val viewState by rememberFlowWithLifecycle(viewModel.state)
         .collectAsState(initial = PieceViewState.Empty)
 
+    val handle = navController.currentBackStackEntry?.savedStateHandle
+    handle?.get<Section>(Keys.SECTION)?.let {
+        viewModel.refreshSections(it)
+        handle.remove<Section>(Keys.SECTION)
+    }
+
+    viewModel.navigateToSection.collectAsState(null).value?.let { openSection(viewState.piece.id) }
     viewModel.navigateToBack.collectAsState(null).value?.let { close() }
+
+
 
     PieceUi(viewState) { action ->
         when (action) {
+            is PieceActions.NewSection -> openSection(viewState.piece.id)
             PieceActions.Close -> close()
             else -> viewModel.submitAction(action)
         }
@@ -60,7 +80,7 @@ fun PieceUi(
 ) {
     Scaffold(
         topBar = {
-            PieceTopBar(viewState.piece.title,
+            PieceTopBar(viewState.piece.name,
                 { actioner(PieceActions.Save) },
                 { actioner(PieceActions.Close) }
             )
@@ -75,7 +95,7 @@ fun PieceUi(
                     end = 8.dp
                 )
         ) {
-            PieceName(viewState.piece.title) { value ->
+            PieceName(viewState.piece.name) { value ->
                 actioner(PieceActions.ChangeName(value))
             }
             Divider(color = Color.Transparent, thickness = 4.dp)
@@ -102,9 +122,9 @@ fun PieceUi(
                     text = stringResource(R.string.subtitle_sections),
                     style = MaterialTheme.typography.h6,
                 )
-                AddIcon {}
+                AddIcon {actioner(PieceActions.NewSection(viewState.piece.id))}
             }
-            SectionsScrollingContent(viewState.sections)
+            SectionsScrollingContent(viewState.sections, actioner)
         }
     }
 }
@@ -164,11 +184,16 @@ fun PieceTextField(
 
 @Composable
 fun SectionsScrollingContent(
-    sections: List<Section>
+    sections: List<Section>,
+    actioner: (PieceActions) -> Unit
 ) {
     LazyColumn(modifier = Modifier.fillMaxSize()) {
-        items(sections, key = { section -> section.id }) { section ->
-            SectionItem(section, Modifier.fillParentMaxWidth())
+        items(sections, key = { section -> section.order }) { section ->
+            SectionItem(
+                section = section,
+                modifier = Modifier.fillParentMaxWidth(),
+                openSection = { actioner(PieceActions.OpenSection(section.order)) }
+            )
         }
     }
 }
@@ -176,11 +201,12 @@ fun SectionsScrollingContent(
 @Composable
 fun SectionItem(
     section: Section,
-    modifier: Modifier
+    modifier: Modifier,
+    openSection: () -> Unit
 ) {
     Divider()
     Column(modifier = Modifier
-        .clickable { /* TODO */ }
+        .clickable(onClick = openSection)
         .padding(vertical = 6.dp) then modifier) {
         Text(
             text = section.name,
@@ -201,7 +227,7 @@ fun SectionItem(
 @Composable
 fun PieceItemPreview() {
     val piece = Piece(
-        title = "Sweet Harmony",
+        name = "Sweet Harmony",
         author = "The Beloved",
         arranger = "Eiro Nareth"
     )

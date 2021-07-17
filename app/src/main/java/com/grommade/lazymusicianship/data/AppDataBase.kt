@@ -13,7 +13,8 @@ import com.grommade.lazymusicianship.data.entity.*
         Practice::class,
         StateStudyPiece::class,
         StateStudySection::class,
-        Settings::class
+        Settings::class,
+        DataTransfer::class
     ],
     version = 1,
     exportSchema = false
@@ -26,4 +27,5 @@ abstract class AppDataBase : RoomDatabase() {
     abstract fun PracticeDao(): PracticeDao
     abstract fun StateStudyPieceDao(): StateStudyPieceDao
     abstract fun StateStudySectionDao(): StateStudySectionDao
+    abstract fun DataTransferDao(): DataTransferDao
 }

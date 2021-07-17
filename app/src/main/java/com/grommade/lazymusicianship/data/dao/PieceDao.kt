@@ -12,7 +12,7 @@ abstract class PieceDao : EntityDao<Piece>() {
     @Query("DELETE FROM piece_table")
     abstract suspend fun deleteAll()
 
-    @Query("SELECT * FROM piece_table WHERE id = :id")
+    @Query("SELECT * FROM piece_table WHERE piece_id = :id")
     abstract suspend fun getPiece(id: Long): Piece?
 
     @Transaction
@@ -20,10 +20,10 @@ abstract class PieceDao : EntityDao<Piece>() {
     abstract suspend fun getPiecesWithSections(): List<PieceWithSections>
 
     @Transaction
-    @Query("SELECT * FROM piece_table WHERE id = :id")
+    @Query("SELECT * FROM piece_table WHERE piece_id = :id")
     abstract suspend fun getPieceWithSections(id: Long): PieceWithSections?
 
-    @Query("SELECT * FROM piece_table ORDER BY title")
+    @Query("SELECT * FROM piece_table ORDER BY piece_name")
     abstract fun getPiecesFlow(): Flow<List<Piece>>
 
 

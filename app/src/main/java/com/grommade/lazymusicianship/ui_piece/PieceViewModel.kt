@@ -3,8 +3,11 @@ package com.grommade.lazymusicianship.ui_piece
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.grommade.lazymusicianship.data.entity.DataTransfer
 import com.grommade.lazymusicianship.data.entity.Piece
 import com.grommade.lazymusicianship.data.entity.PieceWithSections
+import com.grommade.lazymusicianship.data.entity.Section
+import com.grommade.lazymusicianship.data.repos.RepoDataTransfer
 import com.grommade.lazymusicianship.data.repos.RepoPiece
 import com.grommade.lazymusicianship.util.Keys
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,6 +21,7 @@ import javax.inject.Inject
 @HiltViewModel
 class PieceViewModel @Inject constructor(
     private val repoPiece: RepoPiece,
+    private val repoDataTransfer: RepoDataTransfer,
     handle: SavedStateHandle
 ) : ViewModel() {
 
@@ -29,11 +33,12 @@ class PieceViewModel @Inject constructor(
     val state = currentPiece.map {
         PieceViewState(
             piece = it.piece,
-            sections = it.sections
+            sections = it.sections.sortedBy { section -> section.order }
         )
     }
 
     // FIXME
+    val navigateToSection = MutableSharedFlow<Boolean>()
     val navigateToBack = MutableSharedFlow<Boolean>()
 
     init {
@@ -46,6 +51,7 @@ class PieceViewModel @Inject constructor(
                     is PieceActions.ChangeName -> changeName(action.value)
                     is PieceActions.ChangeAuthor -> changeAuthor(action.value)
                     is PieceActions.ChangeArranger -> changeArranger(action.value)
+                    is PieceActions.OpenSection -> openSection(action.order)
                     PieceActions.Save -> save()
                     else -> {
                     }
@@ -55,7 +61,7 @@ class PieceViewModel @Inject constructor(
     }
 
     private fun changeName(value: String) {
-        changePiece { currentPiece.value.piece.copy(title = value) }
+        changePiece { currentPiece.value.piece.copy(name = value) }
     }
 
     private fun changeAuthor(value: String) {
@@ -70,10 +76,31 @@ class PieceViewModel @Inject constructor(
         currentPiece.value = currentPiece.value.copy(piece = function())
     }
 
+    private fun openSection(order: Int) {
+        viewModelScope.launch {
+            currentPiece.value.sections.find { it.order == order }?.let { section ->
+                repoDataTransfer.save(DataTransfer(section = section))
+            }
+            navigateToSection.emit(true)
+        }
+    }
+
     private fun save() {
         viewModelScope.launch {
             repoPiece.save(currentPiece.value)
             navigateToBack.emit(true)
+        }
+    }
+
+    fun refreshSections(section: Section) {
+        with(currentPiece.value) {
+            val order = when {
+                section.order >= 0 -> section.order
+                sections.isEmpty() -> 0
+                else -> sections.maxOf { it.order } + 1
+            }
+            val sections = sections.filter { it.order != section.order } + section.copy(order = order)
+            currentPiece.value = copy(sections = sections)
         }
     }
 

@@ -35,4 +35,8 @@ class RepositoryModule {
     @Provides
     @Singleton
     fun provideRepositoryStateStudySection(stateDao: StateStudySectionDao) = RepoStateStudySection(stateDao)
+
+    @Provides
+    @Singleton
+    fun provideRepositoryDataTransferDao(dataTransferDao: DataTransferDao) = RepoDataTransfer(dataTransferDao)
 }

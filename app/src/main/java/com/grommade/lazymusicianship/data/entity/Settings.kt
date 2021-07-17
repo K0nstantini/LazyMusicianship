@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 @Immutable
 @Entity(tableName = "settings_table")
 data class Settings(
-    @PrimaryKey(autoGenerate = true)
-    override val id: Long = 0,
-): AppEntity {
+    @PrimaryKey
+    override val id: Long = 1,
+) : AppEntity {
 }

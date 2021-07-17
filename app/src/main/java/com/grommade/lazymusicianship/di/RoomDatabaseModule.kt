@@ -38,7 +38,7 @@ object RoomDatabaseModule {
         return Room.databaseBuilder(
             context,
             AppDataBase::class.java,
-            "lazy_to_do_2020"
+            "lazy_musicianship_2021"
 
         )
             .fallbackToDestructiveMigration()
@@ -109,4 +109,7 @@ object DatabaseDaoModule {
 
     @Provides
     fun provideStateStudySectionDao(db: AppDataBase) = db.StateStudySectionDao()
+
+    @Provides
+    fun provideDataTransferDao(db: AppDataBase) = db.DataTransferDao()
 }

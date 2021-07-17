@@ -16,91 +16,91 @@ class PopulateDBWithPiecesImpl @Inject constructor(
         repoPiece.deleteAll()
 
         Piece(
-            title = "Город, которого нет",
+            name = "Город, которого нет",
             author = "Игорь Корнелюк",
             arranger = "Колосов В. М."
         ).save()
 
         Piece(
-            title = "Et si tu n’existais pas",
+            name = "Et si tu n’existais pas",
             author = "Joe Dassin",
             arranger = "Варфоломеев И."
         ).save()
 
         Piece(
-            title = "Knockin' on Heaven's Door",
+            name = "Knockin' on Heaven's Door",
             author = "Bob Dylan",
             arranger = "Варфоломеев И."
         ).save()
 
         Piece(
-            title = "Don't Cry",
+            name = "Don't Cry",
             author = "Guns N' Roses",
             arranger = "Варфоломеев И."
         ).save()
 
         Piece(
-            title = "I just want you",
+            name = "I just want you",
             author = "Ozzy Osbourne",
             arranger = "Eiro Nareth"
         ).save()
 
         Piece(
-            title = "Кончится лето",
+            name = "Кончится лето",
             author = "Кино",
             arranger = "Eiro Nareth"
         ).save()
 
         Piece(
-            title = "Mutter",
+            name = "Mutter",
             author = "Rammstein",
             arranger = "Eiro Nareth"
         ).save()
 
         Piece(
-            title = "О Любви",
+            name = "О Любви",
             author = "Чиж & Co",
             arranger = "Eiro Nareth"
         ).save()
 
         Piece(
-            title = "Ohne Dich",
+            name = "Ohne Dich",
             author = "Rammstein",
             arranger = "Eiro Nareth"
         ).save()
 
         Piece(
-            title = "Rape Me",
+            name = "Rape Me",
             author = "Nirvana",
             arranger = "Eiro Nareth"
         ).save()
 
         Piece(
-            title = "Серебро",
+            name = "Серебро",
             author = "Би-2",
             arranger = "Eiro Nareth"
         ).save()
 
         Piece(
-            title = "Sweet Harmony",
+            name = "Sweet Harmony",
             author = "The Beloved",
             arranger = "Eiro Nareth"
         ).save()
 
         Piece(
-            title = "Zombie",
+            name = "Zombie",
             author = "The Cranberries",
             arranger = "Eiro Nareth"
         ).save()
 
         Piece(
-            title = "Air OST - Natsukage",
+            name = "Air OST - Natsukage",
             author = "Jun Maeda",
             arranger = "Eddie van der Meer"
         ).save()
 
         Piece(
-            title = "Death Note - Opening",
+            name = "Death Note - Opening",
             author = "Hideki Taniuchi",
             arranger = "Eddie van der Meer"
         ).save()
