@@ -14,8 +14,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
@@ -30,10 +31,13 @@ class PieceViewModel @Inject constructor(
     private val pieceId: Long = handle.get<Long>(Keys.PIECE_ID) ?: -1L
     private val currentPiece = MutableStateFlow(PieceWithSections(Piece(), emptyList()))
 
-    val state = currentPiece.map {
+    private val selectedSection = MutableStateFlow(-1)
+
+    val state = combine(currentPiece, selectedSection) { piece, selected ->
         PieceViewState(
-            piece = it.piece,
-            sections = it.sections.sortedBy { section -> section.order }
+            piece = piece.piece,
+            sections = piece.sections.sortedBy { section -> section.order },
+            selectedSection = selected
         )
     }
 
@@ -52,6 +56,8 @@ class PieceViewModel @Inject constructor(
                     is PieceActions.ChangeAuthor -> changeAuthor(action.value)
                     is PieceActions.ChangeArranger -> changeArranger(action.value)
                     is PieceActions.OpenSection -> openSection(action.order)
+                    is PieceActions.SelectSection -> selectSection(action.order)
+                    is PieceActions.DeleteSection -> deleteSection(action.order)
                     PieceActions.Save -> save()
                     else -> {
                     }
@@ -77,12 +83,22 @@ class PieceViewModel @Inject constructor(
     }
 
     private fun openSection(order: Int) {
+        selectSection(-1)
         viewModelScope.launch {
             currentPiece.value.sections.find { it.order == order }?.let { section ->
                 repoDataTransfer.save(DataTransfer(section = section))
             }
             navigateToSection.emit(true)
         }
+    }
+
+    private fun selectSection(order: Int) {
+        selectedSection.value = order
+    }
+
+    private fun deleteSection(order: Int) {
+        val sections = currentPiece.value.sections.filter { it.order != order }
+        currentPiece.value = currentPiece.value.copy(sections = sections)
     }
 
     private fun save() {

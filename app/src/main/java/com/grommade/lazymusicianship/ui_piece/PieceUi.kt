@@ -1,6 +1,8 @@
 package com.grommade.lazymusicianship.ui_piece
 
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -24,10 +26,12 @@ import com.grommade.lazymusicianship.data.entity.Piece
 import com.grommade.lazymusicianship.data.entity.Section
 import com.grommade.lazymusicianship.ui.common.rememberFlowWithLifecycle
 import com.grommade.lazymusicianship.ui.components.AddIcon
+import com.grommade.lazymusicianship.ui.components.DeleteIcon
 import com.grommade.lazymusicianship.ui.components.NavigationCloseIcon
 import com.grommade.lazymusicianship.ui.components.SaveIcon
 import com.grommade.lazymusicianship.util.Keys
 
+@ExperimentalFoundationApi
 @Composable
 fun PieceUi(
     navController: NavController,
@@ -42,6 +46,7 @@ fun PieceUi(
     )
 }
 
+@ExperimentalFoundationApi
 @Composable
 fun PieceUi(
     viewModel: PieceViewModel,
@@ -73,6 +78,7 @@ fun PieceUi(
     }
 }
 
+@ExperimentalFoundationApi
 @Composable
 fun PieceUi(
     viewState: PieceViewState,
@@ -122,9 +128,13 @@ fun PieceUi(
                     text = stringResource(R.string.subtitle_sections),
                     style = MaterialTheme.typography.h6,
                 )
-                AddIcon {actioner(PieceActions.NewSection(viewState.piece.id))}
+                AddIcon { actioner(PieceActions.NewSection(viewState.piece.id)) }
             }
-            SectionsScrollingContent(viewState.sections, actioner)
+            SectionsScrollingContent(
+                sections = viewState.sections,
+                selectedSection = viewState.selectedSection,
+                actioner = actioner
+            )
         }
     }
 }
@@ -182,47 +192,74 @@ fun PieceTextField(
     )
 }
 
+@ExperimentalFoundationApi
 @Composable
 fun SectionsScrollingContent(
     sections: List<Section>,
+    selectedSection: Int,
     actioner: (PieceActions) -> Unit
 ) {
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         items(sections, key = { section -> section.order }) { section ->
             SectionItem(
                 section = section,
+                selected = section.order == selectedSection,
                 modifier = Modifier.fillParentMaxWidth(),
-                openSection = { actioner(PieceActions.OpenSection(section.order)) }
+                openSection = { actioner(PieceActions.OpenSection(section.order)) },
+                selectSection = { actioner(PieceActions.SelectSection(section.order)) },
+                deleteSection = { actioner(PieceActions.DeleteSection(section.order)) },
             )
         }
     }
 }
 
+@ExperimentalFoundationApi
 @Composable
 fun SectionItem(
     section: Section,
+    selected: Boolean,
     modifier: Modifier,
-    openSection: () -> Unit
+    openSection: () -> Unit,
+    selectSection: () -> Unit,
+    deleteSection: () -> Unit
 ) {
-    Divider()
-    Column(modifier = Modifier
-        .clickable(onClick = openSection)
-        .padding(vertical = 6.dp) then modifier) {
-        Text(
-            text = section.name,
-            style = MaterialTheme.typography.subtitle1.copy(color = MaterialTheme.colors.primaryVariant),
-        )
-        Text(
-            text = stringResource(R.string.section_item_beat, section.beat),
-            style = MaterialTheme.typography.caption
-        )
-        Text(
-            text = stringResource(R.string.section_item_bars, section.countBars),
-            style = MaterialTheme.typography.caption
-        )
+    val backgroundColor = when (selected) {
+        true -> Color.LightGray
+        false -> Color.Transparent
     }
+    Divider()
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .combinedClickable(
+                onClick = openSection,
+                onLongClick = selectSection
+            )
+            .background(color = backgroundColor) then modifier
+    ) {
+        Column(modifier = Modifier.padding(vertical = 6.dp)) {
+            Text(
+                text = section.name,
+                style = MaterialTheme.typography.subtitle1.copy(color = MaterialTheme.colors.primaryVariant),
+            )
+            Text(
+                text = stringResource(R.string.section_item_beat, section.beat),
+                style = MaterialTheme.typography.caption
+            )
+            Text(
+                text = stringResource(R.string.section_item_bars, section.countBars),
+                style = MaterialTheme.typography.caption
+            )
+        }
+        if (selected) {
+            DeleteIcon(deleteSection)
+        }
+    }
+
 }
 
+@ExperimentalFoundationApi
 @Preview
 @Composable
 fun PieceItemPreview() {
@@ -234,15 +271,18 @@ fun PieceItemPreview() {
     val sections = listOf(
         Section(
             id = 1,
+            order = 0,
             name = "Intro",
             beat = 120,
         ),
         Section(
             id = 2,
+            order = 1,
             name = "Verse 1",
         ),
         Section(
             id = 3,
+            order = 2,
             name = "Outro",
         )
     )

@@ -17,6 +17,8 @@ data class Piece(
     val arranger: String = "",
     @ColumnInfo(name = "piece_beat")
     val beat: Int = 0,
+    @ColumnInfo(name = "piece_bars")
+    val countBars: Int = 0,
     val description: String = ""
 ) : AppEntity {
 }

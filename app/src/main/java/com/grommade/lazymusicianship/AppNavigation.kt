@@ -1,5 +1,6 @@
 package com.grommade.lazymusicianship
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.navigation.*
@@ -32,6 +33,7 @@ private sealed class LeafScreen(val route: String) {
     }
 }
 
+@ExperimentalFoundationApi
 @ExperimentalMaterialApi
 @Composable
 fun AppNavigation(navController: NavHostController) {
@@ -54,6 +56,7 @@ private fun NavGraphBuilder.addMainTopLevel(navController: NavController) {
     }
 }
 
+@ExperimentalFoundationApi
 @ExperimentalMaterialApi
 private fun NavGraphBuilder.addPiecesTopLevel(navController: NavController) {
     navigation(
@@ -97,6 +100,7 @@ private fun NavGraphBuilder.addLearning(navController: NavController) {
     }
 }
 
+@ExperimentalFoundationApi
 private fun NavGraphBuilder.addPieceDetails(navController: NavController) {
     composable(
         route = LeafScreen.PieceDetails.route,

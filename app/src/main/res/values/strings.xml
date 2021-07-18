@@ -32,5 +32,6 @@
     <string name="cd_close_icon">Close</string>
     <string name="cd_save_icon">Save</string>
     <string name="cd_add_icon">Add</string>
+    <string name="cd_delete_icon">Delete</string>
 
 </resources>

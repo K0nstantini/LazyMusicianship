@@ -22,6 +22,7 @@ data class Section(
     val isNew: Boolean = true,
     @ColumnInfo(name = "section_beat")
     val beat: Int = 0,
+    @ColumnInfo(name = "section_bars")
     val countBars: Int = 0,
 ): AppEntity, Parcelable {
 }

@@ -1,6 +1,7 @@
 package com.grommade.lazymusicianship.home
 
 import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,6 +31,7 @@ import com.grommade.lazymusicianship.AppNavigation
 import com.grommade.lazymusicianship.R
 import com.grommade.lazymusicianship.Screen
 
+@ExperimentalFoundationApi
 @ExperimentalMaterialApi
 @Composable
 fun Home() {

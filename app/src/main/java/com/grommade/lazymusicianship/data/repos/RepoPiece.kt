@@ -5,6 +5,7 @@ import com.grommade.lazymusicianship.data.dao.PieceDao
 import com.grommade.lazymusicianship.data.dao.SectionDao
 import com.grommade.lazymusicianship.data.entity.Piece
 import com.grommade.lazymusicianship.data.entity.PieceWithSections
+import com.grommade.lazymusicianship.data.entity.Section
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -24,10 +25,25 @@ class RepoPiece @Inject constructor(
     @Transaction
     suspend fun save(pieceWithSections: PieceWithSections) = withContext(ioDispatcher) {
         val id = pieceDao.insertOrUpdate(pieceWithSections.piece)
-        pieceWithSections.sections.forEach { section ->
-            sectionDao.insertOrUpdate(section.copy(pieceId = id))
-        }
+        deleteOldSections(pieceWithSections.sections, id)
+        saveActualSections(pieceWithSections.sections, id)
+    }
 
+    private suspend fun deleteOldSections(sections: List<Section>, id: Long) = withContext(ioDispatcher) {
+        sectionDao.getSectionsByPieceId(id)
+            .map { it.id }
+            .minus(sections.map { it.id })
+            .forEach {
+                sectionDao.delete(it)
+            }
+    }
+
+    private suspend fun saveActualSections(sections: List<Section>, id: Long) = withContext(ioDispatcher) {
+        sections
+            .sortedBy { it.order }
+            .forEachIndexed { index, section ->
+                sectionDao.insertOrUpdate(section.copy(order = index, pieceId = id))
+            }
     }
 
     suspend fun deleteAll() = withContext(ioDispatcher) {

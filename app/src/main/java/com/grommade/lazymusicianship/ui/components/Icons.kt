@@ -4,10 +4,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.grommade.lazymusicianship.R
@@ -20,6 +17,18 @@ fun MoreVertIcon(
         Icon(
             imageVector = Icons.Default.MoreVert,
             contentDescription = stringResource(R.string.cd_more_vert_icon)
+        )
+    }
+}
+
+@Composable
+fun DeleteIcon(
+    callback: () -> Unit
+) {
+    IconButton(onClick = callback) {
+        Icon(
+            imageVector = Icons.Default.Delete,
+            contentDescription = stringResource(R.string.cd_delete_icon)
         )
     }
 }

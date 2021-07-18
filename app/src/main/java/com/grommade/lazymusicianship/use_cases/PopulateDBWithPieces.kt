@@ -1,6 +1,8 @@
 package com.grommade.lazymusicianship.use_cases
 
 import com.grommade.lazymusicianship.data.entity.Piece
+import com.grommade.lazymusicianship.data.entity.PieceWithSections
+import com.grommade.lazymusicianship.data.entity.Section
 import com.grommade.lazymusicianship.data.repos.RepoPiece
 import javax.inject.Inject
 
@@ -33,10 +35,18 @@ class PopulateDBWithPiecesImpl @Inject constructor(
             arranger = "Варфоломеев И."
         ).save()
 
-        Piece(
-            name = "Don't Cry",
-            author = "Guns N' Roses",
-            arranger = "Варфоломеев И."
+        PieceWithSections(
+            piece = Piece(
+                name = "Don't Cry",
+                author = "Guns N' Roses",
+                arranger = "Варфоломеев И."
+            ),
+            sections = listOf(
+                Section(name = "Intro", order = 0, beat = 124, countBars = 10, isNew = false),
+                Section(name = "Verse 1_1", order = 1, beat = 124, countBars = 4, isNew = false),
+                Section(name = "Verse 1_2", order = 2, beat = 124, countBars = 4, isNew = false),
+                Section(name = "Verse 1_3", order = 3, beat = 124, countBars = 4, isNew = false),
+            )
         ).save()
 
         Piece(
@@ -105,6 +115,7 @@ class PopulateDBWithPiecesImpl @Inject constructor(
             arranger = "Eddie van der Meer"
         ).save()
     }
-    
+
     private suspend fun Piece.save() = repoPiece.save(this)
+    private suspend fun PieceWithSections.save() = repoPiece.save(this)
 }
