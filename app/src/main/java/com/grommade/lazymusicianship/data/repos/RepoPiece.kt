@@ -23,30 +23,8 @@ class RepoPiece @Inject constructor(
     }
 
     @Transaction
-    suspend fun save(pieceWithSections: PieceWithSections) = withContext(ioDispatcher) {
-        val id = pieceDao.insertOrUpdate(pieceWithSections.piece)
-        deleteOldSections(pieceWithSections.sections, id)
-        saveActualSections(pieceWithSections.sections, id)
-    }
-
-    private suspend fun deleteOldSections(sections: List<Section>, id: Long) = withContext(ioDispatcher) {
-        sectionDao.getSectionsByPieceId(id)
-            .map { it.id }
-            .minus(sections.map { it.id })
-            .forEach {
-                sectionDao.delete(it)
-            }
-    }
-
-    private suspend fun saveActualSections(sections: List<Section>, id: Long) = withContext(ioDispatcher) {
-        sections
-            .sortedBy { it.order }
-            .forEachIndexed { index, section ->
-                sectionDao.insertOrUpdate(section.copy(order = index, pieceId = id))
-            }
-    }
-
     suspend fun deleteAll() = withContext(ioDispatcher) {
+        sectionDao.deleteAll()
         pieceDao.deleteAll()
     }
 
@@ -54,7 +32,4 @@ class RepoPiece @Inject constructor(
         pieceDao.getPiece(id)
     }
 
-    suspend fun getPieceWithSections(id: Long) = withContext(ioDispatcher) {
-        pieceDao.getPieceWithSections(id)
-    }
 }

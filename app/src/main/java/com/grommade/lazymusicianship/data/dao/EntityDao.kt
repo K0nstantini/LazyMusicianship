@@ -14,6 +14,13 @@ abstract class EntityDao<in E : AppEntity> {
     @Delete
     abstract suspend fun delete(entity: E)
 
+    @Transaction
+    open suspend fun delete(entities: List<E>) {
+        entities.forEach {
+            delete(it)
+        }
+    }
+
     suspend fun insertOrUpdate(entity: E): Long {
         return if (entity.id == 0L) {
             insert(entity)

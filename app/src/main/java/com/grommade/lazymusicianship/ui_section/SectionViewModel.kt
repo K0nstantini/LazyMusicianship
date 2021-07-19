@@ -1,9 +1,11 @@
 package com.grommade.lazymusicianship.ui_section
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grommade.lazymusicianship.data.entity.Section
-import com.grommade.lazymusicianship.data.repos.RepoDataTransfer
+import com.grommade.lazymusicianship.data.repos.RepoSection
+import com.grommade.lazymusicianship.util.Keys
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,12 +16,18 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SectionViewModel @Inject constructor(
-    private val repoDataTransfer: RepoDataTransfer,
+    private val repoSection: RepoSection,
+    private val handle: SavedStateHandle
 ) : ViewModel() {
 
     private val pendingActions = MutableSharedFlow<SectionActions>()
 
-    private val currentSection = MutableStateFlow(Section())
+    private val currentSection = MutableStateFlow(
+        Section(
+            pieceId = handle.get<Long>(Keys.PIECE_ID) ?: 0,
+            parentId = handle.get<Long>(Keys.PARENT_ID) ?: 0
+        )
+    )
 
     val state = currentSection.map { section ->
         SectionViewState(section = section)
@@ -30,8 +38,9 @@ class SectionViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            repoDataTransfer.getData()?.let { data ->
-                currentSection.value = data.section
+            val sectionId: Long = handle.get<Long>(Keys.SECTION_ID) ?: 0
+            repoSection.getSection(sectionId)?.let { section ->
+                currentSection.value = section
             }
             pendingActions.collect { action ->
                 when (action) {
@@ -39,6 +48,7 @@ class SectionViewModel @Inject constructor(
                     is SectionActions.ChangeBeat -> changeBeat(action.value)
                     is SectionActions.ChangeBars -> changeBars(action.value)
                     is SectionActions.ChangeNew -> changeNew(action.value)
+                    SectionActions.Save -> save()
                     else -> {
                     }
                 }
@@ -61,11 +71,18 @@ class SectionViewModel @Inject constructor(
     }
 
     private fun changeNew(value: Boolean) {
-        changeSection { copy(isNew = value) }
+        changeSection { copy(firstTime = value) }
     }
 
     private fun changeSection(foo: Section.() -> Section) {
         currentSection.value = foo(currentSection.value)
+    }
+
+    private fun save() {
+        viewModelScope.launch {
+            repoSection.save(currentSection.value)
+            navigateToBack.emit(true)
+        }
     }
 
 

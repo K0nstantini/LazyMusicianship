@@ -1,15 +1,13 @@
 package com.grommade.lazymusicianship.ui_piece
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -18,60 +16,65 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
 import com.google.accompanist.insets.ui.Scaffold
 import com.google.accompanist.insets.ui.TopAppBar
 import com.grommade.lazymusicianship.R
 import com.grommade.lazymusicianship.data.entity.Piece
 import com.grommade.lazymusicianship.data.entity.Section
 import com.grommade.lazymusicianship.ui.common.rememberFlowWithLifecycle
-import com.grommade.lazymusicianship.ui.components.AddIcon
-import com.grommade.lazymusicianship.ui.components.DeleteIcon
-import com.grommade.lazymusicianship.ui.components.NavigationCloseIcon
-import com.grommade.lazymusicianship.ui.components.SaveIcon
-import com.grommade.lazymusicianship.util.Keys
+import com.grommade.lazymusicianship.ui.components.*
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
+@ExperimentalCoroutinesApi
 @ExperimentalFoundationApi
 @Composable
 fun PieceUi(
-    navController: NavController,
-    openSection: (Long) -> Unit,
+    openSection: (Long, Long, Long) -> Unit,
     close: () -> Unit,
 ) {
     PieceUi(
         viewModel = hiltViewModel(),
-        navController = navController,
         openSection = openSection,
         close = close
     )
 }
 
+@ExperimentalCoroutinesApi
 @ExperimentalFoundationApi
 @Composable
 fun PieceUi(
     viewModel: PieceViewModel,
-    navController: NavController,
-    openSection: (Long) -> Unit,
+    openSection: (Long, Long, Long) -> Unit,
     close: () -> Unit
 ) {
 
     val viewState by rememberFlowWithLifecycle(viewModel.state)
         .collectAsState(initial = PieceViewState.Empty)
 
-    val handle = navController.currentBackStackEntry?.savedStateHandle
-    handle?.get<Section>(Keys.SECTION)?.let {
-        viewModel.refreshSections(it)
-        handle.remove<Section>(Keys.SECTION)
+    viewModel.navigateToSection.collectAsState(null).value?.let {pieceId ->
+        openSection(pieceId, 0, 0)
     }
-
-    viewModel.navigateToSection.collectAsState(null).value?.let { openSection(viewState.piece.id) }
     viewModel.navigateToBack.collectAsState(null).value?.let { close() }
 
-
+    val confirmToWriteDialog = remember { mutableStateOf(false) }
+    if (confirmToWriteDialog.value) {
+        BuiltSimpleOkCancelDialog(
+            title = stringResource(R.string.alert_save_before_add_section),
+            callback = viewModel::saveAndAddSection,
+            close = { confirmToWriteDialog.value = false }
+        )
+    }
 
     PieceUi(viewState) { action ->
         when (action) {
-            is PieceActions.NewSection -> openSection(viewState.piece.id)
+            is PieceActions.OpenSection -> openSection(viewState.piece.id, action.sectionId, 0)
+            is PieceActions.NewSection -> {
+                if (viewState.piece.isNew) {
+                    confirmToWriteDialog.value = true
+                } else {
+                    openSection(viewState.piece.id, 0, action.parentId)
+                }
+            }
             PieceActions.Close -> close()
             else -> viewModel.submitAction(action)
         }
@@ -87,11 +90,12 @@ fun PieceUi(
     Scaffold(
         topBar = {
             PieceTopBar(viewState.piece.name,
-                { actioner(PieceActions.Save) },
+                { actioner(PieceActions.SaveAndClose) },
                 { actioner(PieceActions.Close) }
             )
         },
         modifier = Modifier.fillMaxSize(),
+//        backgroundColor = Color(0xFFcbae82)
     ) { paddingValues ->
         Column(
             Modifier
@@ -107,15 +111,27 @@ fun PieceUi(
             Divider(color = Color.Transparent, thickness = 4.dp)
             PieceTextField(
                 text = viewState.piece.author,
-                label = stringResource(R.string.hint_edit_text_author)
+                label = stringResource(R.string.piece_hint_edit_text_author)
             ) { value ->
                 actioner(PieceActions.ChangeAuthor(value))
             }
             PieceTextField(
                 text = viewState.piece.arranger,
-                label = stringResource(R.string.hint_edit_text_arranger)
+                label = stringResource(R.string.piece_hint_edit_text_arranger)
             ) { value ->
                 actioner(PieceActions.ChangeArranger(value))
+            }
+            BeatField(
+                beat = viewState.piece.beat,
+                label = stringResource(R.string.piece_hint_edit_text_beat)
+            ) { value ->
+                actioner(PieceActions.ChangeBeat(value))
+            }
+            TimeField(
+                time = viewState.piece.time,
+                label = stringResource(R.string.piece_hint_edit_text_time)
+            ) { value ->
+                actioner(PieceActions.ChangeTime(value))
             }
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -128,7 +144,7 @@ fun PieceUi(
                     text = stringResource(R.string.subtitle_sections),
                     style = MaterialTheme.typography.h6,
                 )
-                AddIcon { actioner(PieceActions.NewSection(viewState.piece.id)) }
+                AddIcon { actioner(PieceActions.NewSection(0)) }
             }
             SectionsScrollingContent(
                 sections = viewState.sections,
@@ -149,6 +165,7 @@ fun PieceTopBar(
         title = { },
         modifier = Modifier.fillMaxWidth(),
         backgroundColor = MaterialTheme.colors.surface.copy(alpha = 0.97f),
+//        backgroundColor = Color(0xFFcbae82),
         contentColor = MaterialTheme.colors.onSurface,
         navigationIcon = { NavigationCloseIcon(close) },
         actions = { SaveIcon(name.isNotEmpty(), save) }
@@ -163,7 +180,7 @@ fun PieceName(
     TextField(
         value = name,
         onValueChange = changeName,
-        label = { Text(stringResource(R.string.hint_edit_text_name)) },
+        label = { Text(stringResource(R.string.piece_hint_edit_text_name)) },
         colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.Transparent),
         isError = name.isEmpty(),
         singleLine = true,
@@ -192,22 +209,54 @@ fun PieceTextField(
     )
 }
 
+@Composable
+fun BeatField(
+    beat: Int,
+    label: String,
+    changeText: (String) -> Unit
+) {
+    OutlinedTextField(
+        value = beat.toString(),
+        onValueChange = changeText,
+        label = { Text(label) },
+        singleLine = true,
+        modifier = Modifier.width(100.dp)
+    )
+}
+
+@Composable
+fun TimeField(
+    time: Int,
+    label: String,
+    changeText: (String) -> Unit
+) {
+    OutlinedTextField(
+        value = time.toString(),
+        onValueChange = changeText,
+        label = { Text(label) },
+        singleLine = true,
+        modifier = Modifier.width(100.dp)
+    )
+}
+
 @ExperimentalFoundationApi
 @Composable
 fun SectionsScrollingContent(
     sections: List<Section>,
-    selectedSection: Int,
+    selectedSection: Long,
     actioner: (PieceActions) -> Unit
 ) {
     LazyColumn(modifier = Modifier.fillMaxSize()) {
-        items(sections, key = { section -> section.order }) { section ->
+        items(sections) { section ->
             SectionItem(
-                section = section,
-                selected = section.order == selectedSection,
+                name = section.name,
+                level = section.getLevel(sections),
+                selected = section.id == selectedSection,
                 modifier = Modifier.fillParentMaxWidth(),
-                openSection = { actioner(PieceActions.OpenSection(section.order)) },
-                selectSection = { actioner(PieceActions.SelectSection(section.order)) },
-                deleteSection = { actioner(PieceActions.DeleteSection(section.order)) },
+                openSection = { actioner(PieceActions.OpenSection(section.id)) },
+                newSection = { actioner(PieceActions.NewSection(section.id)) },
+                selectSection = { actioner(PieceActions.SelectSection(section.id)) },
+                deleteSection = { actioner(PieceActions.DeleteSection(section)) },
             )
         }
     }
@@ -216,47 +265,48 @@ fun SectionsScrollingContent(
 @ExperimentalFoundationApi
 @Composable
 fun SectionItem(
-    section: Section,
+    name: String,
+    level: Int,
     selected: Boolean,
     modifier: Modifier,
     openSection: () -> Unit,
+    newSection: () -> Unit,
     selectSection: () -> Unit,
     deleteSection: () -> Unit
 ) {
     val backgroundColor = when (selected) {
         true -> Color.LightGray
-        false -> Color.Transparent
+        false -> Color(0xFFb2fab4)
     }
-    Divider()
-    Row(
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .combinedClickable(
-                onClick = openSection,
-                onLongClick = selectSection
-            )
-            .background(color = backgroundColor) then modifier
+    val padding = (level * 8).dp
+    Divider(color = Color.Transparent, thickness = 8.dp)
+    Card(
+        border = BorderStroke(width = 1.dp, color = Color.LightGray),
+        backgroundColor = backgroundColor,
+        modifier = Modifier.padding(start = padding)
     ) {
-        Column(modifier = Modifier.padding(vertical = 6.dp)) {
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .combinedClickable(
+                    onClick = openSection,
+                    onLongClick = selectSection
+                )
+                .padding(start = 32.dp) then modifier
+        ) {
             Text(
-                text = section.name,
+                text = name,
                 style = MaterialTheme.typography.subtitle1.copy(color = MaterialTheme.colors.primaryVariant),
             )
-            Text(
-                text = stringResource(R.string.section_item_beat, section.beat),
-                style = MaterialTheme.typography.caption
-            )
-            Text(
-                text = stringResource(R.string.section_item_bars, section.countBars),
-                style = MaterialTheme.typography.caption
-            )
-        }
-        if (selected) {
-            DeleteIcon(deleteSection)
+            if (selected) {
+                Row() {
+                    DeleteIcon(deleteSection)
+                    AddIcon(newSection)
+                }
+            }
         }
     }
-
 }
 
 @ExperimentalFoundationApi
@@ -282,6 +332,18 @@ fun PieceItemPreview() {
         ),
         Section(
             id = 3,
+            order = 0,
+            name = "1",
+            parentId = 2,
+        ),
+        Section(
+            id = 4,
+            order = 1,
+            name = "2",
+            parentId = 2,
+        ),
+        Section(
+            id = 5,
             order = 2,
             name = "Outro",
         )

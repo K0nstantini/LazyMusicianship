@@ -4,6 +4,7 @@ import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
+// FIXME: Del?
 @Entity(tableName = "data_transfer_table")
 data class DataTransfer(
     @PrimaryKey

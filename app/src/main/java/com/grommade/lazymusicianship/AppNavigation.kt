@@ -7,11 +7,11 @@ import androidx.navigation.*
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navArgument
-import com.grommade.lazymusicianship.data.entity.Section
 import com.grommade.lazymusicianship.ui_piece.PieceUi
 import com.grommade.lazymusicianship.ui_pieces_list.PiecesListUi
 import com.grommade.lazymusicianship.ui_section.SectionUi
 import com.grommade.lazymusicianship.util.Keys
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 sealed class Screen(val route: String) {
     object Main : Screen("mainroot")
@@ -28,11 +28,18 @@ private sealed class LeafScreen(val route: String) {
         fun createRoute(pieceId: Long): String = "piece/$pieceId"
     }
 
-    object SectionDetails : LeafScreen("piece/{${Keys.PIECE_ID}}/section") {
-        fun createRoute(pieceId: Long): String = "piece/$pieceId/section"
+    object SectionDetails : LeafScreen(
+        "piece/{${Keys.PIECE_ID}}/section/{${Keys.SECTION_ID}}?${Keys.PARENT_ID}={${Keys.PARENT_ID}}"
+    ) {
+        fun createRoute(
+            pieceId: Long,
+            sectionId: Long,
+            parentId: Long
+        ): String = "piece/$pieceId/section/$sectionId?${Keys.PARENT_ID}=$parentId"
     }
 }
 
+@ExperimentalCoroutinesApi
 @ExperimentalFoundationApi
 @ExperimentalMaterialApi
 @Composable
@@ -56,6 +63,7 @@ private fun NavGraphBuilder.addMainTopLevel(navController: NavController) {
     }
 }
 
+@ExperimentalCoroutinesApi
 @ExperimentalFoundationApi
 @ExperimentalMaterialApi
 private fun NavGraphBuilder.addPiecesTopLevel(navController: NavController) {
@@ -100,6 +108,7 @@ private fun NavGraphBuilder.addLearning(navController: NavController) {
     }
 }
 
+@ExperimentalCoroutinesApi
 @ExperimentalFoundationApi
 private fun NavGraphBuilder.addPieceDetails(navController: NavController) {
     composable(
@@ -109,9 +118,8 @@ private fun NavGraphBuilder.addPieceDetails(navController: NavController) {
         )
     ) {
         PieceUi(
-            navController = navController,
-            openSection = { pieceId ->
-                navController.navigate(LeafScreen.SectionDetails.createRoute(pieceId))
+            openSection = { pieceId, sectionId, parentId ->
+                navController.navigate(LeafScreen.SectionDetails.createRoute(pieceId, sectionId, parentId))
             },
             close = navController::navigateUp
         )
@@ -124,13 +132,10 @@ private fun NavGraphBuilder.addSectionDetails(navController: NavController) {
         route = LeafScreen.SectionDetails.route,
         arguments = listOf(
             navArgument(Keys.PIECE_ID) { type = NavType.LongType },
+            navArgument(Keys.SECTION_ID) { type = NavType.LongType },
+            navArgument(Keys.PARENT_ID) { defaultValue = 0L },
         )
     ) {
-        SectionUi(
-            save = { section: Section ->
-                navController.previousBackStackEntry?.savedStateHandle?.set(Keys.SECTION, section)
-            },
-            close = navController::navigateUp
-        )
+        SectionUi(close = navController::navigateUp)
     }
 }

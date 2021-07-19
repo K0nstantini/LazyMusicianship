@@ -16,15 +16,15 @@ abstract class PieceDao : EntityDao<Piece>() {
     abstract suspend fun getPiece(id: Long): Piece?
 
     @Transaction
-    @Query("SELECT * FROM piece_table")
-    abstract suspend fun getPiecesWithSections(): List<PieceWithSections>
-
-    @Transaction
     @Query("SELECT * FROM piece_table WHERE piece_id = :id")
     abstract suspend fun getPieceWithSections(id: Long): PieceWithSections?
 
     @Query("SELECT * FROM piece_table ORDER BY piece_name")
     abstract fun getPiecesFlow(): Flow<List<Piece>>
+
+    @Transaction
+    @Query("SELECT * FROM piece_table WHERE piece_id = :id")
+    abstract fun getPieceWithSectionsFlow(id: Long): Flow<PieceWithSections?>
 
 
 }

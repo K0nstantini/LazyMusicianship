@@ -30,7 +30,9 @@ import com.google.accompanist.insets.ui.Scaffold
 import com.grommade.lazymusicianship.AppNavigation
 import com.grommade.lazymusicianship.R
 import com.grommade.lazymusicianship.Screen
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
+@ExperimentalCoroutinesApi
 @ExperimentalFoundationApi
 @ExperimentalMaterialApi
 @Composable

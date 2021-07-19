@@ -9,7 +9,9 @@ import androidx.compose.runtime.CompositionLocalProvider
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.grommade.lazymusicianship.ui.common.LocalBackPressedDispatcher
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
+@ExperimentalCoroutinesApi
 @ExperimentalFoundationApi
 @ExperimentalMaterialApi
 @AndroidEntryPoint

@@ -1,9 +1,9 @@
 package com.grommade.lazymusicianship.use_cases
 
 import com.grommade.lazymusicianship.data.entity.Piece
-import com.grommade.lazymusicianship.data.entity.PieceWithSections
 import com.grommade.lazymusicianship.data.entity.Section
 import com.grommade.lazymusicianship.data.repos.RepoPiece
+import com.grommade.lazymusicianship.data.repos.RepoSection
 import javax.inject.Inject
 
 interface PopulateDBWithPieces {
@@ -11,7 +11,8 @@ interface PopulateDBWithPieces {
 }
 
 class PopulateDBWithPiecesImpl @Inject constructor(
-    private val repoPiece: RepoPiece
+    private val repoPiece: RepoPiece,
+    private val repoSection: RepoSection
 ) : PopulateDBWithPieces {
     override suspend fun invoke() {
 
@@ -35,19 +36,20 @@ class PopulateDBWithPiecesImpl @Inject constructor(
             arranger = "Варфоломеев И."
         ).save()
 
-        PieceWithSections(
-            piece = Piece(
-                name = "Don't Cry",
-                author = "Guns N' Roses",
-                arranger = "Варфоломеев И."
-            ),
-            sections = listOf(
-                Section(name = "Intro", order = 0, beat = 124, countBars = 10, isNew = false),
-                Section(name = "Verse 1_1", order = 1, beat = 124, countBars = 4, isNew = false),
-                Section(name = "Verse 1_2", order = 2, beat = 124, countBars = 4, isNew = false),
-                Section(name = "Verse 1_3", order = 3, beat = 124, countBars = 4, isNew = false),
-            )
+        /** ============= Don't Cry ========================*/
+
+        val idCry = Piece(
+            name = "Don't Cry",
+            author = "Guns N' Roses",
+            arranger = "Варфоломеев И."
         ).save()
+
+        val defaultSectionCry = Section(pieceId = idCry, beat = 124, firstTime = false)
+        defaultSectionCry.copy(name = "Intro").save()
+        val idCryVerse1 = defaultSectionCry.copy(name = "Verse 1").save()
+        defaultSectionCry.copy(name = "1", parentId = idCryVerse1).save()
+        defaultSectionCry.copy(name = "2", parentId = idCryVerse1).save()
+        defaultSectionCry.copy(name = "3", parentId = idCryVerse1).save()
 
         Piece(
             name = "I just want you",
@@ -117,5 +119,5 @@ class PopulateDBWithPiecesImpl @Inject constructor(
     }
 
     private suspend fun Piece.save() = repoPiece.save(this)
-    private suspend fun PieceWithSections.save() = repoPiece.save(this)
+    private suspend fun Section.save() = repoSection.save(this)
 }

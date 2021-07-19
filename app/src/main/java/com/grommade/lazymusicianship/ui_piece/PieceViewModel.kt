@@ -3,51 +3,51 @@ package com.grommade.lazymusicianship.ui_piece
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.grommade.lazymusicianship.data.entity.DataTransfer
 import com.grommade.lazymusicianship.data.entity.Piece
-import com.grommade.lazymusicianship.data.entity.PieceWithSections
 import com.grommade.lazymusicianship.data.entity.Section
-import com.grommade.lazymusicianship.data.repos.RepoDataTransfer
 import com.grommade.lazymusicianship.data.repos.RepoPiece
+import com.grommade.lazymusicianship.data.repos.RepoSection
 import com.grommade.lazymusicianship.util.Keys
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 
 @HiltViewModel
 class PieceViewModel @Inject constructor(
     private val repoPiece: RepoPiece,
-    private val repoDataTransfer: RepoDataTransfer,
+    private val repoSection: RepoSection,
     handle: SavedStateHandle
 ) : ViewModel() {
 
     private val pendingActions = MutableSharedFlow<PieceActions>()
 
     private val pieceId: Long = handle.get<Long>(Keys.PIECE_ID) ?: -1L
-    private val currentPiece = MutableStateFlow(PieceWithSections(Piece(), emptyList()))
+    private val currentPiece = MutableStateFlow(Piece())
 
-    private val selectedSection = MutableStateFlow(-1)
+    @ExperimentalCoroutinesApi
+    private val currentSections = currentPiece.flatMapLatest {
+        repoSection.getSectionsFlow(currentPiece.value.id)
+    }
 
-    val state = combine(currentPiece, selectedSection) { piece, selected ->
+    private val selectedSection = MutableStateFlow(0L)
+
+    @ExperimentalCoroutinesApi
+    val state = combine(currentPiece, currentSections, selectedSection) { piece, sections, selected ->
         PieceViewState(
-            piece = piece.piece,
-            sections = piece.sections.sortedBy { section -> section.order },
+            piece = piece,
+            sections = sections.sortedBy { it.hierarchicalSort(sections) },
             selectedSection = selected
         )
     }
 
-    // FIXME
-    val navigateToSection = MutableSharedFlow<Boolean>()
+    val navigateToSection = MutableSharedFlow<Long>()
     val navigateToBack = MutableSharedFlow<Boolean>()
 
     init {
         viewModelScope.launch {
-            repoPiece.getPieceWithSections(pieceId)?.let { piece ->
+            repoPiece.getPiece(pieceId)?.let { piece ->
                 currentPiece.value = piece
             }
             pendingActions.collect { action ->
@@ -55,10 +55,11 @@ class PieceViewModel @Inject constructor(
                     is PieceActions.ChangeName -> changeName(action.value)
                     is PieceActions.ChangeAuthor -> changeAuthor(action.value)
                     is PieceActions.ChangeArranger -> changeArranger(action.value)
-                    is PieceActions.OpenSection -> openSection(action.order)
-                    is PieceActions.SelectSection -> selectSection(action.order)
-                    is PieceActions.DeleteSection -> deleteSection(action.order)
-                    PieceActions.Save -> save()
+                    is PieceActions.ChangeBeat -> changeBeat(action.value)
+                    is PieceActions.ChangeTime -> changeTime(action.value)
+                    is PieceActions.SelectSection -> selectSection(action.id)
+                    is PieceActions.DeleteSection -> deleteSection(action.section)
+                    PieceActions.SaveAndClose -> saveAndClose()
                     else -> {
                     }
                 }
@@ -67,56 +68,53 @@ class PieceViewModel @Inject constructor(
     }
 
     private fun changeName(value: String) {
-        changePiece { currentPiece.value.piece.copy(name = value) }
+        changePiece { currentPiece.value.copy(name = value) }
     }
 
     private fun changeAuthor(value: String) {
-        changePiece { currentPiece.value.piece.copy(author = value) }
+        changePiece { currentPiece.value.copy(author = value) }
     }
 
     private fun changeArranger(value: String) {
-        changePiece { currentPiece.value.piece.copy(arranger = value) }
+        changePiece { currentPiece.value.copy(arranger = value) }
     }
 
-    private fun changePiece(function: () -> Piece) {
-        currentPiece.value = currentPiece.value.copy(piece = function())
+    private fun changeBeat(value: String) {
+        val beat = value.toIntOrNull() ?: 0
+        changePiece { currentPiece.value.copy(beat = beat) }
     }
 
-    private fun openSection(order: Int) {
-        selectSection(-1)
+    private fun changeTime(value: String) {
+        val time = value.toIntOrNull() ?: 0
+        changePiece { currentPiece.value.copy(time = time) }
+    }
+
+    private fun selectSection(id: Long) {
+        selectedSection.value = id
+    }
+
+    private fun deleteSection(section: Section) {
         viewModelScope.launch {
-            currentPiece.value.sections.find { it.order == order }?.let { section ->
-                repoDataTransfer.save(DataTransfer(section = section))
-            }
-            navigateToSection.emit(true)
+            repoSection.delete(section)
         }
     }
 
-    private fun selectSection(order: Int) {
-        selectedSection.value = order
+    private fun changePiece(function: () -> Piece) {
+        currentPiece.value = function()
     }
 
-    private fun deleteSection(order: Int) {
-        val sections = currentPiece.value.sections.filter { it.order != order }
-        currentPiece.value = currentPiece.value.copy(sections = sections)
-    }
-
-    private fun save() {
+    private fun saveAndClose() {
         viewModelScope.launch {
             repoPiece.save(currentPiece.value)
             navigateToBack.emit(true)
         }
     }
 
-    fun refreshSections(section: Section) {
-        with(currentPiece.value) {
-            val order = when {
-                section.order >= 0 -> section.order
-                sections.isEmpty() -> 0
-                else -> sections.maxOf { it.order } + 1
-            }
-            val sections = sections.filter { it.order != section.order } + section.copy(order = order)
-            currentPiece.value = copy(sections = sections)
+    fun saveAndAddSection() {
+        viewModelScope.launch {
+            val id = repoPiece.save(currentPiece.value)
+            changePiece { currentPiece.value.copy(id = id) }
+            navigateToSection.emit(id)
         }
     }
 

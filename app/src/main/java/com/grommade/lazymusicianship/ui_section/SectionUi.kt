@@ -16,7 +16,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.insets.ui.Scaffold
 import com.google.accompanist.insets.ui.TopAppBar
 import com.grommade.lazymusicianship.R
-import com.grommade.lazymusicianship.data.entity.Section
 import com.grommade.lazymusicianship.ui.common.rememberFlowWithLifecycle
 import com.grommade.lazymusicianship.ui.components.NavigationCloseIcon
 import com.grommade.lazymusicianship.ui.components.SaveIcon
@@ -25,12 +24,10 @@ import com.grommade.lazymusicianship.ui.components.SetItemSwitch
 @ExperimentalMaterialApi
 @Composable
 fun SectionUi(
-    save: (Section) -> Unit,
     close: () -> Unit
 ) {
     SectionUi(
         viewModel = hiltViewModel(),
-        save = save,
         close = close
     )
 }
@@ -39,7 +36,6 @@ fun SectionUi(
 @Composable
 fun SectionUi(
     viewModel: SectionViewModel,
-    save: (Section) -> Unit,
     close: () -> Unit
 ) {
 
@@ -50,10 +46,6 @@ fun SectionUi(
 
     SectionUi(viewState) { action ->
         when (action) {
-            SectionActions.Save -> {
-                save(viewState.section)
-                close()
-            }
             SectionActions.Close -> close()
             else -> viewModel.submitAction(action)
         }
@@ -93,7 +85,7 @@ fun SectionUi(
             ) {
                 PieceTextField(
                     text = viewState.section.beat.toString(),
-                    label = stringResource(R.string.hint_edit_text_beat)
+                    label = stringResource(R.string.piece_hint_edit_text_beat)
                 ) { value ->
                     actioner(SectionActions.ChangeBeat(value))
                 }
@@ -108,8 +100,8 @@ fun SectionUi(
             Divider(Modifier.padding(top = 16.dp))
             SetItemSwitch(
                 title = stringResource(R.string.title_is_new),
-                stateSwitch = viewState.section.isNew,
-                onClick = { actioner(SectionActions.ChangeNew(viewState.section.isNew)) },
+                stateSwitch = viewState.section.firstTime,
+                onClick = { actioner(SectionActions.ChangeNew(viewState.section.firstTime)) },
                 onClickSwitch = { actioner(SectionActions.ChangeNew(it)) },
             )
         }
@@ -140,7 +132,7 @@ fun SectionName(
     TextField(
         value = name,
         onValueChange = changeName,
-        label = { Text(stringResource(R.string.hint_edit_text_name)) },
+        label = { Text(stringResource(R.string.piece_hint_edit_text_name)) },
         colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.Transparent),
         isError = name.isEmpty(),
         singleLine = true,
