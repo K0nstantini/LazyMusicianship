@@ -1,23 +1,21 @@
 package com.grommade.lazymusicianship.ui_pieces_list
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.constraintlayout.compose.Dimension
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.insets.ui.Scaffold
 import com.google.accompanist.insets.ui.TopAppBar
@@ -25,8 +23,10 @@ import com.grommade.lazymusicianship.BuildConfig
 import com.grommade.lazymusicianship.R
 import com.grommade.lazymusicianship.data.entity.Piece
 import com.grommade.lazymusicianship.ui.common.rememberFlowWithLifecycle
+import com.grommade.lazymusicianship.ui.components.DeleteIcon
 import com.grommade.lazymusicianship.ui.components.MoreVertIcon
 
+@ExperimentalFoundationApi
 @Composable
 fun PiecesListUi(openPiece: (Long) -> Unit) {
     PiecesListUi(
@@ -35,6 +35,7 @@ fun PiecesListUi(openPiece: (Long) -> Unit) {
     )
 }
 
+@ExperimentalFoundationApi
 @Composable
 fun PiecesListUi(
     viewModel: PiecesListViewModel,
@@ -52,6 +53,7 @@ fun PiecesListUi(
     }
 }
 
+@ExperimentalFoundationApi
 @Composable
 fun PiecesListUi(
     viewState: PiecesListViewState,
@@ -71,10 +73,12 @@ fun PiecesListUi(
             items(viewState.pieces, key = { piece -> piece.id }) { piece ->
                 PieceItem(
                     piece = piece,
-                    modifier = Modifier.fillParentMaxWidth()
-                ) {
-                    actioner(PiecesListActions.Open(piece.id))
-                }
+                    selected = piece.id == viewState.selectedPiece,
+                    modifier = Modifier.fillParentMaxWidth(),
+                    selectPiece = { actioner(PiecesListActions.SelectPiece(piece.id)) },
+                    deletePiece = { actioner(PiecesListActions.Delete(piece)) },
+                    openPiece = { actioner(PiecesListActions.Open(piece.id)) }
+                )
             }
         }
     }
@@ -125,80 +129,56 @@ fun FloatingActionButton(addNew: () -> Unit) {
     }
 }
 
+@ExperimentalFoundationApi
 @Composable
 fun PieceItem(
     piece: Piece,
+    selected: Boolean,
     modifier: Modifier,
-    openPiece: () -> Unit
+    selectPiece: () -> Unit,
+    openPiece: () -> Unit,
+    deletePiece: () -> Unit
 ) {
     val hasAuthor = piece.author.isNotEmpty()
+    val backgroundColor = when (selected) {
+        true -> Color.LightGray
+        false -> Color.Transparent
+    }
 
-    ConstraintLayout(
-        modifier = Modifier.clickable(onClick = openPiece) then modifier
+    Divider()
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .background(color = backgroundColor)
+            .combinedClickable(
+                onClick = openPiece,
+                onLongClick = selectPiece
+            )
+            .padding(start = 16.dp, top = 8.dp, bottom = 8.dp)
+                then modifier
     ) {
-        val (divider, pieceTitle, authorTitle, overflow) = createRefs()
-
-        Divider(
-            Modifier.constrainAs(divider) {
-                top.linkTo(parent.top)
-                centerHorizontallyTo(parent)
-                width = Dimension.fillToConstraints
-            }
-        )
-        Text(
-            text = piece.name,
-            maxLines = 2,
-            style = MaterialTheme.typography.subtitle1,
-            modifier = Modifier.constrainAs(pieceTitle) {
-                linkTo(
-                    start = parent.start,
-                    end = parent.end,
-                    startMargin = 24.dp,
-                    endMargin = 16.dp,
-                    bias = 0f
-                )
-                top.linkTo(parent.top, 16.dp)
-                if (!hasAuthor) {
-                    bottom.linkTo(parent.bottom, 16.dp)
-                }
-                width = Dimension.preferredWrapContent
-            }
-        )
-        if (hasAuthor) {
+        Column() {
             Text(
-                text = piece.author,
-                maxLines = 1,
-                style = MaterialTheme.typography.caption,
-                modifier = Modifier.constrainAs(authorTitle) {
-                    linkTo(
-                        start = parent.start,
-                        end = parent.end,
-                        startMargin = 24.dp,
-                        endMargin = 16.dp,
-                        bias = 0f
-                    )
-                    top.linkTo(pieceTitle.bottom, 6.dp)
-                    bottom.linkTo(parent.bottom, 16.dp)
-                    width = Dimension.preferredWrapContent
-                }
+                text = piece.name,
+                maxLines = 2,
+                style = MaterialTheme.typography.subtitle1,
             )
-        }
-        IconButton(
-            onClick = { /* TODO */ },
-            modifier = Modifier.constrainAs(overflow) {
-                end.linkTo(parent.end, 8.dp)
-                centerVerticallyTo(pieceTitle)
+            if (hasAuthor) {
+                Text(
+                    text = piece.author,
+                    maxLines = 1,
+                    style = MaterialTheme.typography.caption,
+                )
             }
-        ) {
-            Icon(
-                imageVector = Icons.Default.MoreVert,
-                contentDescription = stringResource(R.string.cd_more_vert_icon)
-            )
+        }
+        if (selected) {
+            DeleteIcon(deletePiece)
         }
     }
 }
 
-
+@ExperimentalFoundationApi
 @Preview
 @Composable
 fun PiecesListUiPreview() {
@@ -207,15 +187,19 @@ fun PiecesListUiPreview() {
         Piece(id = 2, name = "Elfen Lied"),
         Piece(id = 3, name = "Let It Be", author = "Beatles"),
     )
-    PiecesListUi(PiecesListViewState(pieces = list)) {}
+    PiecesListUi(PiecesListViewState(pieces = list, selectedPiece = 2)) {}
 }
 
+@ExperimentalFoundationApi
 @Preview
 @Composable
 fun PieceItemPreview() {
     PieceItem(
         piece = Piece(name = "Sherlock (BBC) Main Theme"),
+        selected = false,
         modifier = Modifier,
-        openPiece = {}
+        selectPiece = {},
+        openPiece = {},
+        deletePiece = {}
     )
 }

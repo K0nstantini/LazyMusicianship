@@ -92,6 +92,7 @@ private fun NavGraphBuilder.addMain(navController: NavController) {
     }
 }
 
+@ExperimentalFoundationApi
 private fun NavGraphBuilder.addPieces(navController: NavController) {
     composable(LeafScreen.Pieces.route) {
         PiecesListUi(

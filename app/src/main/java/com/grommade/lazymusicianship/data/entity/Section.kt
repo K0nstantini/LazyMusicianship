@@ -20,6 +20,7 @@ data class Section(
     @ColumnInfo(name = "section_parentId")
     val parentId: Long = 0L,
     val order: Int = 0,
+    @ColumnInfo(name = "section_firstTime")
     val firstTime: Boolean = true,
     @ColumnInfo(name = "section_beat")
     val beat: Int = 0,
