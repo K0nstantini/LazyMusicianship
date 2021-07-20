@@ -17,7 +17,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.text.isDigitsOnly
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.insets.ui.Scaffold
 import com.google.accompanist.insets.ui.TopAppBar
@@ -116,49 +115,12 @@ fun PieceUi(
             PieceName(viewState.piece.name) { value ->
                 actioner(PieceActions.ChangeName(value))
             }
-//            Divider(color = Color.Transparent, thickness = 4.dp)
-//            PieceTextField(
-//                text = viewState.piece.author,
-//                label = stringResource(R.string.piece_hint_edit_text_author)
-//            ) { value ->
-//                actioner(PieceActions.ChangeAuthor(value))
-//            }
-//            PieceTextField(
-//                text = viewState.piece.arranger,
-//                label = stringResource(R.string.piece_hint_edit_text_arranger)
-//            ) { value ->
-//                actioner(PieceActions.ChangeArranger(value))
-//            }
-//            BeatField(
-//                beat = viewState.piece.tempo,
-//                label = stringResource(R.string.piece_hint_edit_text_beat)
-//            ) { value ->
-//                actioner(PieceActions.ChangeBeat(value))
-//            }
-//            TimeField(
-//                time = viewState.piece.time,
-//                label = stringResource(R.string.piece_hint_edit_text_time)
-//            ) { value ->
-//                actioner(PieceActions.ChangeTime(value))
-//            }
-//            Row(
-//                horizontalArrangement = Arrangement.SpaceBetween,
-//                verticalAlignment = Alignment.CenterVertically,
-//                modifier = Modifier
-//                    .padding(top = 8.dp)
-//                    .fillMaxWidth()
-//            ) {
-//                Text(
-//                    text = stringResource(R.string.subtitle_sections),
-//                    style = MaterialTheme.typography.h6,
-//                )
-//                AddIcon { actioner(PieceActions.NewSection(0)) }
-//            }
-            var state by remember { mutableStateOf(1) }
+
+            var state by remember { mutableStateOf(0) }
             val titles = listOf(
-                stringResource(R.string.subtitle_sections),
-                stringResource(R.string.subtitle_info),
-                stringResource(R.string.subtitle_description),
+                stringResource(R.string.tab_sections),
+                stringResource(R.string.tab_info),
+                stringResource(R.string.tab_description),
             )
             TabRow(
                 selectedTabIndex = state,
@@ -179,6 +141,9 @@ fun PieceUi(
                     actioner = actioner
                 )
                 1 -> PieceInfo(viewState.piece, actioner)
+                2 -> PieceDescription(viewState.piece.description) { value: String ->
+                    actioner(PieceActions.ChangeDescription(value))
+                }
             }
         }
     }
@@ -228,26 +193,17 @@ fun PieceInfo(
     actioner: (PieceActions) -> Unit
 ) {
     InfoItem(
-        title = stringResource(R.string.alert_title_change_author),
+        title = stringResource(R.string.piece_title_author),
         value = piece.author,
-        label = stringResource(R.string.piece_hint_edit_text_author),
         changeInfo = { value: String -> actioner(PieceActions.ChangeAuthor(value)) }
     )
     InfoItem(
-        title = stringResource(R.string.alert_title_change_arranger),
+        title = stringResource(R.string.piece_title_arranger),
         value = piece.arranger,
-        label = stringResource(R.string.piece_hint_edit_text_arranger),
         changeInfo = { value: String -> actioner(PieceActions.ChangeArranger(value)) }
     )
-    InfoItem(
-        title = stringResource(R.string.alert_title_change_tempo),
-        value = piece.tempo.toString(),
-        label = stringResource(R.string.piece_hint_edit_text_tempo),
-        isTextValid = { text: String -> text.isDigitsOnly() },
-        changeInfo = { value: String -> actioner(PieceActions.ChangeTempo(value)) }
-    )
     TimeItem(
-        title = stringResource(R.string.alert_title_change_time),
+        title = stringResource(R.string.piece_title_time),
         value = piece.time,
         changeTime = { value: Int -> actioner(PieceActions.ChangeTime(value)) }
     )
@@ -258,7 +214,6 @@ fun PieceInfo(
 fun InfoItem(
     title: String,
     value: String,
-    label: String,
     isTextValid: (String) -> Boolean = { true },
     changeInfo: (String) -> Unit
 ) {
@@ -267,7 +222,6 @@ fun InfoItem(
         BuiltInputDialog(
             title = title,
             value = value,
-            label = label,
             isTextValid = isTextValid,
             callback = changeInfo,
             close = { alertDialog.value = false }
@@ -299,49 +253,14 @@ fun TimeItem(
 }
 
 @Composable
-fun PieceTextField(
-    text: String,
-    label: String,
-    changeText: (String) -> Unit
-) {
-    TextField(
-        value = text,
-        onValueChange = changeText,
-        label = { Text(label) },
-        colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.Transparent),
-        singleLine = true,
-        textStyle = MaterialTheme.typography.body2,
-        modifier = Modifier.fillMaxWidth()
-    )
-}
-
-@Composable
-fun BeatField(
-    beat: Int,
-    label: String,
-    changeText: (String) -> Unit
+fun PieceDescription(
+    description: String,
+    changeDescription: (String) -> Unit
 ) {
     OutlinedTextField(
-        value = beat.toString(),
-        onValueChange = changeText,
-        label = { Text(label) },
-        singleLine = true,
-        modifier = Modifier.width(100.dp)
-    )
-}
-
-@Composable
-fun TimeField(
-    time: Int,
-    label: String,
-    changeText: (String) -> Unit
-) {
-    OutlinedTextField(
-        value = time.toString(),
-        onValueChange = changeText,
-        label = { Text(label) },
-        singleLine = true,
-        modifier = Modifier.width(100.dp)
+        value = description,
+        onValueChange = changeDescription,
+        modifier = Modifier.fillMaxSize()
     )
 }
 
@@ -358,7 +277,7 @@ fun SectionsScrollingContent(
         horizontalArrangement = Arrangement.End
     ) {
         IconButton(
-            onClick = {},
+            onClick = { actioner(PieceActions.NewSection(0)) },
             modifier = Modifier
                 .padding(vertical = 4.dp)
                 .padding(end = 8.dp)

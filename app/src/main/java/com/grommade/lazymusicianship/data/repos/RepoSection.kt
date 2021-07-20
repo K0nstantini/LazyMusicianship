@@ -37,4 +37,8 @@ class RepoSection @Inject constructor(
     suspend fun getSection(id: Long) = withContext(ioDispatcher) {
         sectionDao.getSection(id)
     }
+
+    suspend fun getLastCreated(pieceId: Long) = withContext(ioDispatcher) {
+        sectionDao.getLastCreated(pieceId)
+    }
 }

@@ -4,14 +4,9 @@ import android.content.Context
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.grommade.lazymusicianship.R
 import com.grommade.lazymusicianship.data.AppDataBase
 import com.grommade.lazymusicianship.data.dao.SettingsDao
-import com.grommade.lazymusicianship.data.dao.StateStudyPieceDao
-import com.grommade.lazymusicianship.data.dao.StateStudySectionDao
 import com.grommade.lazymusicianship.data.entity.Settings
-import com.grommade.lazymusicianship.data.entity.StateStudyPiece
-import com.grommade.lazymusicianship.data.entity.StateStudySection
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -32,8 +27,6 @@ object RoomDatabaseModule {
     fun provideDataBase(
         @ApplicationContext context: Context,
         settingsDaoProvide: Provider<SettingsDao>,
-        statePieceDaoProvide: Provider<StateStudyPieceDao>,
-        stateSectionDaoProvide: Provider<StateStudySectionDao>,
     ): AppDataBase {
         return Room.databaseBuilder(
             context,
@@ -48,8 +41,6 @@ object RoomDatabaseModule {
                         super.onCreate(db)
                         CoroutineScope(SupervisorJob()).launch {
                             insertSettings()
-                            insertStatePiece()
-                            insertStateSection()
                         }
                     }
 
@@ -59,27 +50,11 @@ object RoomDatabaseModule {
                             if (settingsDaoProvide.get().getCount() == 0) {
                                 insertSettings()
                             }
-                            if (statePieceDaoProvide.get().getCount() == 0) {
-                                insertStatePiece()
-                            }
-                            if (stateSectionDaoProvide.get().getCount() == 0) {
-                                insertStateSection()
-                            }
                         }
                     }
 
                     private suspend fun insertSettings() {
                         settingsDaoProvide.get().insert(Settings())
-                    }
-
-                    private suspend fun insertStatePiece() {
-                        val state = StateStudyPiece(id = 1, name = context.getString(R.string.state_name_final))
-                        statePieceDaoProvide.get().insert(state)
-                    }
-
-                    private suspend fun insertStateSection() {
-                        val state = StateStudySection(id = 1, name = context.getString(R.string.state_name_final))
-                        stateSectionDaoProvide.get().insert(state)
                     }
 
                 }
@@ -105,10 +80,7 @@ object DatabaseDaoModule {
     fun providePracticeDao(db: AppDataBase) = db.PracticeDao()
 
     @Provides
-    fun provideStateStudyPieceDao(db: AppDataBase) = db.StateStudyPieceDao()
-
-    @Provides
-    fun provideStateStudySectionDao(db: AppDataBase) = db.StateStudySectionDao()
+    fun provideStateStudyDao(db: AppDataBase) = db.StateStudyDao()
 
     @Provides
     fun provideDataTransferDao(db: AppDataBase) = db.DataTransferDao()

@@ -24,8 +24,6 @@ data class Section(
     val firstTime: Boolean = true,
     @ColumnInfo(name = "section_tempo")
     val tempo: Int = 0,
-    @ColumnInfo(name = "section_bars")
-    val countBars: Int = 0,
 ) : AppEntity, Parcelable {
 
     fun getLevel(sections: List<Section>) = generateSequence(this) { section ->
@@ -44,7 +42,7 @@ data class Section(
     fun hierarchicalSort(tasks: List<Section>): String {
         return generateSequence(this) { task ->
             tasks.find { it.id == task.parentId }
-        }.toList().reversed().joinToString { it.name + it.id }
+        }.toList().reversed().joinToString { "${it.order}:" + it.id }
     }
 
 }

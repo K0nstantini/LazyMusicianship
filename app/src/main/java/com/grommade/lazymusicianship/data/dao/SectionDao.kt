@@ -26,6 +26,9 @@ abstract class SectionDao : EntityDao<Section>() {
     @Query("SELECT * FROM section_table WHERE pieceId = :id")
     abstract fun getSectionsFlow(id: Long): Flow<List<Section>>
 
+    @Query("SELECT * FROM section_table WHERE pieceId = :pieceId ORDER BY section_id DESC LIMIT 1")
+    abstract suspend fun getLastCreated(pieceId: Long): Section?
+
     @Query(lastOrder)
     abstract suspend fun getLastOrder(pieceId: Long, parentId: Long): Int?
 

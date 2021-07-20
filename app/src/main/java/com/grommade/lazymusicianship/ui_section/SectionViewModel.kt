@@ -17,17 +17,16 @@ import javax.inject.Inject
 @HiltViewModel
 class SectionViewModel @Inject constructor(
     private val repoSection: RepoSection,
-    private val handle: SavedStateHandle
+    handle: SavedStateHandle
 ) : ViewModel() {
 
     private val pendingActions = MutableSharedFlow<SectionActions>()
 
-    private val currentSection = MutableStateFlow(
-        Section(
-            pieceId = handle.get<Long>(Keys.PIECE_ID) ?: 0,
-            parentId = handle.get<Long>(Keys.PARENT_ID) ?: 0
-        )
-    )
+    private val pieceId = handle.get<Long>(Keys.PIECE_ID) ?: 0
+    private val parentId = handle.get<Long>(Keys.PARENT_ID) ?: 0
+    private val sectionId: Long = handle.get<Long>(Keys.SECTION_ID) ?: 0
+
+    private val currentSection = MutableStateFlow(Section())
 
     val state = currentSection.map { section ->
         SectionViewState(section = section)
@@ -38,15 +37,11 @@ class SectionViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val sectionId: Long = handle.get<Long>(Keys.SECTION_ID) ?: 0
-            repoSection.getSection(sectionId)?.let { section ->
-                currentSection.value = section
-            }
+            initSection()
             pendingActions.collect { action ->
                 when (action) {
                     is SectionActions.ChangeName -> changeName(action.value)
-                    is SectionActions.ChangeBeat -> changeBeat(action.value)
-                    is SectionActions.ChangeBars -> changeBars(action.value)
+                    is SectionActions.ChangeTempo -> changeTempo(action.value)
                     is SectionActions.ChangeNew -> changeNew(action.value)
                     SectionActions.Save -> save()
                     else -> {
@@ -56,18 +51,31 @@ class SectionViewModel @Inject constructor(
         }
     }
 
+    private suspend fun initSection() {
+        currentSection.value = when (val section = repoSection.getSection(sectionId)) {
+            is Section -> section
+            else -> createNewSection()
+        }
+    }
+
+    private suspend fun createNewSection(): Section {
+        val lastSection = repoSection.getLastCreated(pieceId) ?: Section()
+        return Section(
+            pieceId = pieceId,
+            parentId = parentId,
+            tempo = lastSection.tempo,
+            firstTime = lastSection.firstTime
+        )
+    }
+
+
     private fun changeName(value: String) {
         changeSection { copy(name = value) }
     }
 
-    private fun changeBeat(value: String) {
+    private fun changeTempo(value: String) {
         val beat = value.toIntOrNull() ?: 0
         changeSection { copy(tempo = beat) }
-    }
-
-    private fun changeBars(value: String) {
-        val countBars = value.toIntOrNull() ?: 0
-        changeSection { copy(countBars = countBars) }
     }
 
     private fun changeNew(value: Boolean) {

@@ -91,11 +91,14 @@ fun MaterialDialog.timepicker(
     waitForPositiveButton: Boolean = true,
     timeRange: ClosedRange<LocalTime> = LocalTime.MIN..LocalTime.MAX,
     is24HourClock: Boolean = false,
+    minutesAndSeconds: Boolean = false,
     onTimeChange: (LocalTime) -> Unit = {}
 ) {
+    val currentScreen = if (minutesAndSeconds) ClockScreen.Minute else ClockScreen.Hour
     val timePickerState = remember {
         TimePickerState(
             selectedTime = initialTime.coerceIn(timeRange),
+            currentScreen = currentScreen,
             colors = colors,
             timeRange = timeRange,
             is24Hour = is24HourClock
@@ -113,7 +116,7 @@ fun MaterialDialog.timepicker(
 
     // BoxWithConstraints {
     // TimePickerExpandedImpl(title = title, state = timePickerState)
-    TimePickerImpl(title = title, state = timePickerState)
+    TimePickerImpl(title = title, state = timePickerState, minutesAndSeconds = minutesAndSeconds)
     // }
 }
 
@@ -162,6 +165,7 @@ internal fun TimePickerImpl(
     modifier: Modifier = Modifier,
     title: String,
     state: TimePickerState,
+    minutesAndSeconds: Boolean = false,
     onBack: (() -> Unit)? = null
 ) {
     Column(
@@ -174,7 +178,7 @@ internal fun TimePickerImpl(
             }
         }
 
-        TimeLayout(state = state)
+        TimeLayout(state = state, minutesAndSeconds = minutesAndSeconds)
 
         Spacer(modifier = Modifier.height(36.dp))
         Crossfade(state.currentScreen) {
@@ -185,6 +189,7 @@ internal fun TimePickerImpl(
                     ClockHourLayout(state = state)
                 }
                 ClockScreen.Minute -> ClockMinuteLayout(state = state)
+                ClockScreen.Second -> ClockSecondLayout(state = state)
             }
         }
 
@@ -274,6 +279,25 @@ private fun ClockMinuteLayout(state: TimePickerState) {
 }
 
 @Composable
+private fun ClockSecondLayout(state: TimePickerState) {
+    val isEnabled: (Int) -> Boolean =
+        remember(state.timeRange, state.selectedTime, state.selectedTime.isAM) {
+            { index ->
+                index in state.minuteRange(state.selectedTime.isAM, state.selectedTime.hour)
+            }
+        }
+    ClockLayout(
+        anchorPoints = 60,
+        label = { index -> index.toString().padStart(2, '0') },
+        onAnchorChange = { seconds -> state.selectedTime = state.selectedTime.withSecond(seconds) },
+        startAnchor = state.selectedTime.second,
+        isNamedAnchor = { anchor -> anchor % 5 == 0 },
+        colors = state.colors,
+        isAnchorEnabled = isEnabled
+    )
+}
+
+@Composable
 internal fun TimePickerTitle(text: String, height: Dp, onBack: (() -> Unit)?) {
     if (onBack != null) {
         Row(Modifier.height(height), verticalAlignment = Alignment.CenterVertically) {
@@ -341,7 +365,7 @@ internal fun ClockLabel(
 }
 
 @Composable
-internal fun TimeLayout(modifier: Modifier = Modifier, state: TimePickerState) {
+internal fun TimeLayout(modifier: Modifier = Modifier, state: TimePickerState, minutesAndSeconds: Boolean = false) {
     val clockHour: String = remember(
         state.is24Hour,
         state.selectedTime,
@@ -360,12 +384,22 @@ internal fun TimeLayout(modifier: Modifier = Modifier, state: TimePickerState) {
             .height(80.dp)
             .fillMaxWidth()
     ) {
-        ClockLabel(
-            text = clockHour,
-            backgroundColor = state.colors.backgroundColor(state.currentScreen.isHour()).value,
-            textColor = state.colors.textColor(state.currentScreen.isHour()).value,
-            onClick = { state.currentScreen = ClockScreen.Hour }
-        )
+        if (minutesAndSeconds) {
+            ClockLabel(
+                text = state.selectedTime.minute.toString().padStart(2, '0'),
+                backgroundColor = state.colors.backgroundColor(state.currentScreen.isMinute()).value,
+                textColor = state.colors.textColor(state.currentScreen.isMinute()).value,
+                onClick = { state.currentScreen = ClockScreen.Minute }
+
+            )
+        } else {
+            ClockLabel(
+                text = clockHour,
+                backgroundColor = state.colors.backgroundColor(state.currentScreen.isHour()).value,
+                textColor = state.colors.textColor(state.currentScreen.isHour()).value,
+                onClick = { state.currentScreen = ClockScreen.Hour }
+            )
+        }
 
         Box(
             Modifier
@@ -379,13 +413,23 @@ internal fun TimeLayout(modifier: Modifier = Modifier, state: TimePickerState) {
             )
         }
 
-        ClockLabel(
-            text = state.selectedTime.minute.toString().padStart(2, '0'),
-            backgroundColor = state.colors.backgroundColor(state.currentScreen.isMinute()).value,
-            textColor = state.colors.textColor(state.currentScreen.isMinute()).value,
-            onClick = { state.currentScreen = ClockScreen.Minute }
+        if (minutesAndSeconds) {
+            ClockLabel(
+                text = state.selectedTime.second.toString().padStart(2, '0'),
+                backgroundColor = state.colors.backgroundColor(state.currentScreen.isSecond()).value,
+                textColor = state.colors.textColor(state.currentScreen.isSecond()).value,
+                onClick = { state.currentScreen = ClockScreen.Second }
 
-        )
+            )
+        } else {
+            ClockLabel(
+                text = state.selectedTime.minute.toString().padStart(2, '0'),
+                backgroundColor = state.colors.backgroundColor(state.currentScreen.isMinute()).value,
+                textColor = state.colors.textColor(state.currentScreen.isMinute()).value,
+                onClick = { state.currentScreen = ClockScreen.Minute }
+
+            )
+        }
 
         if (!state.is24Hour) {
             VerticalPeriodPicker(state = state)

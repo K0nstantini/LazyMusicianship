@@ -30,11 +30,7 @@ class RepositoryModule {
 
     @Provides
     @Singleton
-    fun provideRepositoryStateStudyPiece(stateDao: StateStudyPieceDao) = RepoStateStudyPiece(stateDao)
-
-    @Provides
-    @Singleton
-    fun provideRepositoryStateStudySection(stateDao: StateStudySectionDao) = RepoStateStudySection(stateDao)
+    fun provideRepositoryStateStudy(stateDao: StateStudyDao) = RepoStateStudy(stateDao)
 
     @Provides
     @Singleton

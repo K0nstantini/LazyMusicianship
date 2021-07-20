@@ -7,10 +7,12 @@ import java.time.LocalTime
 
 internal enum class ClockScreen {
     Hour,
-    Minute;
+    Minute,
+    Second;
 
     fun isHour() = this == Hour
     fun isMinute() = this == Minute
+    fun isSecond() = this == Minute
 }
 
 internal class TimePickerState(

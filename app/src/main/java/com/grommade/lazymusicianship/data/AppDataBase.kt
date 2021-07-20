@@ -11,8 +11,7 @@ import com.grommade.lazymusicianship.data.entity.*
         Piece::class,
         Section::class,
         Practice::class,
-        StateStudyPiece::class,
-        StateStudySection::class,
+        StateStudy::class,
         Settings::class,
         DataTransfer::class
     ],
@@ -25,7 +24,6 @@ abstract class AppDataBase : RoomDatabase() {
     abstract fun PieceDao(): PieceDao
     abstract fun SectionDao(): SectionDao
     abstract fun PracticeDao(): PracticeDao
-    abstract fun StateStudyPieceDao(): StateStudyPieceDao
-    abstract fun StateStudySectionDao(): StateStudySectionDao
+    abstract fun StateStudyDao(): StateStudyDao
     abstract fun DataTransferDao(): DataTransferDao
 }
