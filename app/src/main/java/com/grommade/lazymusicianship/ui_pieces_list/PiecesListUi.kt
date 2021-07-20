@@ -125,7 +125,7 @@ fun FloatingActionButton(addNew: () -> Unit) {
         onClick = addNew,
         modifier = Modifier.padding(bottom = 48.dp)
     ) {
-        Icon(Icons.Filled.Add, "")
+        Icon(Icons.Filled.Add, stringResource(R.string.cd_add_icon))
     }
 }
 

@@ -17,8 +17,8 @@ data class Piece(
     val arranger: String = "",
     @ColumnInfo(name = "piece_firstTime")
     val firstTime: Boolean = true,
-    @ColumnInfo(name = "piece_beat")
-    val beat: Int = 0,
+    @ColumnInfo(name = "piece_tempo")
+    val tempo: Int = 0,
     val time: Int = 0,
     val description: String = ""
 ) : AppEntity {

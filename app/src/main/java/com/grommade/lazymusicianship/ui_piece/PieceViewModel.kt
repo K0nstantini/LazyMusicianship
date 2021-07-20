@@ -55,7 +55,7 @@ class PieceViewModel @Inject constructor(
                     is PieceActions.ChangeName -> changeName(action.value)
                     is PieceActions.ChangeAuthor -> changeAuthor(action.value)
                     is PieceActions.ChangeArranger -> changeArranger(action.value)
-                    is PieceActions.ChangeBeat -> changeBeat(action.value)
+                    is PieceActions.ChangeTempo -> changeBeat(action.value)
                     is PieceActions.ChangeTime -> changeTime(action.value)
                     is PieceActions.SelectSection -> selectSection(action.id)
                     is PieceActions.DeleteSection -> deleteSection(action.section)
@@ -81,12 +81,11 @@ class PieceViewModel @Inject constructor(
 
     private fun changeBeat(value: String) {
         val beat = value.toIntOrNull() ?: 0
-        changePiece { currentPiece.value.copy(beat = beat) }
+        changePiece { currentPiece.value.copy(tempo = beat) }
     }
 
-    private fun changeTime(value: String) {
-        val time = value.toIntOrNull() ?: 0
-        changePiece { currentPiece.value.copy(time = time) }
+    private fun changeTime(value: Int) {
+        changePiece { currentPiece.value.copy(time = value) }
     }
 
     private fun selectSection(id: Long) {

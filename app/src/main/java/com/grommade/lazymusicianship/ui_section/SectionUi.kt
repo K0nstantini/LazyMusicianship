@@ -84,8 +84,8 @@ fun SectionUi(
                     .fillMaxWidth()
             ) {
                 PieceTextField(
-                    text = viewState.section.beat.toString(),
-                    label = stringResource(R.string.piece_hint_edit_text_beat)
+                    text = viewState.section.tempo.toString(),
+                    label = stringResource(R.string.piece_hint_edit_text_tempo)
                 ) { value ->
                     actioner(SectionActions.ChangeBeat(value))
                 }

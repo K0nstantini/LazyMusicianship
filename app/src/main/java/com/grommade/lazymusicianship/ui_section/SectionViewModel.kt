@@ -62,7 +62,7 @@ class SectionViewModel @Inject constructor(
 
     private fun changeBeat(value: String) {
         val beat = value.toIntOrNull() ?: 0
-        changeSection { copy(beat = beat) }
+        changeSection { copy(tempo = beat) }
     }
 
     private fun changeBars(value: String) {

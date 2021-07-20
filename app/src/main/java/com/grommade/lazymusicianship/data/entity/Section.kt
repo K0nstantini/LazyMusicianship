@@ -22,8 +22,8 @@ data class Section(
     val order: Int = 0,
     @ColumnInfo(name = "section_firstTime")
     val firstTime: Boolean = true,
-    @ColumnInfo(name = "section_beat")
-    val beat: Int = 0,
+    @ColumnInfo(name = "section_tempo")
+    val tempo: Int = 0,
     @ColumnInfo(name = "section_bars")
     val countBars: Int = 0,
 ) : AppEntity, Parcelable {

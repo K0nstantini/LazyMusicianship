@@ -44,7 +44,7 @@ class PopulateDBWithPiecesImpl @Inject constructor(
             arranger = "Варфоломеев И."
         ).save()
 
-        val defaultSectionCry = Section(pieceId = idCry, beat = 124, firstTime = false)
+        val defaultSectionCry = Section(pieceId = idCry, tempo = 124, firstTime = false)
         defaultSectionCry.copy(name = "Intro").save()
         val idCryVerse1 = defaultSectionCry.copy(name = "Verse 1").save()
         defaultSectionCry.copy(name = "1", parentId = idCryVerse1).save()

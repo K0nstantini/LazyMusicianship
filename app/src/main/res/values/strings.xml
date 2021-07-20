@@ -13,15 +13,21 @@
     <string name="piece_hint_edit_text_name">Name</string>
     <string name="piece_hint_edit_text_author">Author</string>
     <string name="piece_hint_edit_text_arranger">Arranger</string>
-    <string name="piece_hint_edit_text_beat">Beat</string>
+    <string name="piece_hint_edit_text_tempo">Tempo</string>
     <string name="piece_hint_edit_text_time">Time</string>
 
     <string name="subtitle_sections">Sections</string>
+    <string name="subtitle_info">Info</string>
+    <string name="subtitle_description">Description</string>
 
     <string name="section_item_beat">Beat: %s</string>
     <string name="section_item_bars">Bars: %s</string>
 
-    <string name="alert_save_before_add_section">Save piece?</string>
+    <string name="alert_title_save_before_add_section">Save piece?</string>
+    <string name="alert_title_change_author">Author</string>
+    <string name="alert_title_change_arranger">Arranger</string>
+    <string name="alert_title_change_tempo">Tempo</string>
+    <string name="alert_title_change_time">Time</string>
 
     <!--    Section-->
     <string name="hint_edit_text_beat">Beat</string>

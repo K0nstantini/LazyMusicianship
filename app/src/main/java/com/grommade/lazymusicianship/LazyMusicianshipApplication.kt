@@ -1,7 +1,6 @@
 package com.grommade.lazymusicianship
 
 import android.app.Application
-import com.vanpra.composematerialdialogs.BuildConfig
 import dagger.hilt.android.HiltAndroidApp
 import timber.log.Timber
 
@@ -12,8 +11,8 @@ class LazyMusicianshipApplication : Application() {
         super.onCreate()
 
         // FIXME
-//        if (BuildConfig.DEBUG) {
+        if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
-//        }
+        }
     }
 }

@@ -109,6 +109,7 @@ private fun NavGraphBuilder.addLearning(navController: NavController) {
     }
 }
 
+@ExperimentalMaterialApi
 @ExperimentalCoroutinesApi
 @ExperimentalFoundationApi
 private fun NavGraphBuilder.addPieceDetails(navController: NavController) {
