@@ -34,6 +34,18 @@ fun DeleteIcon(
 }
 
 @Composable
+fun SettingsIcon(
+    callback: () -> Unit
+) {
+    IconButton(onClick = callback) {
+        Icon(
+            imageVector = Icons.Default.Settings,
+            contentDescription = stringResource(R.string.cd_settings_icon)
+        )
+    }
+}
+
+@Composable
 fun NavigationCloseIcon(
     callback: () -> Unit
 ) {

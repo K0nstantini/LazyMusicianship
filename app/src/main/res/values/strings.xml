@@ -41,6 +41,10 @@
     <string name="section_title_tempo">Tempo</string>
     <string name="section_title_new">New</string>
 
+    <!--    Main-->
+    <string name="main_menu_states">States</string>
+    <string name="main_menu_settings">Settings</string>
+
     <!--    Settings items-->
     <string name="btn_clear">Clear</string>
 
@@ -50,5 +54,6 @@
     <string name="cd_save_icon">Save</string>
     <string name="cd_add_icon">Add</string>
     <string name="cd_delete_icon">Delete</string>
+    <string name="cd_settings_icon">Settings</string>
 
 </resources>

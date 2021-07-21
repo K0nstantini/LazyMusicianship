@@ -7,6 +7,7 @@ import androidx.navigation.*
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navArgument
+import com.grommade.lazymusicianship.ui_main.MainUi
 import com.grommade.lazymusicianship.ui_piece.PieceUi
 import com.grommade.lazymusicianship.ui_pieces_list.PiecesListUi
 import com.grommade.lazymusicianship.ui_section.SectionUi
@@ -37,6 +38,8 @@ private sealed class LeafScreen(val route: String) {
             parentId: Long
         ): String = "piece/$pieceId/section/$sectionId?${Keys.PARENT_ID}=$parentId"
     }
+
+    object States : LeafScreen("main/states")
 }
 
 @ExperimentalCoroutinesApi
@@ -60,6 +63,7 @@ private fun NavGraphBuilder.addMainTopLevel(navController: NavController) {
         startDestination = LeafScreen.Main.route
     ) {
         addMain(navController)
+        addStates(navController)
     }
 }
 
@@ -88,7 +92,9 @@ private fun NavGraphBuilder.addPracticeTopLevel(navController: NavController) {
 
 private fun NavGraphBuilder.addMain(navController: NavController) {
     composable(LeafScreen.Main.route) {
-//        MainUi()
+        MainUi(
+            openStates = { navController.navigate(LeafScreen.States.route) }
+        )
     }
 }
 
@@ -139,5 +145,11 @@ private fun NavGraphBuilder.addSectionDetails(navController: NavController) {
         )
     ) {
         SectionUi(close = navController::navigateUp)
+    }
+}
+
+private fun NavGraphBuilder.addStates(navController: NavController) {
+    composable(route = LeafScreen.States.route) {
+//        StatesUi(back = navController::navigateUp)
     }
 }
