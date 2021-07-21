@@ -8,6 +8,7 @@
     <string name="main_title">Main</string>
     <string name="pieces_title">Pieces</string>
     <string name="practice_title">Practice</string>
+    <string name="states_title">Learning states</string>
 
     <!--    Piece-->
     <string name="piece_hint_edit_text_name">Name</string>
@@ -45,12 +46,20 @@
     <string name="main_menu_states">States</string>
     <string name="main_menu_settings">Settings</string>
 
+    <!--    State study-->
+    <string name="state_title_for_piece">For piece</string>
+    <string name="state_title_for_section">For section</string>
+    <string name="state_title_consider_tempo">Consider tempo</string>
+    <string name="state_title_count_number_of_times">Count number of times</string>
+    <string name="state_title_completed">Completed</string>
+
     <!--    Settings items-->
     <string name="btn_clear">Clear</string>
 
     <!--    Content Descriptions-->
     <string name="cd_more_vert_icon">More</string>
     <string name="cd_close_icon">Close</string>
+    <string name="cd_back_icon">Back</string>
     <string name="cd_save_icon">Save</string>
     <string name="cd_add_icon">Add</string>
     <string name="cd_delete_icon">Delete</string>

@@ -83,6 +83,7 @@ fun MainDropdownMenu(actioner: (MainActions) -> Unit) {
 
             DropdownMenuItem(onClick = {
                 expanded = false
+                actioner(MainActions.OpenStates)
             }) {
                 Text(stringResource(R.string.main_menu_states))
             }

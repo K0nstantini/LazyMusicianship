@@ -24,6 +24,7 @@ import com.grommade.lazymusicianship.R
 import com.grommade.lazymusicianship.data.entity.Piece
 import com.grommade.lazymusicianship.ui.common.rememberFlowWithLifecycle
 import com.grommade.lazymusicianship.ui.components.DeleteIcon
+import com.grommade.lazymusicianship.ui.components.FloatingAddActionButton
 import com.grommade.lazymusicianship.ui.components.MoreVertIcon
 
 @ExperimentalFoundationApi
@@ -64,7 +65,7 @@ fun PiecesListUi(
             PiecesListTopBar { actioner(PiecesListActions.PopulateDB) }
         },
         modifier = Modifier.fillMaxSize(),
-        floatingActionButton = { FloatingActionButton { actioner(PiecesListActions.AddNew) } },
+        floatingActionButton = { FloatingAddActionButton { actioner(PiecesListActions.AddNew) } },
     ) { paddingValues ->
         LazyColumn(
             contentPadding = paddingValues,
@@ -119,15 +120,7 @@ fun PiecesListDropdownMenu(populateDB: () -> Unit) {
     }
 }
 
-@Composable
-fun FloatingActionButton(addNew: () -> Unit) {
-    FloatingActionButton(
-        onClick = addNew,
-        modifier = Modifier.padding(bottom = 48.dp)
-    ) {
-        Icon(Icons.Filled.Add, stringResource(R.string.cd_add_icon))
-    }
-}
+
 
 @ExperimentalFoundationApi
 @Composable

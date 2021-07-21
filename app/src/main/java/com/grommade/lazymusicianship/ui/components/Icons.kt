@@ -58,6 +58,18 @@ fun NavigationCloseIcon(
 }
 
 @Composable
+fun NavigationBackIcon(
+    callback: () -> Unit
+) {
+    IconButton(onClick = callback) {
+        Icon(
+            imageVector = Icons.Filled.ArrowBack,
+            contentDescription = stringResource(R.string.cd_back_icon)
+        )
+    }
+}
+
+@Composable
 fun AddIcon(
     callback: () -> Unit
 ) {

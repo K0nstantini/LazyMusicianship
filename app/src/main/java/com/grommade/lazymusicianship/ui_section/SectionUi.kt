@@ -17,6 +17,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.insets.ui.Scaffold
 import com.google.accompanist.insets.ui.TopAppBar
 import com.grommade.lazymusicianship.R
+import com.grommade.lazymusicianship.ui.TextFieldName
 import com.grommade.lazymusicianship.ui.common.rememberFlowWithLifecycle
 import com.grommade.lazymusicianship.ui.components.*
 
@@ -59,7 +60,7 @@ fun SectionUi(
 ) {
     Scaffold(
         topBar = {
-            SectionTopBar(viewState.section.name,
+            SaveCloseTopBar(viewState.section.name,
                 { actioner(SectionActions.Save) },
                 { actioner(SectionActions.Close) }
             )
@@ -74,7 +75,7 @@ fun SectionUi(
                     end = 8.dp
                 )
         ) {
-            SectionName(viewState.section.name) { value ->
+            TextFieldName(viewState.section.name) { value ->
                 actioner(SectionActions.ChangeName(value))
             }
             TempoItem(
@@ -86,47 +87,11 @@ fun SectionUi(
             SetItemSwitch(
                 title = stringResource(R.string.section_title_new),
                 stateSwitch = viewState.section.firstTime,
-                onClick = { actioner(SectionActions.ChangeNew(viewState.section.firstTime)) },
+                onClick = { actioner(SectionActions.ChangeNew(!viewState.section.firstTime)) },
                 onClickSwitch = { actioner(SectionActions.ChangeNew(it)) },
             )
         }
     }
-}
-
-@Composable
-fun SectionTopBar(
-    name: String,
-    save: () -> Unit,
-    close: () -> Unit
-) {
-    TopAppBar(
-        title = { },
-        modifier = Modifier.fillMaxWidth(),
-        backgroundColor = MaterialTheme.colors.surface.copy(alpha = 0.97f),
-        contentColor = MaterialTheme.colors.onSurface,
-        navigationIcon = { NavigationCloseIcon(close) },
-        actions = { SaveIcon(name.isNotEmpty(), save) }
-    )
-}
-
-@Composable
-fun SectionName(
-    name: String,
-    changeName: (String) -> Unit
-) {
-    TextField(
-        value = name,
-        onValueChange = changeName,
-        label = { Text(stringResource(R.string.piece_hint_edit_text_name)) },
-        colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.Transparent),
-        isError = name.isEmpty(),
-        singleLine = true,
-        textStyle = MaterialTheme.typography.h6.copy(
-            fontSize = 16.sp,
-            color = MaterialTheme.colors.secondaryVariant
-        ),
-        modifier = Modifier.fillMaxWidth()
-    )
 }
 
 @ExperimentalMaterialApi

@@ -11,6 +11,8 @@ import com.grommade.lazymusicianship.ui_main.MainUi
 import com.grommade.lazymusicianship.ui_piece.PieceUi
 import com.grommade.lazymusicianship.ui_pieces_list.PiecesListUi
 import com.grommade.lazymusicianship.ui_section.SectionUi
+import com.grommade.lazymusicianship.ui_state_details.StateDetailsUi
+import com.grommade.lazymusicianship.ui_states.StatesUi
 import com.grommade.lazymusicianship.util.Keys
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
@@ -40,6 +42,10 @@ private sealed class LeafScreen(val route: String) {
     }
 
     object States : LeafScreen("main/states")
+
+    object StateDetails : LeafScreen("main/states/{${Keys.STATE_ID}}") {
+        fun createRoute(stateId: Long): String = "main/states/$stateId"
+    }
 }
 
 @ExperimentalCoroutinesApi
@@ -57,6 +63,8 @@ fun AppNavigation(navController: NavHostController) {
     }
 }
 
+@ExperimentalMaterialApi
+@ExperimentalFoundationApi
 private fun NavGraphBuilder.addMainTopLevel(navController: NavController) {
     navigation(
         route = Screen.Main.route,
@@ -64,6 +72,7 @@ private fun NavGraphBuilder.addMainTopLevel(navController: NavController) {
     ) {
         addMain(navController)
         addStates(navController)
+        addStateDetails(navController)
     }
 }
 
@@ -148,8 +157,24 @@ private fun NavGraphBuilder.addSectionDetails(navController: NavController) {
     }
 }
 
+@ExperimentalFoundationApi
 private fun NavGraphBuilder.addStates(navController: NavController) {
     composable(route = LeafScreen.States.route) {
-//        StatesUi(back = navController::navigateUp)
+        StatesUi(
+            openState = { stateId -> navController.navigate(LeafScreen.StateDetails.createRoute(stateId)) },
+            back = navController::navigateUp
+        )
+    }
+}
+
+@ExperimentalMaterialApi
+private fun NavGraphBuilder.addStateDetails(navController: NavController) {
+    composable(
+        route = LeafScreen.StateDetails.route,
+        arguments = listOf(
+            navArgument(Keys.STATE_ID) { type = NavType.LongType }
+        )
+    ) {
+        StateDetailsUi(close = navController::navigateUp)
     }
 }

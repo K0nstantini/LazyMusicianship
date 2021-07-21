@@ -12,7 +12,7 @@ data class StateStudy(
     val name: String = "",
     val forPiece: Boolean = true,
     val forSection: Boolean = true,
-    val considerBeat: Boolean = false,
-    val considerTimes: Boolean = false,
+    val considerTempo: Boolean = false,
+    val countNumberOfTimes: Boolean = false,
     val completed: Boolean = false,
 ) : AppEntity

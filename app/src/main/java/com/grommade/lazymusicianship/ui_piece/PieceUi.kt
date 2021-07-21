@@ -23,6 +23,7 @@ import com.google.accompanist.insets.ui.TopAppBar
 import com.grommade.lazymusicianship.R
 import com.grommade.lazymusicianship.data.entity.Piece
 import com.grommade.lazymusicianship.data.entity.Section
+import com.grommade.lazymusicianship.ui.TextFieldName
 import com.grommade.lazymusicianship.ui.common.rememberFlowWithLifecycle
 import com.grommade.lazymusicianship.ui.components.*
 import com.grommade.lazymusicianship.ui.components.material_dialogs.core.MaterialDialog
@@ -96,13 +97,12 @@ fun PieceUi(
 ) {
     Scaffold(
         topBar = {
-            PieceTopBar(viewState.piece.name,
+            SaveCloseTopBar(viewState.piece.name,
                 { actioner(PieceActions.SaveAndClose) },
                 { actioner(PieceActions.Close) }
             )
         },
         modifier = Modifier.fillMaxSize(),
-//        backgroundColor = Color(0xFFcbae82)
     ) { paddingValues ->
         Column(
             Modifier
@@ -112,7 +112,7 @@ fun PieceUi(
                     end = 8.dp
                 )
         ) {
-            PieceName(viewState.piece.name) { value ->
+            TextFieldName(viewState.piece.name) { value ->
                 actioner(PieceActions.ChangeName(value))
             }
 
@@ -147,43 +147,6 @@ fun PieceUi(
             }
         }
     }
-}
-
-@Composable
-fun PieceTopBar(
-    name: String,
-    save: () -> Unit,
-    close: () -> Unit
-) {
-    TopAppBar(
-        title = { },
-        modifier = Modifier.fillMaxWidth(),
-        backgroundColor = MaterialTheme.colors.surface.copy(alpha = 0.97f),
-//        backgroundColor = Color(0xFFcbae82),
-        contentColor = MaterialTheme.colors.onSurface,
-        navigationIcon = { NavigationCloseIcon(close) },
-        actions = { SaveIcon(name.isNotEmpty(), save) }
-    )
-}
-
-@Composable
-fun PieceName(
-    name: String,
-    changeName: (String) -> Unit
-) {
-    TextField(
-        value = name,
-        onValueChange = changeName,
-        label = { Text(stringResource(R.string.piece_hint_edit_text_name)) },
-        colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.Transparent),
-        isError = name.isEmpty(),
-        singleLine = true,
-        textStyle = MaterialTheme.typography.h6.copy(
-            fontSize = 16.sp,
-            color = MaterialTheme.colors.secondaryVariant
-        ),
-        modifier = Modifier.fillMaxWidth()
-    )
 }
 
 @ExperimentalMaterialApi

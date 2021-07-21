@@ -20,8 +20,6 @@ class MainViewModel @Inject constructor() : ViewModel() {
         viewModelScope.launch {
             pendingActions.collect { action ->
                 when (action) {
-                    is MainActions.OpenSettings -> {
-                    }
                     else -> {
                     }
                 }

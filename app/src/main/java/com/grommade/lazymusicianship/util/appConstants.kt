@@ -4,7 +4,7 @@ object Keys {
     const val PIECE_ID = "pieceId"
     const val SECTION_ID = "sectionId"
     const val PARENT_ID = "parentId"
-    const val SECTION = "section"
+    const val STATE_ID = "stateId"
 }
 
 const val HOURS_IN_DAY = 24
