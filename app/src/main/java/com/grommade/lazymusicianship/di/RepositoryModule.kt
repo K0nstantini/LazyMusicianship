@@ -1,38 +1,34 @@
 package com.grommade.lazymusicianship.di
 
-import com.grommade.lazymusicianship.data.dao.*
-import com.grommade.lazymusicianship.data.repos.*
+import com.grommade.lazymusicianship.data.repos_impl.*
+import com.grommade.lazymusicianship.domain.repos.*
+import dagger.Binds
 import dagger.Module
-import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-class RepositoryModule {
+abstract class RepositoryModule {
 
-    @Provides
+    @Binds
     @Singleton
-    fun provideRepositorySettings(settingsDao: SettingsDao) = RepoSettings(settingsDao)
+    abstract fun bindRepositorySettings(repo: RepoSettingsImpl): RepoSettings
 
-    @Provides
+    @Binds
     @Singleton
-    fun provideRepositoryPiece(pieceDao: PieceDao, sectionDao: SectionDao) = RepoPiece(pieceDao, sectionDao)
+    abstract fun bindRepositoryPiece(repo: RepoPieceImpl): RepoPiece
 
-    @Provides
+    @Binds
     @Singleton
-    fun provideRepositorySection(sectionDao: SectionDao) = RepoSection(sectionDao)
+    abstract fun bindRepositorySection(repo: RepoSectionImpl): RepoSection
 
-    @Provides
+    @Binds
     @Singleton
-    fun provideRepositoryPractice(practiceDao: PracticeDao) = RepoPractice(practiceDao)
+    abstract fun bindRepositoryPractice(repo: RepoPracticeImpl): RepoPractice
 
-    @Provides
+    @Binds
     @Singleton
-    fun provideRepositoryStateStudy(stateDao: StateStudyDao) = RepoStateStudy(stateDao)
-
-    @Provides
-    @Singleton
-    fun provideRepositoryDataTransferDao(dataTransferDao: DataTransferDao) = RepoDataTransfer(dataTransferDao)
+    abstract fun bindRepositoryStateStudy(repo: RepoStateStudyImpl): RepoStateStudy
 }

@@ -1,4 +1,4 @@
-package com.grommade.lazymusicianship.home
+package com.grommade.lazymusicianship.app.home
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity

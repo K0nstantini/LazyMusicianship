@@ -13,10 +13,10 @@ import kotlinx.parcelize.Parcelize
 data class Section(
     @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "section_id") override val id: Long = 0L,
     @ColumnInfo(name = "section_name") val name: String = "",
-    @ColumnInfo(name = "section_pieceId") val pieceId: Long = 0L,
-    @ColumnInfo(name = "section_parentId") val parentId: Long = -1L,
+    @ColumnInfo(name = "section_piece_id") val pieceId: Long = 0L,
+    @ColumnInfo(name = "section_parent_id") val parentId: Long = 0L,
     val order: Int = 0,
-    @ColumnInfo(name = "section_firstTime") val firstTime: Boolean = true,
+    @ColumnInfo(name = "section_first_time") val firstTime: Boolean = true,
     @ColumnInfo(name = "section_tempo") val tempo: Int = 0,
 ) : AppEntity, Parcelable {
 

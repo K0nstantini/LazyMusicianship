@@ -1,9 +1,9 @@
-package com.grommade.lazymusicianship.use_cases
+package com.grommade.lazymusicianship.domain.use_cases
 
 import com.grommade.lazymusicianship.data.entity.Piece
 import com.grommade.lazymusicianship.data.entity.Section
-import com.grommade.lazymusicianship.data.repos.RepoPiece
-import com.grommade.lazymusicianship.data.repos.RepoSection
+import com.grommade.lazymusicianship.domain.repos.RepoPiece
+import com.grommade.lazymusicianship.domain.repos.RepoSection
 import javax.inject.Inject
 
 interface PopulateDBWithPieces {

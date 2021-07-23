@@ -1,4 +1,4 @@
-package com.grommade.lazymusicianship.home
+package com.grommade.lazymusicianship.app.home
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Box

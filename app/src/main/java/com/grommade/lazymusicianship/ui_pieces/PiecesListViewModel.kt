@@ -3,8 +3,8 @@ package com.grommade.lazymusicianship.ui_pieces
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grommade.lazymusicianship.data.entity.Piece
-import com.grommade.lazymusicianship.data.repos.RepoPiece
-import com.grommade.lazymusicianship.use_cases.PopulateDBWithPieces
+import com.grommade.lazymusicianship.domain.repos.RepoPiece
+import com.grommade.lazymusicianship.domain.use_cases.PopulateDBWithPieces
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,7 +21,7 @@ class PiecesListViewModel @Inject constructor(
 
     private val pendingActions = MutableSharedFlow<PiecesListActions>()
 
-    private val piecesList = repoPiece.piecesFlow
+    private val piecesList = repoPiece.getPiecesFlow()
 
     private val selectedPiece = MutableStateFlow(0L)
 

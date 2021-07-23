@@ -8,9 +8,6 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 abstract class StateStudyDao: EntityDao<StateStudy>() {
 
-    @Query("DELETE FROM state_study_table  WHERE state_study_id = :id")
-    abstract suspend fun delete(id: Long)
-
     @Query("SELECT * FROM state_study_table WHERE state_study_id = :id")
     abstract suspend fun getState(id: Long): StateStudy?
 

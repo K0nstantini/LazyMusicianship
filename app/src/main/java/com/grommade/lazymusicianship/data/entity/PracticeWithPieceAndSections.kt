@@ -7,7 +7,7 @@ data class PracticeWithPieceAndSections(
     @Embedded
     val practice: Practice = Practice(),
 
-    @Relation(parentColumn = "practice_pieceId", entityColumn = "piece_id", entity = Piece::class)
+    @Relation(parentColumn = "practice_piece_id", entityColumn = "piece_id", entity = Piece::class)
     val piece: Piece = Piece(),
 
     @Relation(parentColumn = "practice_state_id", entityColumn = "state_study_id", entity = StateStudy::class)

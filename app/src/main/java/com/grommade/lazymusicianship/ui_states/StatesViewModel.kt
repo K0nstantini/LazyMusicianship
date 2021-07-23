@@ -3,7 +3,7 @@ package com.grommade.lazymusicianship.ui_states
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grommade.lazymusicianship.data.entity.StateStudy
-import com.grommade.lazymusicianship.data.repos.RepoStateStudy
+import com.grommade.lazymusicianship.domain.repos.RepoStateStudy
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,7 +19,7 @@ class StatesViewModel @Inject constructor(
 
     private val pendingActions = MutableSharedFlow<StatesActions>()
 
-    private val statesStudy = repoStateStudy.statesFlow
+    private val statesStudy = repoStateStudy.getStatesFlow()
     private val selectedState = MutableStateFlow(0L)
 
     val state = combine(statesStudy, selectedState) { state, selected ->

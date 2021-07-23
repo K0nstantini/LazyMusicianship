@@ -3,7 +3,7 @@ package com.grommade.lazymusicianship.ui_practice
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grommade.lazymusicianship.data.entity.Practice
-import com.grommade.lazymusicianship.data.repos.RepoPractice
+import com.grommade.lazymusicianship.domain.repos.RepoPractice
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,7 +19,7 @@ class PracticeViewModel @Inject constructor(
 
     private val pendingActions = MutableSharedFlow<PracticeActions>()
 
-    private val practices = repoPractice.practicesItemsFlow
+    private val practices = repoPractice.getPracticesItemsFlow()
     private val selectedPractice = MutableStateFlow(0L)
 
     val state = combine(practices, selectedPractice) { practicesList, selected ->

@@ -10,7 +10,7 @@ import java.time.LocalDate
 @Entity(tableName = "practice_table")
 data class Practice(
     @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "practice_id") override val id: Long = 0,
-    @ColumnInfo(name = "practice_pieceId") val pieceId: Long = 0L,
+    @ColumnInfo(name = "practice_piece_id") val pieceId: Long = 0L,
     @ColumnInfo(name = "practice_section_id_from") val sectionIdFrom: Long = 0L,
     @ColumnInfo(name = "practice_section_id_to") val sectionIdTo: Long = 0L,
     @ColumnInfo(name = "practice_state_id") val stateId: Long = 0L,

@@ -4,10 +4,10 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grommade.lazymusicianship.data.entity.*
-import com.grommade.lazymusicianship.data.repos.RepoPiece
-import com.grommade.lazymusicianship.data.repos.RepoPractice
-import com.grommade.lazymusicianship.data.repos.RepoSection
-import com.grommade.lazymusicianship.data.repos.RepoStateStudy
+import com.grommade.lazymusicianship.domain.repos.RepoPiece
+import com.grommade.lazymusicianship.domain.repos.RepoPractice
+import com.grommade.lazymusicianship.domain.repos.RepoSection
+import com.grommade.lazymusicianship.domain.repos.RepoStateStudy
 import com.grommade.lazymusicianship.util.Keys
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -27,11 +27,11 @@ class PracticeDetailsViewModel @Inject constructor(
 
     private val currentPracticeItem = MutableStateFlow(PracticeWithPieceAndSections())
 
-    private val allPieces = repoPiece.piecesFlow
-    private val allSections = currentPracticeItem.map { pieceItem ->
-        repoSection.getSectionsByPieceId(pieceItem.piece.id)
+    private val allPieces = repoPiece.getPiecesFlow()
+    private val allSections = currentPracticeItem.flatMapLatest { pieceItem ->
+        repoSection.getSectionsFlow(pieceItem.piece.id)
     }
-    private val allStates = repoStateStudy.statesFlow
+    private val allStates = repoStateStudy.getStatesFlow()
 
     val state = combine(
         currentPracticeItem,
@@ -71,7 +71,7 @@ class PracticeDetailsViewModel @Inject constructor(
 
     private suspend fun initPractice() {
         val practiceId = handle.get<Long>(Keys.PRACTICE_ID) ?: 0
-        repoPractice.getPracticeWithPieceAndSections(practiceId)?.let { practiceItem ->
+        repoPractice.getPracticeItem(practiceId)?.let { practiceItem ->
             currentPracticeItem.value = practiceItem
         }
     }
@@ -119,11 +119,10 @@ class PracticeDetailsViewModel @Inject constructor(
     private fun sectionsNotCorrect(): Boolean {
         val sectionFrom = currentPracticeItem.value.sectionFrom ?: Section()
         val sectionTo = currentPracticeItem.value.sectionTo ?: Section()
-        val noSections = sectionFrom.isNew && sectionTo.isNew
-        val oneParent = sectionFrom.parentId == sectionTo.parentId
-        val firstLessOrEvenLast = sectionFrom.order <= sectionTo.order
-        val correct = noSections || oneParent && firstLessOrEvenLast
-        return !correct
+        val oneEmpty = sectionFrom.isNew xor sectionTo.isNew
+        val diffParent = sectionFrom.parentId != sectionTo.parentId
+        val lastMoreFirst = sectionFrom.order > sectionTo.order
+        return oneEmpty || diffParent || lastMoreFirst
     }
 
     fun submitAction(action: PracticeDetailsActions) {

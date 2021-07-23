@@ -82,6 +82,4 @@ object DatabaseDaoModule {
     @Provides
     fun provideStateStudyDao(db: AppDataBase) = db.StateStudyDao()
 
-    @Provides
-    fun provideDataTransferDao(db: AppDataBase) = db.DataTransferDao()
 }
