@@ -21,7 +21,7 @@ class RepoSection @Inject constructor(
 
     @Transaction
     suspend fun delete(section: Section) = withContext(ioDispatcher) {
-        val sections = sectionDao.getSections(section.pieceId)
+        val sections = sectionDao.getSectionsByPieceId(section.pieceId)
         sectionDao.delete(section.getAllChildren(sections))
         sectionDao.delete(section)
     }
@@ -36,6 +36,10 @@ class RepoSection @Inject constructor(
 
     suspend fun getSection(id: Long) = withContext(ioDispatcher) {
         sectionDao.getSection(id)
+    }
+
+    suspend fun getSectionsByPieceId(id: Long) = withContext(ioDispatcher) {
+        sectionDao.getSectionsByPieceId(id)
     }
 
     suspend fun getLastCreated(pieceId: Long) = withContext(ioDispatcher) {

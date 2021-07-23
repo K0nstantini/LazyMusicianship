@@ -2,26 +2,23 @@ package com.grommade.lazymusicianship.ui_section
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.core.text.isDigitsOnly
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.insets.ui.Scaffold
-import com.google.accompanist.insets.ui.TopAppBar
 import com.grommade.lazymusicianship.R
 import com.grommade.lazymusicianship.ui.TextFieldName
 import com.grommade.lazymusicianship.ui.common.rememberFlowWithLifecycle
-import com.grommade.lazymusicianship.ui.components.*
+import com.grommade.lazymusicianship.ui.components.BuiltInputDialog
+import com.grommade.lazymusicianship.ui.components.SaveCloseTopBar
+import com.grommade.lazymusicianship.ui.components.SetItemDefault
+import com.grommade.lazymusicianship.ui.components.SetItemSwitch
 
-@ExperimentalMaterialApi
 @Composable
 fun SectionUi(
     close: () -> Unit
@@ -32,7 +29,6 @@ fun SectionUi(
     )
 }
 
-@ExperimentalMaterialApi
 @Composable
 fun SectionUi(
     viewModel: SectionViewModel,
@@ -52,7 +48,6 @@ fun SectionUi(
     }
 }
 
-@ExperimentalMaterialApi
 @Composable
 fun SectionUi(
     viewState: SectionViewState,
@@ -60,9 +55,10 @@ fun SectionUi(
 ) {
     Scaffold(
         topBar = {
-            SaveCloseTopBar(viewState.section.name,
-                { actioner(SectionActions.Save) },
-                { actioner(SectionActions.Close) }
+            SaveCloseTopBar(
+                saveEnabled = !viewState.section.isNew,
+                save = { actioner(SectionActions.SaveAndClose) },
+                close = { actioner(SectionActions.Close) }
             )
         },
         modifier = Modifier.fillMaxSize(),
@@ -94,7 +90,6 @@ fun SectionUi(
     }
 }
 
-@ExperimentalMaterialApi
 @Composable
 fun TempoItem(
     title: String,
@@ -120,7 +115,6 @@ fun TempoItem(
     )
 }
 
-@ExperimentalMaterialApi
 @Preview
 @Composable
 fun SectionUiPreview() {

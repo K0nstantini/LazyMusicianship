@@ -1,8 +1,7 @@
-package com.grommade.lazymusicianship.ui_piece
+package com.grommade.lazymusicianship.ui_piece_details
 
 import androidx.compose.runtime.Immutable
 import com.grommade.lazymusicianship.data.entity.Piece
-import com.grommade.lazymusicianship.data.entity.PieceWithSections
 import com.grommade.lazymusicianship.data.entity.Section
 
 @Immutable

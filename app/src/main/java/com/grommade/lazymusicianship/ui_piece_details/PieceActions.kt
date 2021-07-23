@@ -1,4 +1,4 @@
-package com.grommade.lazymusicianship.ui_piece
+package com.grommade.lazymusicianship.ui_piece_details
 
 import com.grommade.lazymusicianship.data.entity.Section
 

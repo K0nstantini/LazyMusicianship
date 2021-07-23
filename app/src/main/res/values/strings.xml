@@ -46,6 +46,19 @@
     <string name="main_menu_states">States</string>
     <string name="main_menu_settings">Settings</string>
 
+    <!--    Practice-->
+    <string name="practice_title_date">Date</string>
+    <string name="practice_title_piece">Piece</string>
+    <string name="practice_title_section_from">Section from</string>
+    <string name="practice_title_section_to">Section to</string>
+    <string name="practice_title_state_study">State</string>
+
+    <string name="practice_alert_list_pieces">Pieces</string>
+    <string name="practice_alert_list_sections">Sections</string>
+    <string name="practice_alert_state_study">State</string>
+
+    <string name="practice_sections_error">The sections are not next to each other</string>
+
     <!--    State study-->
     <string name="state_title_for_piece">For piece</string>
     <string name="state_title_for_section">For section</string>

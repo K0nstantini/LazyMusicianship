@@ -1,4 +1,4 @@
-package com.grommade.lazymusicianship.ui_piece
+package com.grommade.lazymusicianship.ui_piece_details
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -9,7 +9,6 @@ import com.grommade.lazymusicianship.data.repos.RepoPiece
 import com.grommade.lazymusicianship.data.repos.RepoSection
 import com.grommade.lazymusicianship.util.Keys
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -26,14 +25,12 @@ class PieceViewModel @Inject constructor(
     private val pieceId: Long = handle.get<Long>(Keys.PIECE_ID) ?: -1L
     private val currentPiece = MutableStateFlow(Piece())
 
-    @ExperimentalCoroutinesApi
     private val currentSections = currentPiece.flatMapLatest {
         repoSection.getSectionsFlow(currentPiece.value.id)
     }
 
     private val selectedSection = MutableStateFlow(0L)
 
-    @ExperimentalCoroutinesApi
     val state = combine(currentPiece, currentSections, selectedSection) { piece, sections, selected ->
         PieceViewState(
             piece = piece,

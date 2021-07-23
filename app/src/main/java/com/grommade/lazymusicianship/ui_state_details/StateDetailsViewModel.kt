@@ -42,7 +42,7 @@ class StateDetailsViewModel @Inject constructor(
                     is StateDetailsActions.ChangeTempo -> changeState { copy(considerTempo = action.value) }
                     is StateDetailsActions.ChangeTimes -> changeState { copy(countNumberOfTimes = action.value) }
                     is StateDetailsActions.ChangeCompleted -> changeState { copy(completed = action.value) }
-                    StateDetailsActions.Save -> save()
+                    StateDetailsActions.SaveAndClose -> save()
                     else -> {
                     }
                 }

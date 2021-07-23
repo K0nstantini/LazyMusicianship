@@ -1,4 +1,4 @@
-package com.grommade.lazymusicianship.util
+package com.grommade.lazymusicianship.util.extentions
 
 fun String.toTime() =
     dropLast(3).toInt() * 60 + this.drop(3).toInt()

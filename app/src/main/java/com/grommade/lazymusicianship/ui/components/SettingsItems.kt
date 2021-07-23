@@ -16,7 +16,6 @@ import androidx.constraintlayout.compose.Dimension
 import com.grommade.lazymusicianship.R
 import com.grommade.lazymusicianship.ui.theme.LazyMusicianshipTheme
 
-@ExperimentalMaterialApi
 @Composable
 fun SetItemDefault(
     title: String,
@@ -32,7 +31,6 @@ fun SetItemDefault(
     )
 }
 
-@ExperimentalMaterialApi
 @Composable
 fun SetItemWithClear(
     title: String,
@@ -53,7 +51,6 @@ fun SetItemWithClear(
 }
 
 
-@ExperimentalMaterialApi
 @Composable
 private fun SetItemBody(
     title: String,
@@ -115,7 +112,6 @@ private fun SetItemBody(
     Divider(thickness = 1.dp)
 }
 
-@ExperimentalMaterialApi
 @Composable
 fun SetItemSwitch(
     title: String,
@@ -180,7 +176,6 @@ fun SetItemTitle(text: String) {
     )
 }
 
-@ExperimentalMaterialApi
 @Preview
 @Composable
 fun SetItemDefaultPreview() {
@@ -192,7 +187,6 @@ fun SetItemDefaultPreview() {
     }
 }
 
-@ExperimentalMaterialApi
 @Preview
 @Composable
 fun SetItemWithClearPreview() {
@@ -204,7 +198,6 @@ fun SetItemWithClearPreview() {
     }
 }
 
-@ExperimentalMaterialApi
 @Preview
 @Composable
 fun SetItemSwitchPreview() {
@@ -216,7 +209,6 @@ fun SetItemSwitchPreview() {
     }
 }
 
-@ExperimentalMaterialApi
 @Preview
 @Composable
 fun SetItemTitlePreview() {

@@ -5,6 +5,7 @@ object Keys {
     const val SECTION_ID = "sectionId"
     const val PARENT_ID = "parentId"
     const val STATE_ID = "stateId"
+    const val PRACTICE_ID = "practiceId"
 }
 
 const val HOURS_IN_DAY = 24

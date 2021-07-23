@@ -1,14 +1,11 @@
-package com.grommade.lazymusicianship.ui_pieces_list
+package com.grommade.lazymusicianship.ui_pieces
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,7 +24,6 @@ import com.grommade.lazymusicianship.ui.components.DeleteIcon
 import com.grommade.lazymusicianship.ui.components.FloatingAddActionButton
 import com.grommade.lazymusicianship.ui.components.MoreVertIcon
 
-@ExperimentalFoundationApi
 @Composable
 fun PiecesListUi(openPiece: (Long) -> Unit) {
     PiecesListUi(
@@ -36,7 +32,6 @@ fun PiecesListUi(openPiece: (Long) -> Unit) {
     )
 }
 
-@ExperimentalFoundationApi
 @Composable
 fun PiecesListUi(
     viewModel: PiecesListViewModel,
@@ -54,7 +49,6 @@ fun PiecesListUi(
     }
 }
 
-@ExperimentalFoundationApi
 @Composable
 fun PiecesListUi(
     viewState: PiecesListViewState,
@@ -122,7 +116,6 @@ fun PiecesListDropdownMenu(populateDB: () -> Unit) {
 
 
 
-@ExperimentalFoundationApi
 @Composable
 fun PieceItem(
     piece: Piece,
@@ -171,7 +164,6 @@ fun PieceItem(
     }
 }
 
-@ExperimentalFoundationApi
 @Preview
 @Composable
 fun PiecesListUiPreview() {
@@ -183,7 +175,6 @@ fun PiecesListUiPreview() {
     PiecesListUi(PiecesListViewState(pieces = list, selectedPiece = 2)) {}
 }
 
-@ExperimentalFoundationApi
 @Preview
 @Composable
 fun PieceItemPreview() {

@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Divider
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -21,7 +20,6 @@ import com.grommade.lazymusicianship.ui.common.rememberFlowWithLifecycle
 import com.grommade.lazymusicianship.ui.components.SaveCloseTopBar
 import com.grommade.lazymusicianship.ui.components.SetItemSwitch
 
-@ExperimentalMaterialApi
 @Composable
 fun StateDetailsUi(
     close: () -> Unit
@@ -32,7 +30,6 @@ fun StateDetailsUi(
     )
 }
 
-@ExperimentalMaterialApi
 @Composable
 fun StateDetailsUi(
     viewModel: StateDetailsViewModel,
@@ -52,7 +49,6 @@ fun StateDetailsUi(
     }
 }
 
-@ExperimentalMaterialApi
 @Composable
 fun StateDetailsUi(
     viewState: StateDetailsViewState,
@@ -60,9 +56,10 @@ fun StateDetailsUi(
 ) {
     Scaffold(
         topBar = {
-            SaveCloseTopBar(viewState.stateStudy.name,
-                { actioner(StateDetailsActions.Save) },
-                { actioner(StateDetailsActions.Close) }
+            SaveCloseTopBar(
+                saveEnabled = viewState.stateStudy.name.isNotEmpty(),
+                save = { actioner(StateDetailsActions.SaveAndClose) },
+                close = { actioner(StateDetailsActions.Close) }
             )
         },
         modifier = Modifier.fillMaxSize(),
@@ -113,7 +110,6 @@ fun StateDetailsUi(
     }
 }
 
-@ExperimentalMaterialApi
 @Preview
 @Composable
 fun StateDetailsUiPreview() {

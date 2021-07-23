@@ -3,12 +3,13 @@ package com.grommade.lazymusicianship.data.entity
 import androidx.room.Embedded
 import androidx.room.Relation
 
+// FIXME: Del?
 data class PieceWithSections(
-    @Embedded val piece: Piece,
+    @Embedded val piece: Piece = Piece(),
     @Relation(
         parentColumn = "piece_id",
-        entityColumn = "pieceId"
+        entityColumn = "section_pieceId"
     )
-    val sections: List<Section>
+    val sections: List<Section> = emptyList()
 ) {
 }

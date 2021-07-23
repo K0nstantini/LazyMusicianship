@@ -35,6 +35,13 @@ android {
     }
     kotlinOptions {
         jvmTarget = '1.8'
+        freeCompilerArgs += [
+                "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
+                "-Xopt-in=androidx.compose.material.ExperimentalMaterialApi",
+                "-Xopt-in=androidx.compose.animation.ExperimentalAnimationApi",
+                "-Xopt-in=androidx.compose.foundation.ExperimentalFoundationApi",
+                "-Xopt-in=com.google.accompanist.pager.ExperimentalPagerApi"
+        ]
     }
     buildFeatures {
         compose true
@@ -73,7 +80,7 @@ dependencies {
     implementation 'androidx.hilt:hilt-navigation-compose:1.0.0-alpha03'
 
     // Coroutines
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.1-native-mt'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.1'
 
     // Room
     def room_version = "2.4.0-alpha03"
@@ -90,6 +97,8 @@ dependencies {
     implementation 'androidx.navigation:navigation-compose:2.4.0-alpha04'
 
     // Accompanist
-    implementation "com.google.accompanist:accompanist-insets:0.14.0"
-    implementation "com.google.accompanist:accompanist-insets-ui:0.14.0"
+    def accompanist_version = "0.14.0"
+    implementation "com.google.accompanist:accompanist-insets:$accompanist_version"
+    implementation "com.google.accompanist:accompanist-insets-ui:$accompanist_version"
+    implementation "com.google.accompanist:accompanist-pager:$accompanist_version"
 }

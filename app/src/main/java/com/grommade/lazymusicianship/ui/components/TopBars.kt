@@ -8,7 +8,7 @@ import com.google.accompanist.insets.ui.TopAppBar
 
 @Composable
 fun SaveCloseTopBar(
-    name: String,
+    saveEnabled: Boolean = true,
     save: () -> Unit,
     close: () -> Unit
 ) {
@@ -18,6 +18,6 @@ fun SaveCloseTopBar(
         backgroundColor = MaterialTheme.colors.surface.copy(alpha = 0.97f),
         contentColor = MaterialTheme.colors.onSurface,
         navigationIcon = { NavigationCloseIcon(close) },
-        actions = { SaveIcon(name.isNotEmpty(), save) }
+        actions = { SaveIcon(saveEnabled, save) }
     )
 }

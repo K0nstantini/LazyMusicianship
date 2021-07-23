@@ -1,7 +1,6 @@
 package com.grommade.lazymusicianship.home
 
 import androidx.compose.animation.Crossfade
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,11 +29,7 @@ import com.google.accompanist.insets.ui.Scaffold
 import com.grommade.lazymusicianship.AppNavigation
 import com.grommade.lazymusicianship.R
 import com.grommade.lazymusicianship.Screen
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 
-@ExperimentalCoroutinesApi
-@ExperimentalFoundationApi
-@ExperimentalMaterialApi
 @Composable
 fun Home() {
     val navController = rememberNavController()

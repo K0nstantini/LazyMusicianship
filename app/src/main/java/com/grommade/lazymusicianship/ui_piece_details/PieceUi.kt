@@ -1,7 +1,6 @@
-package com.grommade.lazymusicianship.ui_piece
+package com.grommade.lazymusicianship.ui_piece_details
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -16,10 +15,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.insets.ui.Scaffold
-import com.google.accompanist.insets.ui.TopAppBar
 import com.grommade.lazymusicianship.R
 import com.grommade.lazymusicianship.data.entity.Piece
 import com.grommade.lazymusicianship.data.entity.Section
@@ -27,12 +24,8 @@ import com.grommade.lazymusicianship.ui.TextFieldName
 import com.grommade.lazymusicianship.ui.common.rememberFlowWithLifecycle
 import com.grommade.lazymusicianship.ui.components.*
 import com.grommade.lazymusicianship.ui.components.material_dialogs.core.MaterialDialog
-import com.grommade.lazymusicianship.util.toStrTime
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import com.grommade.lazymusicianship.util.extentions.toStrTime
 
-@ExperimentalMaterialApi
-@ExperimentalCoroutinesApi
-@ExperimentalFoundationApi
 @Composable
 fun PieceUi(
     openSection: (Long, Long, Long) -> Unit,
@@ -45,9 +38,6 @@ fun PieceUi(
     )
 }
 
-@ExperimentalMaterialApi
-@ExperimentalCoroutinesApi
-@ExperimentalFoundationApi
 @Composable
 fun PieceUi(
     viewModel: PieceViewModel,
@@ -88,8 +78,6 @@ fun PieceUi(
     }
 }
 
-@ExperimentalMaterialApi
-@ExperimentalFoundationApi
 @Composable
 fun PieceUi(
     viewState: PieceViewState,
@@ -97,9 +85,10 @@ fun PieceUi(
 ) {
     Scaffold(
         topBar = {
-            SaveCloseTopBar(viewState.piece.name,
-                { actioner(PieceActions.SaveAndClose) },
-                { actioner(PieceActions.Close) }
+            SaveCloseTopBar(
+                saveEnabled = viewState.piece.name.isNotEmpty(),
+                save = { actioner(PieceActions.SaveAndClose) },
+                close = { actioner(PieceActions.Close) }
             )
         },
         modifier = Modifier.fillMaxSize(),
@@ -149,7 +138,6 @@ fun PieceUi(
     }
 }
 
-@ExperimentalMaterialApi
 @Composable
 fun PieceInfo(
     piece: Piece,
@@ -172,7 +160,6 @@ fun PieceInfo(
     )
 }
 
-@ExperimentalMaterialApi
 @Composable
 fun InfoItem(
     title: String,
@@ -198,7 +185,6 @@ fun InfoItem(
     )
 }
 
-@ExperimentalMaterialApi
 @Composable
 fun TimeItem(
     title: String,
@@ -227,7 +213,6 @@ fun PieceDescription(
     )
 }
 
-@ExperimentalFoundationApi
 @Composable
 fun SectionsScrollingContent(
     sections: List<Section>,
@@ -270,7 +255,6 @@ fun SectionsScrollingContent(
     }
 }
 
-@ExperimentalFoundationApi
 @Composable
 fun SectionItem(
     name: String,
@@ -316,8 +300,6 @@ fun SectionItem(
     }
 }
 
-@ExperimentalMaterialApi
-@ExperimentalFoundationApi
 @Preview
 @Composable
 fun PieceItemPreview() {

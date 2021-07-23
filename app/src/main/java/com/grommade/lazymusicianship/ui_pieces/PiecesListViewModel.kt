@@ -1,4 +1,4 @@
-package com.grommade.lazymusicianship.ui_pieces_list
+package com.grommade.lazymusicianship.ui_pieces
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

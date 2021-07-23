@@ -7,6 +7,6 @@ sealed class StateDetailsActions {
     data class ChangeTempo(val value: Boolean): StateDetailsActions()
     data class ChangeTimes(val value: Boolean): StateDetailsActions()
     data class ChangeCompleted(val value: Boolean): StateDetailsActions()
-    object Save: StateDetailsActions()
+    object SaveAndClose: StateDetailsActions()
     object Close: StateDetailsActions()
 }

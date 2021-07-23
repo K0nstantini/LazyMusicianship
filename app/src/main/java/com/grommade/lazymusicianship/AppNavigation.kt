@@ -1,20 +1,19 @@
 package com.grommade.lazymusicianship
 
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.navigation.*
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navArgument
 import com.grommade.lazymusicianship.ui_main.MainUi
-import com.grommade.lazymusicianship.ui_piece.PieceUi
-import com.grommade.lazymusicianship.ui_pieces_list.PiecesListUi
+import com.grommade.lazymusicianship.ui_piece_details.PieceUi
+import com.grommade.lazymusicianship.ui_pieces.PiecesListUi
+import com.grommade.lazymusicianship.ui_practice.PracticeUi
+import com.grommade.lazymusicianship.ui_practice_details.PracticeDetailsUi
 import com.grommade.lazymusicianship.ui_section.SectionUi
 import com.grommade.lazymusicianship.ui_state_details.StateDetailsUi
 import com.grommade.lazymusicianship.ui_states.StatesUi
 import com.grommade.lazymusicianship.util.Keys
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 sealed class Screen(val route: String) {
     object Main : Screen("mainroot")
@@ -41,6 +40,10 @@ private sealed class LeafScreen(val route: String) {
         ): String = "piece/$pieceId/section/$sectionId?${Keys.PARENT_ID}=$parentId"
     }
 
+    object PracticeDetails : LeafScreen("practice/{${Keys.PRACTICE_ID}}") {
+        fun createRoute(practiceId: Long): String = "practice/$practiceId"
+    }
+
     object States : LeafScreen("main/states")
 
     object StateDetails : LeafScreen("main/states/{${Keys.STATE_ID}}") {
@@ -48,9 +51,6 @@ private sealed class LeafScreen(val route: String) {
     }
 }
 
-@ExperimentalCoroutinesApi
-@ExperimentalFoundationApi
-@ExperimentalMaterialApi
 @Composable
 fun AppNavigation(navController: NavHostController) {
     NavHost(
@@ -63,8 +63,6 @@ fun AppNavigation(navController: NavHostController) {
     }
 }
 
-@ExperimentalMaterialApi
-@ExperimentalFoundationApi
 private fun NavGraphBuilder.addMainTopLevel(navController: NavController) {
     navigation(
         route = Screen.Main.route,
@@ -76,9 +74,6 @@ private fun NavGraphBuilder.addMainTopLevel(navController: NavController) {
     }
 }
 
-@ExperimentalCoroutinesApi
-@ExperimentalFoundationApi
-@ExperimentalMaterialApi
 private fun NavGraphBuilder.addPiecesTopLevel(navController: NavController) {
     navigation(
         route = Screen.Pieces.route,
@@ -95,7 +90,8 @@ private fun NavGraphBuilder.addPracticeTopLevel(navController: NavController) {
         route = Screen.Practice.route,
         startDestination = LeafScreen.Practice.route
     ) {
-        addLearning(navController)
+        addPractice(navController)
+        addPracticeDetails(navController)
     }
 }
 
@@ -107,7 +103,6 @@ private fun NavGraphBuilder.addMain(navController: NavController) {
     }
 }
 
-@ExperimentalFoundationApi
 private fun NavGraphBuilder.addPieces(navController: NavController) {
     composable(LeafScreen.Pieces.route) {
         PiecesListUi(
@@ -118,15 +113,16 @@ private fun NavGraphBuilder.addPieces(navController: NavController) {
     }
 }
 
-private fun NavGraphBuilder.addLearning(navController: NavController) {
+private fun NavGraphBuilder.addPractice(navController: NavController) {
     composable(LeafScreen.Practice.route) {
-//        PracticeUi()
+        PracticeUi(
+            openPracticeDetails = { practiceId ->
+                navController.navigate(LeafScreen.PracticeDetails.createRoute(practiceId))
+            }
+        )
     }
 }
 
-@ExperimentalMaterialApi
-@ExperimentalCoroutinesApi
-@ExperimentalFoundationApi
 private fun NavGraphBuilder.addPieceDetails(navController: NavController) {
     composable(
         route = LeafScreen.PieceDetails.route,
@@ -143,7 +139,6 @@ private fun NavGraphBuilder.addPieceDetails(navController: NavController) {
     }
 }
 
-@ExperimentalMaterialApi
 private fun NavGraphBuilder.addSectionDetails(navController: NavController) {
     composable(
         route = LeafScreen.SectionDetails.route,
@@ -157,7 +152,6 @@ private fun NavGraphBuilder.addSectionDetails(navController: NavController) {
     }
 }
 
-@ExperimentalFoundationApi
 private fun NavGraphBuilder.addStates(navController: NavController) {
     composable(route = LeafScreen.States.route) {
         StatesUi(
@@ -167,7 +161,6 @@ private fun NavGraphBuilder.addStates(navController: NavController) {
     }
 }
 
-@ExperimentalMaterialApi
 private fun NavGraphBuilder.addStateDetails(navController: NavController) {
     composable(
         route = LeafScreen.StateDetails.route,
@@ -176,5 +169,16 @@ private fun NavGraphBuilder.addStateDetails(navController: NavController) {
         )
     ) {
         StateDetailsUi(close = navController::navigateUp)
+    }
+}
+
+private fun NavGraphBuilder.addPracticeDetails(navController: NavController) {
+    composable(
+        route = LeafScreen.PracticeDetails.route,
+        arguments = listOf(
+            navArgument(Keys.PRACTICE_ID) { type = NavType.LongType }
+        )
+    ) {
+        PracticeDetailsUi(close = navController::navigateUp)
     }
 }

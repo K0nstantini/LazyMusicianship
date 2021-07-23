@@ -43,7 +43,7 @@ class SectionViewModel @Inject constructor(
                     is SectionActions.ChangeName -> changeName(action.value)
                     is SectionActions.ChangeTempo -> changeTempo(action.value)
                     is SectionActions.ChangeNew -> changeNew(action.value)
-                    SectionActions.Save -> save()
+                    SectionActions.SaveAndClose -> save()
                     else -> {
                     }
                 }

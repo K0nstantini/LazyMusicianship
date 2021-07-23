@@ -8,11 +8,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.grommade.lazymusicianship.ui.components.material_dialogs.core.MaterialDialog
-import com.grommade.lazymusicianship.ui.components.material_dialogs.core.buttons
+import com.grommade.lazymusicianship.ui.components.datepiker.datepicker
+import com.grommade.lazymusicianship.ui.components.material_dialogs.core.*
 import com.grommade.lazymusicianship.ui.components.timepicker.timepicker
 import com.grommade.lazymusicianship.util.MINUTES_IN_HOUR
 import com.grommade.lazymusicianship.util.SECONDS_IN_MINUTE
+import java.time.LocalDate
 import java.time.LocalTime
 
 @Composable
@@ -106,6 +107,14 @@ fun BuiltInputDialog(
 }
 
 @Composable
+fun MaterialDialog.BuiltDateDialog(callback: (LocalDate) -> Unit) {
+    build {
+        datepicker(onDateChange = callback)
+        SetButtonsOkCancel()
+    }
+}
+
+@Composable
 fun MaterialDialog.BuiltMSTimeDialog(initialTime: Int = 0, callback: (Int) -> Unit) {
     build {
         timepicker(
@@ -116,6 +125,52 @@ fun MaterialDialog.BuiltMSTimeDialog(initialTime: Int = 0, callback: (Int) -> Un
             callback(time.toSeconds())
         }
         SetButtonsOkCancel()
+    }
+}
+
+@Composable
+fun MaterialDialog.BuiltListDialog(
+    title: String,
+    message: String = "",
+    list: List<String>,
+    callback: (Int) -> Unit
+) {
+    build {
+        SetTitle(title, message)
+        listItems(list = list) { index, _ ->
+            callback(index)
+        }
+    }
+}
+
+@Composable
+fun MaterialDialog.BuiltSingleChoiceDialog(
+    title: String,
+    message: String = "",
+    list: List<String>,
+    initialSelection: Int? = null,
+    callback: (Int) -> Unit
+) {
+    build {
+        SetTitle(title, message)
+        listItemsSingleChoice(
+            list = list,
+            initialSelection = initialSelection
+        ) {
+            callback(it)
+        }
+        SetButtonsOkCancel()
+    }
+}
+
+@Composable
+private fun MaterialDialog.SetTitle(
+    title: String,
+    message: String = "",
+) {
+    title(title)
+    if (message.isNotEmpty()) {
+        message(message)
     }
 }
 

@@ -1,6 +1,5 @@
 package com.grommade.lazymusicianship.ui_states
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
@@ -28,7 +27,6 @@ import com.grommade.lazymusicianship.ui.components.DeleteIcon
 import com.grommade.lazymusicianship.ui.components.FloatingAddActionButton
 import com.grommade.lazymusicianship.ui.components.NavigationBackIcon
 
-@ExperimentalFoundationApi
 @Composable
 fun StatesUi(
     openState: (Long) -> Unit,
@@ -41,7 +39,6 @@ fun StatesUi(
     )
 }
 
-@ExperimentalFoundationApi
 @Composable
 fun StatesUi(
     viewModel: StatesViewModel,
@@ -61,7 +58,6 @@ fun StatesUi(
     }
 }
 
-@ExperimentalFoundationApi
 @Composable
 fun StatesUi(
     viewState: StatesViewState,
@@ -101,7 +97,6 @@ fun StatesTopBar(back: () -> Unit) {
     )
 }
 
-@ExperimentalFoundationApi
 @Composable
 fun StateItem(
     state: StateStudy,
@@ -140,7 +135,6 @@ fun StateItem(
     }
 }
 
-@ExperimentalFoundationApi
 @Preview
 @Composable
 fun StatesUiPreview() {
