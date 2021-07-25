@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grommade.lazymusicianship.data.entity.StateStudy
 import com.grommade.lazymusicianship.domain.observers.ObserveStates
-import com.grommade.lazymusicianship.domain.use_cases.DeleteStateStudy
+import com.grommade.lazymusicianship.domain.use_cases.DeleteState
 import com.grommade.lazymusicianship.ui.common.SnackBarManager
 import com.grommade.lazymusicianship.util.doIfFailure
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,7 +16,7 @@ import javax.inject.Inject
 class StatesViewModel @Inject constructor(
     observeStates: ObserveStates,
     private val snackBarManager: SnackBarManager,
-    private val deleteStateStudy: DeleteStateStudy,
+    private val deleteStateStudy: DeleteState,
 ) : ViewModel() {
 
     private val pendingActions = MutableSharedFlow<StatesActions>()
@@ -52,7 +52,7 @@ class StatesViewModel @Inject constructor(
 
     private fun delete(state: StateStudy) {
         viewModelScope.launch {
-            deleteStateStudy(DeleteStateStudy.Params(state)).first()
+            deleteStateStudy(DeleteState.Params(state)).first()
                 .doIfFailure { message, _ ->
                     snackBarManager.addError(message ?: "Unknown error message")
                 }

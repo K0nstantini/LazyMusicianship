@@ -9,11 +9,11 @@ import com.grommade.lazymusicianship.util.ResultOf
 import javax.inject.Inject
 
 
-class DeleteStateStudy @Inject constructor(
+class DeleteState @Inject constructor(
     private val repoStateStudy: RepoStateStudy,
     private val repoPractice: RepoPractice,
     private val resHelper: ResourcesHelper,
-) : ResultUserCase<DeleteStateStudy.Params, ResultOf<Boolean>>() {
+) : ResultUserCase<DeleteState.Params, ResultOf<Boolean>>() {
 
 
     override suspend fun doWork(params: Params): ResultOf<Boolean> {

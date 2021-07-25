@@ -4,18 +4,21 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grommade.lazymusicianship.data.entity.StateStudy
-import com.grommade.lazymusicianship.domain.repos.RepoStateStudy
 import com.grommade.lazymusicianship.domain.use_cases.GetState
+import com.grommade.lazymusicianship.domain.use_cases.SaveState
 import com.grommade.lazymusicianship.util.Keys
+import com.grommade.lazymusicianship.util.doIfSuccess
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class StateDetailsViewModel @Inject constructor(
-    private val repoStateStudy: RepoStateStudy,
-    private val getState: GetState,
+    private val getStateStudy: GetState,
+    private val saveStateStudy: SaveState,
     private val handle: SavedStateHandle
 ) : ViewModel() {
 
@@ -26,9 +29,6 @@ class StateDetailsViewModel @Inject constructor(
     val state = currentState.map { stateStudy ->
         StateDetailsViewState(stateStudy = stateStudy)
     }
-
-    // FIXME
-    val navigateToBack = MutableSharedFlow<Boolean>()
 
     init {
         viewModelScope.launch {
@@ -41,7 +41,6 @@ class StateDetailsViewModel @Inject constructor(
                     is StateDetailsActions.ChangeTempo -> changeState { copy(considerTempo = action.value) }
                     is StateDetailsActions.ChangeTimes -> changeState { copy(countNumberOfTimes = action.value) }
                     is StateDetailsActions.ChangeCompleted -> changeState { copy(completed = action.value) }
-                    StateDetailsActions.SaveAndClose -> save()
                     else -> {
                     }
                 }
@@ -51,21 +50,19 @@ class StateDetailsViewModel @Inject constructor(
 
     private suspend fun initStateStudy() {
         val stateId = handle.get<Long>(Keys.STATE_ID) ?: 0
-        val stateStudy = getState(GetState.Params(stateId)).first()
-        stateStudy?.let { currentState.value = it }
+        getStateStudy(GetState.Params(stateId)).first()
+            .doIfSuccess { currentState.value = it }
     }
 
     private fun changeState(foo: StateStudy.() -> StateStudy) {
         currentState.value = foo(currentState.value)
     }
 
-    private fun save() {
-        viewModelScope.launch {
-            repoStateStudy.save(currentState.value)
-            navigateToBack.emit(true)
+    fun save() {
+        CoroutineScope(Job()).launch {
+            saveStateStudy(SaveState.Params(currentState.value)).collect()
         }
     }
-
 
     fun submitAction(action: StateDetailsActions) {
         viewModelScope.launch { pendingActions.emit(action) }

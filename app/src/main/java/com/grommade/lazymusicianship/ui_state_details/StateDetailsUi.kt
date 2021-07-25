@@ -15,10 +15,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.insets.ui.Scaffold
 import com.grommade.lazymusicianship.R
-import com.grommade.lazymusicianship.ui.components.TextFieldName
 import com.grommade.lazymusicianship.ui.common.rememberFlowWithLifecycle
 import com.grommade.lazymusicianship.ui.components.SaveCloseTopBar
 import com.grommade.lazymusicianship.ui.components.SetItemSwitch
+import com.grommade.lazymusicianship.ui.components.TextFieldName
 
 @Composable
 fun StateDetailsUi(
@@ -39,10 +39,12 @@ fun StateDetailsUi(
     val viewState by rememberFlowWithLifecycle(viewModel.state)
         .collectAsState(initial = StateDetailsViewState.Empty)
 
-    viewModel.navigateToBack.collectAsState(null).value?.let { close() }
-
     StateDetailsUi(viewState) { action ->
         when (action) {
+            StateDetailsActions.SaveAndClose -> {
+                viewModel.save()
+                close()
+            }
             StateDetailsActions.Close -> close()
             else -> viewModel.submitAction(action)
         }
