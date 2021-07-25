@@ -2,11 +2,11 @@ package com.grommade.lazymusicianship.ui_states
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.grommade.lazymusicianship.R
 import com.grommade.lazymusicianship.data.entity.StateStudy
 import com.grommade.lazymusicianship.domain.observers.ObserveStates
 import com.grommade.lazymusicianship.domain.use_cases.DeleteStateStudy
 import com.grommade.lazymusicianship.ui.common.SnackBarManager
+import com.grommade.lazymusicianship.util.doIfFailure
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -52,10 +52,10 @@ class StatesViewModel @Inject constructor(
 
     private fun delete(state: StateStudy) {
         viewModelScope.launch {
-            val result = deleteStateStudy(DeleteStateStudy.Params(state)).first()
-            if (!result) {
-                snackBarManager.addError(R.string.snack_state_already_in_use)
-            }
+            deleteStateStudy(DeleteStateStudy.Params(state)).first()
+                .doIfFailure { message, _ ->
+                    snackBarManager.addError(message ?: "Unknown error message")
+                }
         }
     }
 

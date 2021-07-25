@@ -10,7 +10,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -84,7 +83,6 @@ fun StatesUi(
     }
 
     val snackHostState = remember { SnackbarHostState() }
-    val resources = LocalContext.current.resources
 
     SnackbarHost(
         hostState = snackHostState,
@@ -102,7 +100,7 @@ fun StatesUi(
 
     LaunchedEffect(viewState.error) {
         viewState.error?.let { error ->
-            snackHostState.showSnackbar(resources.getString(error))
+            snackHostState.showSnackbar(error)
         }
     }
 }

@@ -24,10 +24,10 @@ import java.time.Duration
 import javax.inject.Inject
 
 class SnackBarManager @Inject constructor() {
-    private val pendingErrors = Channel<Int>(3, BufferOverflow.DROP_OLDEST)
+    private val pendingErrors = Channel<String>(3, BufferOverflow.DROP_OLDEST)
     private val removeErrorSignal = Channel<Unit>(Channel.RENDEZVOUS)
 
-    val errors: Flow<Int?> = flow {
+    val errors: Flow<String?> = flow {
         emit(null)
 
         pendingErrors.receiveAsFlow().collect {
@@ -42,7 +42,7 @@ class SnackBarManager @Inject constructor() {
         }
     }
 
-    suspend fun addError(error: Int) {
+    suspend fun addError(error: String) {
         pendingErrors.send(error)
     }
 
