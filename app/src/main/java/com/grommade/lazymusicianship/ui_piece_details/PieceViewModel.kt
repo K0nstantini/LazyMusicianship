@@ -7,7 +7,9 @@ import com.grommade.lazymusicianship.data.entity.Piece
 import com.grommade.lazymusicianship.data.entity.Section
 import com.grommade.lazymusicianship.domain.repos.RepoPiece
 import com.grommade.lazymusicianship.domain.repos.RepoSection
+import com.grommade.lazymusicianship.domain.use_cases.GetPiece
 import com.grommade.lazymusicianship.util.Keys
+import com.grommade.lazymusicianship.util.doIfSuccess
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -16,13 +18,13 @@ import javax.inject.Inject
 @HiltViewModel
 class PieceViewModel @Inject constructor(
     private val repoPiece: RepoPiece,
+    private val getPiece: GetPiece,
     private val repoSection: RepoSection,
-    handle: SavedStateHandle
+    private val handle: SavedStateHandle
 ) : ViewModel() {
 
     private val pendingActions = MutableSharedFlow<PieceActions>()
 
-    private val pieceId: Long = handle.get<Long>(Keys.PIECE_ID) ?: -1L
     private val currentPiece = MutableStateFlow(Piece())
 
     private val currentSections = currentPiece.flatMapLatest {
@@ -44,9 +46,8 @@ class PieceViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            repoPiece.getPiece(pieceId)?.let { piece ->
-                currentPiece.value = piece
-            }
+            initPiece()
+
             pendingActions.collect { action ->
                 when (action) {
                     is PieceActions.ChangeName -> changeName(action.value)
@@ -62,6 +63,12 @@ class PieceViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    private suspend fun initPiece() {
+        val pieceId = handle.get<Long>(Keys.PIECE_ID) ?: 0
+        getPiece(GetPiece.Params(pieceId)).first()
+            .doIfSuccess { currentPiece.value = it }
     }
 
     private fun changeName(value: String) {

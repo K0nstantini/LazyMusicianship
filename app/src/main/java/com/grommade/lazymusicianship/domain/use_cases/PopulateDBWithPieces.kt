@@ -2,19 +2,17 @@ package com.grommade.lazymusicianship.domain.use_cases
 
 import com.grommade.lazymusicianship.data.entity.Piece
 import com.grommade.lazymusicianship.data.entity.Section
+import com.grommade.lazymusicianship.domain.InputWorkUseCase
 import com.grommade.lazymusicianship.domain.repos.RepoPiece
 import com.grommade.lazymusicianship.domain.repos.RepoSection
 import javax.inject.Inject
 
-interface PopulateDBWithPieces {
-    suspend operator fun invoke()
-}
-
-class PopulateDBWithPiecesImpl @Inject constructor(
+class PopulateDBWithPieces @Inject constructor(
     private val repoPiece: RepoPiece,
     private val repoSection: RepoSection
-) : PopulateDBWithPieces {
-    override suspend fun invoke() {
+) : InputWorkUseCase<Unit>() {
+
+    override suspend fun doWork(params: Unit) {
 
         repoPiece.deleteAll()
 
