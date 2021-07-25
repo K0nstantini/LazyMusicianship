@@ -19,6 +19,7 @@ import com.google.accompanist.insets.ui.TopAppBar
 import com.grommade.lazymusicianship.BuildConfig
 import com.grommade.lazymusicianship.R
 import com.grommade.lazymusicianship.data.entity.Piece
+import com.grommade.lazymusicianship.ui.common.ShowSnackBar
 import com.grommade.lazymusicianship.ui.common.rememberFlowWithLifecycle
 import com.grommade.lazymusicianship.ui.components.DeleteIcon
 import com.grommade.lazymusicianship.ui.components.FloatingAddActionButton
@@ -53,7 +54,7 @@ fun PiecesListUi(
 fun PiecesListUi(
     viewState: PiecesListViewState,
     actioner: (PiecesListActions) -> Unit
-) {
+) = Box(modifier = Modifier.fillMaxSize()) {
     Scaffold(
         topBar = {
             PiecesListTopBar { actioner(PiecesListActions.PopulateDB) }
@@ -77,6 +78,12 @@ fun PiecesListUi(
             }
         }
     }
+
+    ShowSnackBar(
+        error = viewState.error,
+        modifier = Modifier.align(Alignment.BottomCenter),
+        onDismiss = { actioner(PiecesListActions.ClearError) }
+    )
 }
 
 @Composable
@@ -113,7 +120,6 @@ fun PiecesListDropdownMenu(populateDB: () -> Unit) {
         }
     }
 }
-
 
 
 @Composable

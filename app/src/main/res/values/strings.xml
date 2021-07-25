@@ -37,6 +37,8 @@
     <string name="alert_title_change_tempo">Tempo</string>
     <string name="alert_title_change_time">Time</string>
 
+    <string name="snack_piece_already_in_use">This piece already in use</string>
+
     <!--    Section-->
     <string name="hint_edit_text_beat">Beat</string>
     <string name="section_title_tempo">Tempo</string>

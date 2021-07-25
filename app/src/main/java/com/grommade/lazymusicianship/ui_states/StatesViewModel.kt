@@ -23,7 +23,11 @@ class StatesViewModel @Inject constructor(
 
     private val selectedState = MutableStateFlow(0L)
 
-    val state = combine(observeStates.observe(), selectedState, snackBarManager.errors) { states, selected, error ->
+    val state = combine(
+        observeStates.observe(),
+        selectedState,
+        snackBarManager.errors
+    ) { states, selected, error ->
         StatesViewState(
             states = states,
             selected = selected,

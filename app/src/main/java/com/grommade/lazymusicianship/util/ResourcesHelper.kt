@@ -12,4 +12,7 @@ class ResourcesHelper @Inject constructor(
 ) {
     val errorStateDel
         get() = context.getString(R.string.snack_state_already_in_use)
+
+    val errorPieceDel
+        get() = context.getString(R.string.snack_piece_already_in_use)
 }

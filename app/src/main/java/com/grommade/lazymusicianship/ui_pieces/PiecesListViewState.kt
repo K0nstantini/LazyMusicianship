@@ -6,7 +6,8 @@ import com.grommade.lazymusicianship.data.entity.Piece
 @Immutable
 data class PiecesListViewState(
     val pieces: List<Piece> = emptyList(),
-    val selectedPiece: Long = 0
+    val selectedPiece: Long = 0,
+    val error: String? = null
 ) {
     companion object {
         val Empty = PiecesListViewState()
