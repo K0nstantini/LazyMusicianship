@@ -3,6 +3,7 @@ package com.grommade.lazymusicianship.ui_pieces
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grommade.lazymusicianship.data.entity.Piece
+import com.grommade.lazymusicianship.domain.observers.ObservePieces
 import com.grommade.lazymusicianship.domain.repos.RepoPiece
 import com.grommade.lazymusicianship.domain.use_cases.PopulateDBWithPiecesImpl
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,16 +17,15 @@ import javax.inject.Inject
 @HiltViewModel
 class PiecesListViewModel @Inject constructor(
     private val repoPiece: RepoPiece,
+    observePieces: ObservePieces,
     populateDBWithPieces: PopulateDBWithPiecesImpl
 ) : ViewModel() {
 
     private val pendingActions = MutableSharedFlow<PiecesListActions>()
 
-    private val piecesList = repoPiece.getPiecesFlow()
-
     private val selectedPiece = MutableStateFlow(0L)
 
-    val state = combine(piecesList, selectedPiece) { pieces, selected ->
+    val state = combine(observePieces.observe(), selectedPiece) { pieces, selected ->
         PiecesListViewState(
             pieces = pieces,
             selectedPiece = selected
@@ -33,6 +33,8 @@ class PiecesListViewModel @Inject constructor(
     }
 
     init {
+        observePieces(Unit)
+
         viewModelScope.launch {
             pendingActions.collect { action ->
                 when (action) {
