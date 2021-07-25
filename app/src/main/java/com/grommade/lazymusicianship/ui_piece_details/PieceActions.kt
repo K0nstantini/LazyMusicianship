@@ -13,5 +13,6 @@ sealed class PieceActions {
     data class SelectSection(val id: Long): PieceActions()
     data class DeleteSection(val section: Section): PieceActions()
     object SaveAndClose: PieceActions()
+    object NavigateToSection: PieceActions()
     object Close: PieceActions()
 }

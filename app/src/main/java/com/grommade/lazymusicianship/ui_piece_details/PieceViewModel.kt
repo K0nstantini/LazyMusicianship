@@ -5,9 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grommade.lazymusicianship.data.entity.Piece
 import com.grommade.lazymusicianship.data.entity.Section
-import com.grommade.lazymusicianship.domain.repos.RepoPiece
 import com.grommade.lazymusicianship.domain.repos.RepoSection
 import com.grommade.lazymusicianship.domain.use_cases.GetPiece
+import com.grommade.lazymusicianship.domain.use_cases.SavePiece
 import com.grommade.lazymusicianship.util.Keys
 import com.grommade.lazymusicianship.util.doIfSuccess
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -17,8 +17,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PieceViewModel @Inject constructor(
-    private val repoPiece: RepoPiece,
     private val getPiece: GetPiece,
+    private val savePiece: SavePiece,
     private val repoSection: RepoSection,
     private val handle: SavedStateHandle
 ) : ViewModel() {
@@ -41,9 +41,6 @@ class PieceViewModel @Inject constructor(
         )
     }
 
-    val navigateToSection = MutableSharedFlow<Long>()
-    val navigateToBack = MutableSharedFlow<Boolean>()
-
     init {
         viewModelScope.launch {
             initPiece()
@@ -57,7 +54,6 @@ class PieceViewModel @Inject constructor(
                     is PieceActions.ChangeDescription -> changeDescription(action.value)
                     is PieceActions.SelectSection -> selectSection(action.id)
                     is PieceActions.DeleteSection -> deleteSection(action.section)
-                    PieceActions.SaveAndClose -> saveAndClose()
                     else -> {
                     }
                 }
@@ -105,19 +101,10 @@ class PieceViewModel @Inject constructor(
         currentPiece.value = function()
     }
 
-    private fun saveAndClose() {
-        viewModelScope.launch {
-            repoPiece.save(currentPiece.value)
-            navigateToBack.emit(true)
-        }
-    }
-
-    fun saveAndAddSection() {
-        viewModelScope.launch {
-            val id = repoPiece.save(currentPiece.value)
-            changePiece { currentPiece.value.copy(id = id) }
-            navigateToSection.emit(id)
-        }
+    suspend fun save(): Long {
+        val id = savePiece(SavePiece.Params(currentPiece.value)).first()
+        changePiece { currentPiece.value.copy(id = id) }
+        return id
     }
 
     fun submitAction(action: PieceActions) {

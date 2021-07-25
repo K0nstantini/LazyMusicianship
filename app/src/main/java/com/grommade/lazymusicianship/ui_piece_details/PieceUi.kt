@@ -20,11 +20,11 @@ import com.google.accompanist.insets.ui.Scaffold
 import com.grommade.lazymusicianship.R
 import com.grommade.lazymusicianship.data.entity.Piece
 import com.grommade.lazymusicianship.data.entity.Section
-import com.grommade.lazymusicianship.ui.components.TextFieldName
 import com.grommade.lazymusicianship.ui.common.rememberFlowWithLifecycle
 import com.grommade.lazymusicianship.ui.components.*
 import com.grommade.lazymusicianship.ui.components.material_dialogs.core.MaterialDialog
 import com.grommade.lazymusicianship.util.extentions.toStrTime
+import kotlinx.coroutines.launch
 
 @Composable
 fun PieceUi(
@@ -48,16 +48,17 @@ fun PieceUi(
     val viewState by rememberFlowWithLifecycle(viewModel.state)
         .collectAsState(initial = PieceViewState.Empty)
 
-    viewModel.navigateToSection.collectAsState(null).value?.let { pieceId ->
-        openSection(pieceId, 0, 0)
-    }
-    viewModel.navigateToBack.collectAsState(null).value?.let { close() }
+    val scope = rememberCoroutineScope()
 
     val confirmToWriteDialog = remember { mutableStateOf(false) }
     if (confirmToWriteDialog.value) {
         BuiltSimpleOkCancelDialog(
             title = stringResource(R.string.alert_title_save_before_add_section),
-            callback = viewModel::saveAndAddSection,
+            callback = {
+                scope.launch {
+                    openSection(viewModel.save(), 0, 0)
+                }
+            },
             close = { confirmToWriteDialog.value = false }
         )
     }
@@ -71,6 +72,10 @@ fun PieceUi(
                 } else {
                     openSection(viewState.piece.id, 0, action.parentId)
                 }
+            }
+            PieceActions.SaveAndClose -> scope.launch {
+                viewModel.save()
+                close()
             }
             PieceActions.Close -> close()
             else -> viewModel.submitAction(action)
