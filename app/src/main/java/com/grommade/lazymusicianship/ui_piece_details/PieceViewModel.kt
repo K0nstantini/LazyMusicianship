@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grommade.lazymusicianship.data.entity.Piece
 import com.grommade.lazymusicianship.data.entity.Section
+import com.grommade.lazymusicianship.domain.observers.ObserveSections
 import com.grommade.lazymusicianship.domain.repos.RepoSection
 import com.grommade.lazymusicianship.domain.use_cases.GetPiece
 import com.grommade.lazymusicianship.domain.use_cases.SavePiece
@@ -20,15 +21,17 @@ class PieceViewModel @Inject constructor(
     private val getPiece: GetPiece,
     private val savePiece: SavePiece,
     private val repoSection: RepoSection,
-    private val handle: SavedStateHandle
+    private val handle: SavedStateHandle,
+    observeSections: ObserveSections
 ) : ViewModel() {
 
     private val pendingActions = MutableSharedFlow<PieceActions>()
 
     private val currentPiece = MutableStateFlow(Piece())
 
-    private val currentSections = currentPiece.flatMapLatest {
-        repoSection.getSectionsFlow(currentPiece.value.id)
+    private val currentSections = currentPiece.flatMapLatest {piece ->
+        observeSections(ObserveSections.Params(piece.id))
+        observeSections.observe()
     }
 
     private val selectedSection = MutableStateFlow(0L)
