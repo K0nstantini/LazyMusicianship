@@ -5,15 +5,12 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Divider
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.material.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -22,6 +19,7 @@ import com.google.accompanist.insets.ui.Scaffold
 import com.google.accompanist.insets.ui.TopAppBar
 import com.grommade.lazymusicianship.R
 import com.grommade.lazymusicianship.data.entity.StateStudy
+import com.grommade.lazymusicianship.ui.common.SwipeDismissSnackBar
 import com.grommade.lazymusicianship.ui.common.rememberFlowWithLifecycle
 import com.grommade.lazymusicianship.ui.components.DeleteIcon
 import com.grommade.lazymusicianship.ui.components.FloatingAddActionButton
@@ -62,7 +60,7 @@ fun StatesUi(
 fun StatesUi(
     viewState: StatesViewState,
     actioner: (StatesActions) -> Unit
-) {
+) = Box(modifier = Modifier.fillMaxSize()) {
     Scaffold(
         topBar = { StatesTopBar { actioner(StatesActions.Back) } },
         floatingActionButton = { FloatingAddActionButton { actioner(StatesActions.AddNew) } },
@@ -82,6 +80,29 @@ fun StatesUi(
                     openPiece = { actioner(StatesActions.Open(state.id)) }
                 )
             }
+        }
+    }
+
+    val snackHostState = remember { SnackbarHostState() }
+    val resources = LocalContext.current.resources
+
+    SnackbarHost(
+        hostState = snackHostState,
+        snackbar = {
+            SwipeDismissSnackBar(
+                data = it,
+                onDismiss = { actioner(StatesActions.ClearError) }
+            )
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .align(Alignment.BottomCenter)
+            .padding(start = 16.dp, end = 16.dp, bottom = 48.dp)
+    )
+
+    LaunchedEffect(viewState.error) {
+        viewState.error?.let { error ->
+            snackHostState.showSnackbar(resources.getString(error))
         }
     }
 }

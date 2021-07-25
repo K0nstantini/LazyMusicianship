@@ -5,18 +5,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grommade.lazymusicianship.data.entity.StateStudy
 import com.grommade.lazymusicianship.domain.repos.RepoStateStudy
+import com.grommade.lazymusicianship.domain.use_cases.GetState
 import com.grommade.lazymusicianship.util.Keys
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class StateDetailsViewModel @Inject constructor(
     private val repoStateStudy: RepoStateStudy,
+    private val getState: GetState,
     private val handle: SavedStateHandle
 ) : ViewModel() {
 
@@ -52,9 +51,8 @@ class StateDetailsViewModel @Inject constructor(
 
     private suspend fun initStateStudy() {
         val stateId = handle.get<Long>(Keys.STATE_ID) ?: 0
-        repoStateStudy.getState(stateId)?.let { stateStudy ->
-            currentState.value = stateStudy
-        }
+        val stateStudy = getState(GetState.Params(stateId)).first()
+        stateStudy?.let { currentState.value = it }
     }
 
     private fun changeState(foo: StateStudy.() -> StateStudy) {

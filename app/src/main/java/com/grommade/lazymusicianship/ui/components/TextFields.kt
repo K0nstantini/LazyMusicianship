@@ -1,4 +1,4 @@
-package com.grommade.lazymusicianship.ui
+package com.grommade.lazymusicianship.ui.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.MaterialTheme

@@ -14,5 +14,6 @@ abstract class UseCasesModules {
 
     @Binds
     @Singleton
-    abstract fun bindPopulateDBWithPieces(populateDBWithPiecesImpl: PopulateDBWithPiecesImpl): PopulateDBWithPieces
+    abstract fun bindPopulateDBWithPieces(populate: PopulateDBWithPiecesImpl): PopulateDBWithPieces
+
 }

@@ -8,5 +8,6 @@ interface RepoPractice {
     suspend fun save(practice: Practice): Long
     suspend fun delete(practice: Practice)
     suspend fun getPracticeItem(id: Long): PracticeWithPieceAndSections?
+    suspend fun countPracticesByStateId(stateId: Long): Int
     fun getPracticesItemsFlow(): Flow<List<PracticeWithPieceAndSections>>
 }

@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.insets.ui.Scaffold
 import com.grommade.lazymusicianship.R
-import com.grommade.lazymusicianship.ui.TextFieldName
+import com.grommade.lazymusicianship.ui.components.TextFieldName
 import com.grommade.lazymusicianship.ui.common.rememberFlowWithLifecycle
 import com.grommade.lazymusicianship.ui.components.SaveCloseTopBar
 import com.grommade.lazymusicianship.ui.components.SetItemSwitch

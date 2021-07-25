@@ -20,7 +20,7 @@ import com.google.accompanist.insets.ui.Scaffold
 import com.grommade.lazymusicianship.R
 import com.grommade.lazymusicianship.data.entity.Piece
 import com.grommade.lazymusicianship.data.entity.Section
-import com.grommade.lazymusicianship.ui.TextFieldName
+import com.grommade.lazymusicianship.ui.components.TextFieldName
 import com.grommade.lazymusicianship.ui.common.rememberFlowWithLifecycle
 import com.grommade.lazymusicianship.ui.components.*
 import com.grommade.lazymusicianship.ui.components.material_dialogs.core.MaterialDialog

@@ -26,4 +26,8 @@ class RepoPracticeImpl @Inject constructor(
         practiceDao.getPracticeItem(id)
     }
 
+    override suspend fun countPracticesByStateId(stateId: Long): Int = withContext(dispatchers.io) {
+        practiceDao.getCountPracticesByStateId(stateId)
+    }
+
 }

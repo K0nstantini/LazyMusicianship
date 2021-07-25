@@ -66,6 +66,8 @@
     <string name="state_title_count_number_of_times">Count number of times</string>
     <string name="state_title_completed">Completed</string>
 
+    <string name="snack_state_already_in_use">This state already in use</string>
+
     <!--    Settings items-->
     <string name="btn_clear">Clear</string>
 
