@@ -11,8 +11,8 @@ class GetPiece @Inject constructor(
 ) : ResultUserCase<GetPiece.Params, ResultOf<Piece>>() {
 
     override suspend fun doWork(params: Params): ResultOf<Piece> {
-        return when (val state = repoPiece.getPiece(params.pieceId)) {
-            is Piece -> ResultOf.Success(state)
+        return when (val piece = repoPiece.getPiece(params.pieceId)) {
+            is Piece -> ResultOf.Success(piece)
             else -> ResultOf.Failure()
         }
     }

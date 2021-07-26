@@ -9,7 +9,6 @@ class SavePiece @Inject constructor(
     private val repoPiece: RepoPiece
 ) : ResultUserCase<SavePiece.Params, Long>() {
 
-
     override suspend fun doWork(params: Params): Long {
         return repoPiece.save(params.piece)
     }

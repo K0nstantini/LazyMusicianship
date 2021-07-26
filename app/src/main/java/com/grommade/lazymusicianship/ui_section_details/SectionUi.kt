@@ -39,10 +39,12 @@ fun SectionUi(
     val viewState by rememberFlowWithLifecycle(viewModel.state)
         .collectAsState(initial = SectionViewState.Empty)
 
-    viewModel.navigateToBack.collectAsState(null).value?.let { close() }
-
     SectionUi(viewState) { action ->
         when (action) {
+            SectionActions.SaveAndClose -> {
+                viewModel.save()
+                close()
+            }
             SectionActions.Close -> close()
             else -> viewModel.submitAction(action)
         }
