@@ -64,7 +64,10 @@ class PracticeDetailsViewModel @Inject constructor(
                     is PracticeDetailsActions.ChangePiece -> changePiece(action.piece)
                     is PracticeDetailsActions.ChangeSectionFrom -> changeSectionFrom(action.section)
                     is PracticeDetailsActions.ChangeSectionTo -> changeSectionTo(action.section)
+                    is PracticeDetailsActions.ChangeTime -> changePractice { copy(elapsedTime = action.value) }
                     is PracticeDetailsActions.ChangeState -> changeStateStudy(action.state)
+                    is PracticeDetailsActions.ChangeTempo -> changePractice { copy(tempo = action.value) }
+                    is PracticeDetailsActions.ChangeCountTimes -> changePractice { copy(countTimes = action.value) }
                     else -> {
                     }
                 }

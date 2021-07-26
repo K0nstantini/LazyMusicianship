@@ -5,14 +5,17 @@ import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.grommade.lazymusicianship.ui.components.datepiker.datepicker
 import com.grommade.lazymusicianship.ui.components.material_dialogs.core.*
 import com.grommade.lazymusicianship.ui.components.timepicker.timepicker
-import com.grommade.lazymusicianship.util.MINUTES_IN_HOUR
-import com.grommade.lazymusicianship.util.SECONDS_IN_MINUTE
+import com.grommade.lazymusicianship.util.extentions.minutesToLocalTime
+import com.grommade.lazymusicianship.util.extentions.secondsToLocalTime
+import com.grommade.lazymusicianship.util.extentions.toMinutes
+import com.grommade.lazymusicianship.util.extentions.toSeconds
 import java.time.LocalDate
 import java.time.LocalTime
 
@@ -46,7 +49,7 @@ fun BuiltSimpleOkCancelDialog(
 }
 
 @Composable
-fun BuiltInputDialog(
+fun BuiltInputDialogDel(
     title: String,
     value: String = "",
     label: String = "",
@@ -115,15 +118,27 @@ fun MaterialDialog.BuiltDateDialog(callback: (LocalDate) -> Unit) {
 }
 
 @Composable
-fun MaterialDialog.BuiltMSTimeDialog(initialTime: Int = 0, callback: (Int) -> Unit) {
+fun MaterialDialog.BuiltTimeDialog(
+    initialTime: Int = 0,
+    callback: (Int) -> Unit,
+    minutesAndSeconds: Boolean = false,
+) {
+    val prefillTime = when (minutesAndSeconds) {
+        true -> initialTime.secondsToLocalTime()
+        false -> initialTime.minutesToLocalTime()
+    }
+    val changeTime = { time: LocalTime ->
+        when (minutesAndSeconds) {
+            true -> callback(time.toSeconds())
+            false -> callback(time.toMinutes())
+        }
+    }
     build {
         timepicker(
-            initialTime = initialTime.secondsToLocalTime(),
+            initialTime = prefillTime,
             is24HourClock = true,
-            minutesAndSeconds = true,
-        ) { time ->
-            callback(time.toSeconds())
-        }
+            minutesAndSeconds = minutesAndSeconds,
+        ) { time -> changeTime(time) }
         SetButtonsOkCancel()
     }
 }
@@ -164,6 +179,31 @@ fun MaterialDialog.BuiltSingleChoiceDialog(
 }
 
 @Composable
+fun MaterialDialog.BuiltInputDialog(
+    title: String,
+    message: String = "",
+    prefill: String = "",
+    label: String = "",
+    hint: String = "",
+    isTextValid: (String) -> Boolean = { true },
+    callback: (String) -> Unit,
+) {
+    build {
+        SetTitle(title, message)
+        Divider(color = Color.Transparent, thickness = 16.dp)
+        input(
+            label = label,
+            hint = hint,
+            prefill = prefill,
+            isTextValid = isTextValid
+        ) {
+            callback(it)
+        }
+        SetButtonsOkCancel()
+    }
+}
+
+@Composable
 private fun MaterialDialog.SetTitle(
     title: String,
     message: String = "",
@@ -173,12 +213,6 @@ private fun MaterialDialog.SetTitle(
         message(message)
     }
 }
-
-private fun Int.secondsToLocalTime(): LocalTime =
-    LocalTime.of(0, this / SECONDS_IN_MINUTE, this % SECONDS_IN_MINUTE)
-
-private fun LocalTime.toSeconds(): Int =
-    hour * MINUTES_IN_HOUR + minute * SECONDS_IN_MINUTE + second
 
 @Composable
 private fun MaterialDialog.SetButtonsOkCancel(

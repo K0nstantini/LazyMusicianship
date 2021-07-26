@@ -1,9 +1,11 @@
-package com.grommade.lazymusicianship.ui_section
+package com.grommade.lazymusicianship.ui_section_details
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -12,12 +14,11 @@ import androidx.core.text.isDigitsOnly
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.insets.ui.Scaffold
 import com.grommade.lazymusicianship.R
-import com.grommade.lazymusicianship.ui.components.TextFieldName
 import com.grommade.lazymusicianship.ui.common.rememberFlowWithLifecycle
-import com.grommade.lazymusicianship.ui.components.BuiltInputDialog
 import com.grommade.lazymusicianship.ui.components.SaveCloseTopBar
-import com.grommade.lazymusicianship.ui.components.SetItemDefault
+import com.grommade.lazymusicianship.ui.components.SetItemDefaultWithInputDialog
 import com.grommade.lazymusicianship.ui.components.SetItemSwitch
+import com.grommade.lazymusicianship.ui.components.TextFieldName
 
 @Composable
 fun SectionUi(
@@ -74,12 +75,13 @@ fun SectionUi(
             TextFieldName(viewState.section.name) { value ->
                 actioner(SectionActions.ChangeName(value))
             }
-            TempoItem(
+            SetItemDefaultWithInputDialog(
                 title = stringResource(R.string.section_title_tempo),
                 value = viewState.section.tempo.toString(),
-                isTextValid = { text: String -> text.isDigitsOnly() },
-                changeInfo = { value: String -> actioner(SectionActions.ChangeTempo(value)) }
-            )
+                isTextValid = { text -> text.isDigitsOnly() }
+            ) { tempo ->
+                actioner(SectionActions.ChangeTempo(tempo.toIntOrNull() ?: 0))
+            }
             SetItemSwitch(
                 title = stringResource(R.string.section_title_new),
                 stateSwitch = viewState.section.firstTime,
@@ -88,31 +90,6 @@ fun SectionUi(
             )
         }
     }
-}
-
-@Composable
-fun TempoItem(
-    title: String,
-    value: String,
-    isTextValid: (String) -> Boolean = { true },
-    changeInfo: (String) -> Unit
-) {
-    val alertDialog = remember { mutableStateOf(false) }
-    if (alertDialog.value) {
-        BuiltInputDialog(
-            title = title,
-            value = value,
-            isTextValid = isTextValid,
-            callback = changeInfo,
-            close = { alertDialog.value = false }
-        )
-    }
-
-    SetItemDefault(
-        title = title,
-        value = value,
-        onClick = { alertDialog.value = true }
-    )
 }
 
 @Preview

@@ -15,6 +15,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.text.isDigitsOnly
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.insets.ui.Scaffold
 import com.grommade.lazymusicianship.R
@@ -22,6 +23,7 @@ import com.grommade.lazymusicianship.data.entity.*
 import com.grommade.lazymusicianship.ui.common.rememberFlowWithLifecycle
 import com.grommade.lazymusicianship.ui.components.*
 import com.grommade.lazymusicianship.ui.components.material_dialogs.core.MaterialDialog
+import com.grommade.lazymusicianship.util.extentions.toStrTime
 import java.time.LocalDate
 
 @Composable
@@ -99,11 +101,33 @@ fun PracticeDetailsUi(
                     style = MaterialTheme.typography.caption.copy(color = Color.Red, fontStyle = FontStyle.Italic)
                 )
             }
+            TimeItem(
+                time = viewState.practiceItem.practice.elapsedTime,
+                changeTime = { time -> actioner(PracticeDetailsActions.ChangeTime(time)) }
+            )
             StateStudyItem(
                 stateName = viewState.practiceItem.stateStudy.name,
                 states = viewState.allStates,
                 changeStudy = { state -> actioner(PracticeDetailsActions.ChangeState(state)) }
             )
+            if (viewState.practiceItem.stateStudy.considerTempo) {
+                SetItemDefaultWithInputDialog(
+                    title = stringResource(R.string.practice_title_tempo),
+                    value = viewState.practiceItem.practice.tempo.toString(),
+                    isTextValid = { text -> text.isDigitsOnly() }
+                ) { tempo ->
+                    actioner(PracticeDetailsActions.ChangeTempo(tempo.toIntOrNull() ?: 0))
+                }
+            }
+            if (viewState.practiceItem.stateStudy.countNumberOfTimes) {
+                SetItemDefaultWithInputDialog(
+                    title = stringResource(R.string.practice_title_count_times),
+                    value = viewState.practiceItem.practice.countTimes.toString(),
+                    isTextValid = { text -> text.isDigitsOnly() }
+                ) { times ->
+                    actioner(PracticeDetailsActions.ChangeCountTimes(times.toIntOrNull() ?: 0))
+                }
+            }
         }
     }
 }
@@ -189,6 +213,22 @@ fun SectionItem(
         showClear = sectionName.isNotEmpty(),
         onClickClear = { changeSection(Section()) },
         onClick = listDialog::show
+    )
+}
+
+@Composable
+fun TimeItem(
+    time: Int,
+    changeTime: (Int) -> Unit
+) {
+    val timeDialog = remember { MaterialDialog() }.apply {
+        BuiltTimeDialog(time, changeTime)
+    }
+
+    SetItemDefault(
+        title = stringResource(R.string.practice_title_elapsed_time),
+        value = time.toStrTime(),
+        onClick = timeDialog::show
     )
 }
 

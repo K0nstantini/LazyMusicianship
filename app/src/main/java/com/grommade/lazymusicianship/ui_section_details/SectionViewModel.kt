@@ -1,4 +1,4 @@
-package com.grommade.lazymusicianship.ui_section
+package com.grommade.lazymusicianship.ui_section_details
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -38,11 +38,12 @@ class SectionViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             initSection()
+
             pendingActions.collect { action ->
                 when (action) {
-                    is SectionActions.ChangeName -> changeName(action.value)
-                    is SectionActions.ChangeTempo -> changeTempo(action.value)
-                    is SectionActions.ChangeNew -> changeNew(action.value)
+                    is SectionActions.ChangeName -> changeSection { copy(name = action.value) }
+                    is SectionActions.ChangeTempo -> changeSection { copy(tempo = action.value) }
+                    is SectionActions.ChangeNew -> changeSection { copy(firstTime = action.value) }
                     SectionActions.SaveAndClose -> save()
                     else -> {
                     }
@@ -68,20 +69,6 @@ class SectionViewModel @Inject constructor(
         )
     }
 
-
-    private fun changeName(value: String) {
-        changeSection { copy(name = value) }
-    }
-
-    private fun changeTempo(value: String) {
-        val beat = value.toIntOrNull() ?: 0
-        changeSection { copy(tempo = beat) }
-    }
-
-    private fun changeNew(value: Boolean) {
-        changeSection { copy(firstTime = value) }
-    }
-
     private fun changeSection(foo: Section.() -> Section) {
         currentSection.value = foo(currentSection.value)
     }
@@ -94,7 +81,7 @@ class SectionViewModel @Inject constructor(
     }
 
 
-    fun submitAction(action: SectionActions) {
-        viewModelScope.launch { pendingActions.emit(action) }
+    fun submitAction(action: SectionActions) = viewModelScope.launch {
+        pendingActions.emit(action)
     }
 }

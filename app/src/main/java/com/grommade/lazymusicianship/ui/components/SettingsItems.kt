@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -14,7 +15,10 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import com.grommade.lazymusicianship.R
+import com.grommade.lazymusicianship.ui.components.material_dialogs.core.MaterialDialog
 import com.grommade.lazymusicianship.ui.theme.LazyMusicianshipTheme
+
+/** ======================================= Items ================================================================== */
 
 @Composable
 fun SetItemDefault(
@@ -176,6 +180,32 @@ fun SetItemTitle(text: String) {
     )
 }
 
+/** ======================================= Items with Dialogs ===================================================== */
+
+@Composable
+fun SetItemDefaultWithInputDialog(
+    title: String,
+    value: String,
+    isTextValid: (String) -> Boolean = { true },
+    callback: (String) -> Unit
+) {
+    val dateDialog = remember { MaterialDialog() }.apply {
+        BuiltInputDialog(
+            title = title,
+            prefill = value,
+            isTextValid = isTextValid,
+            callback = callback
+        )
+    }
+
+    SetItemDefault(
+        title = title,
+        value = value,
+        onClick = dateDialog::show
+    )
+}
+
+/** ======================================= Preview ================================================================ */
 @Preview
 @Composable
 fun SetItemDefaultPreview() {

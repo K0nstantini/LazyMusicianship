@@ -10,7 +10,7 @@ import com.grommade.lazymusicianship.ui_piece_details.PieceUi
 import com.grommade.lazymusicianship.ui_pieces.PiecesListUi
 import com.grommade.lazymusicianship.ui_practice.PracticeUi
 import com.grommade.lazymusicianship.ui_practice_details.PracticeDetailsUi
-import com.grommade.lazymusicianship.ui_section.SectionUi
+import com.grommade.lazymusicianship.ui_section_details.SectionUi
 import com.grommade.lazymusicianship.ui_state_details.StateDetailsUi
 import com.grommade.lazymusicianship.ui_states.StatesUi
 import com.grommade.lazymusicianship.util.Keys

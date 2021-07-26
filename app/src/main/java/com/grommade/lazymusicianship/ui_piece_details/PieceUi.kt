@@ -24,7 +24,6 @@ import com.grommade.lazymusicianship.ui.common.ShowSnackBar
 import com.grommade.lazymusicianship.ui.common.rememberFlowWithLifecycle
 import com.grommade.lazymusicianship.ui.components.*
 import com.grommade.lazymusicianship.ui.components.material_dialogs.core.MaterialDialog
-import com.grommade.lazymusicianship.ui_pieces.PiecesListActions
 import com.grommade.lazymusicianship.util.extentions.toStrTime
 import kotlinx.coroutines.launch
 
@@ -182,7 +181,7 @@ fun InfoItem(
 ) {
     val alertDialog = remember { mutableStateOf(false) }
     if (alertDialog.value) {
-        BuiltInputDialog(
+        BuiltInputDialogDel(
             title = title,
             value = value,
             isTextValid = isTextValid,
@@ -205,7 +204,7 @@ fun TimeItem(
     changeTime: (Int) -> Unit
 ) {
     val alertDialog = remember { MaterialDialog() }
-        .apply { BuiltMSTimeDialog(value, changeTime) }
+        .apply { BuiltTimeDialog(value, changeTime, true) }
 
     SetItemDefault(
         title = title,
