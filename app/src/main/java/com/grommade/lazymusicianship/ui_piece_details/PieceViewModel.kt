@@ -6,10 +6,12 @@ import androidx.lifecycle.viewModelScope
 import com.grommade.lazymusicianship.data.entity.Piece
 import com.grommade.lazymusicianship.data.entity.Section
 import com.grommade.lazymusicianship.domain.observers.ObserveSections
-import com.grommade.lazymusicianship.domain.repos.RepoSection
+import com.grommade.lazymusicianship.domain.use_cases.DeleteSection
 import com.grommade.lazymusicianship.domain.use_cases.GetPiece
 import com.grommade.lazymusicianship.domain.use_cases.SavePiece
+import com.grommade.lazymusicianship.ui.common.SnackBarManager
 import com.grommade.lazymusicianship.util.Keys
+import com.grommade.lazymusicianship.util.doIfFailure
 import com.grommade.lazymusicianship.util.doIfSuccess
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -20,7 +22,8 @@ import javax.inject.Inject
 class PieceViewModel @Inject constructor(
     private val getPiece: GetPiece,
     private val savePiece: SavePiece,
-    private val repoSection: RepoSection,
+    private val deleteSection: DeleteSection,
+    private val snackBarManager: SnackBarManager,
     private val handle: SavedStateHandle,
     observeSections: ObserveSections
 ) : ViewModel() {
@@ -29,18 +32,24 @@ class PieceViewModel @Inject constructor(
 
     private val currentPiece = MutableStateFlow(Piece())
 
-    private val currentSections = currentPiece.flatMapLatest {piece ->
+    private val currentSections = currentPiece.flatMapLatest { piece ->
         observeSections(ObserveSections.Params(piece.id))
         observeSections.observe()
     }
 
     private val selectedSection = MutableStateFlow(0L)
 
-    val state = combine(currentPiece, currentSections, selectedSection) { piece, sections, selected ->
+    val state = combine(
+        currentPiece,
+        currentSections,
+        selectedSection,
+        snackBarManager.errors
+    ) { piece, sections, selected, error ->
         PieceViewState(
             piece = piece,
             sections = sections.sortedBy { it.hierarchicalSort(sections) },
-            selectedSection = selected
+            selectedSection = selected,
+            error = error
         )
     }
 
@@ -57,6 +66,7 @@ class PieceViewModel @Inject constructor(
                     is PieceActions.ChangeDescription -> changeDescription(action.value)
                     is PieceActions.SelectSection -> selectSection(action.id)
                     is PieceActions.DeleteSection -> deleteSection(action.section)
+                    PieceActions.ClearError -> snackBarManager.removeCurrentError()
                     else -> {
                     }
                 }
@@ -96,7 +106,10 @@ class PieceViewModel @Inject constructor(
 
     private fun deleteSection(section: Section) {
         viewModelScope.launch {
-            repoSection.delete(section)
+            deleteSection(DeleteSection.Params(section)).first()
+                .doIfFailure { message, _ ->
+                    snackBarManager.addError(message ?: "Unknown error message")
+                }
         }
     }
 

@@ -20,9 +20,11 @@ import com.google.accompanist.insets.ui.Scaffold
 import com.grommade.lazymusicianship.R
 import com.grommade.lazymusicianship.data.entity.Piece
 import com.grommade.lazymusicianship.data.entity.Section
+import com.grommade.lazymusicianship.ui.common.ShowSnackBar
 import com.grommade.lazymusicianship.ui.common.rememberFlowWithLifecycle
 import com.grommade.lazymusicianship.ui.components.*
 import com.grommade.lazymusicianship.ui.components.material_dialogs.core.MaterialDialog
+import com.grommade.lazymusicianship.ui_pieces.PiecesListActions
 import com.grommade.lazymusicianship.util.extentions.toStrTime
 import kotlinx.coroutines.launch
 
@@ -87,7 +89,7 @@ fun PieceUi(
 fun PieceUi(
     viewState: PieceViewState,
     actioner: (PieceActions) -> Unit
-) {
+)  = Box(modifier = Modifier.fillMaxSize()) {
     Scaffold(
         topBar = {
             SaveCloseTopBar(
@@ -141,6 +143,12 @@ fun PieceUi(
             }
         }
     }
+
+    ShowSnackBar(
+        error = viewState.error,
+        modifier = Modifier.align(Alignment.BottomCenter),
+        onDismiss = { actioner(PieceActions.ClearError) }
+    )
 }
 
 @Composable

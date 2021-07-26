@@ -2,16 +2,21 @@ package com.grommade.lazymusicianship.data.repos_impl
 
 import androidx.room.Transaction
 import com.grommade.lazymusicianship.data.dao.PieceDao
+import com.grommade.lazymusicianship.data.dao.PracticeDao
 import com.grommade.lazymusicianship.data.dao.SectionDao
 import com.grommade.lazymusicianship.data.entity.Piece
 import com.grommade.lazymusicianship.domain.repos.RepoPiece
 import com.grommade.lazymusicianship.util.AppCoroutineDispatchers
+import com.grommade.lazymusicianship.util.ResourcesHelper
+import com.grommade.lazymusicianship.util.ResultOf
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class RepoPieceImpl @Inject constructor(
     private val pieceDao: PieceDao,
     private val sectionDao: SectionDao,
+    private val practiceDao: PracticeDao,
+    private val resHelper: ResourcesHelper,
     private val dispatchers: AppCoroutineDispatchers
 ) : RepoPiece {
 
@@ -20,10 +25,16 @@ class RepoPieceImpl @Inject constructor(
     }
 
     @Transaction
-    override suspend fun delete(piece: Piece) = withContext(dispatchers.io) {
-        val sections = sectionDao.getSections(piece.id)
-        sectionDao.delete(sections)
-        pieceDao.delete(piece)
+    override suspend fun delete(piece: Piece): ResultOf<Boolean> = withContext(dispatchers.io) {
+        return@withContext when (practiceDao.getCountPracticesByPieceId(piece.id)) {
+            0 -> {
+                val sections = sectionDao.getSections(piece.id)
+                sectionDao.delete(sections)
+                pieceDao.delete(piece)
+                ResultOf.Success(true)
+            }
+            else -> ResultOf.Failure(resHelper.errorPieceDel)
+        }
     }
 
     @Transaction

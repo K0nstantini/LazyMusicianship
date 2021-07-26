@@ -44,6 +44,8 @@
     <string name="section_title_tempo">Tempo</string>
     <string name="section_title_new">New</string>
 
+    <string name="snack_section_already_in_use">This section already in use</string>
+
     <!--    Main-->
     <string name="main_menu_states">States</string>
     <string name="main_menu_settings">Settings</string>

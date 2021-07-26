@@ -1,15 +1,20 @@
 package com.grommade.lazymusicianship.data.repos_impl
 
 import androidx.room.Transaction
+import com.grommade.lazymusicianship.data.dao.PracticeDao
 import com.grommade.lazymusicianship.data.dao.SectionDao
 import com.grommade.lazymusicianship.data.entity.Section
 import com.grommade.lazymusicianship.domain.repos.RepoSection
 import com.grommade.lazymusicianship.util.AppCoroutineDispatchers
+import com.grommade.lazymusicianship.util.ResourcesHelper
+import com.grommade.lazymusicianship.util.ResultOf
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class RepoSectionImpl @Inject constructor(
     private val sectionDao: SectionDao,
+    private val practiceDao: PracticeDao,
+    private val resHelper: ResourcesHelper,
     private val dispatchers: AppCoroutineDispatchers
 ) : RepoSection {
 
@@ -20,10 +25,16 @@ class RepoSectionImpl @Inject constructor(
     override fun getSectionsFlow(pieceId: Long) = sectionDao.getSectionsFlow(pieceId)
 
     @Transaction
-    override suspend fun delete(section: Section) = withContext(dispatchers.io) {
+    override suspend fun delete(section: Section): ResultOf<Boolean> = withContext(dispatchers.io) {
         val sections = sectionDao.getSections(section.pieceId)
-        sectionDao.delete(section.getAllChildren(sections))
-        sectionDao.delete(section)
+        val sectionsToDel = section.getAllChildren(sections) + section
+        return@withContext when (practiceDao.getCountPracticesBySectionsId(sectionsToDel.map { it.id })) {
+            0 -> {
+                sectionDao.delete(sectionsToDel)
+                ResultOf.Success(true)
+            }
+            else -> ResultOf.Failure(resHelper.errorSectionDel)
+        }
     }
 
     override suspend fun getSection(id: Long) = withContext(dispatchers.io) {

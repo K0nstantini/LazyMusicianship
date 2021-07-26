@@ -12,7 +12,7 @@ sealed class PieceActions {
     data class NewSection(val parentId: Long): PieceActions()
     data class SelectSection(val id: Long): PieceActions()
     data class DeleteSection(val section: Section): PieceActions()
+    object ClearError : PieceActions()
     object SaveAndClose: PieceActions()
-    object NavigateToSection: PieceActions()
     object Close: PieceActions()
 }

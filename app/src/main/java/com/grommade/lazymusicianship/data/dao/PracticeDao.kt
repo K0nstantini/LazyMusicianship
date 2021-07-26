@@ -18,6 +18,12 @@ abstract class PracticeDao : EntityDao<Practice>() {
     @Query("SELECT COUNT(*) FROM practice_table WHERE practice_piece_id = :pieceId")
     abstract suspend fun getCountPracticesByPieceId(pieceId: Long): Int
 
+    @Query(
+        "SELECT COUNT(*) FROM practice_table " +
+                "WHERE practice_section_id_from IN (:sectionsId) OR practice_section_id_to IN (:sectionsId)"
+    )
+    abstract suspend fun getCountPracticesBySectionsId(sectionsId: List<Long>): Int
+
     @Query("SELECT * FROM practice_table ORDER BY date DESC, practice_id DESC")
     abstract fun getPracticesItemsFlow(): Flow<List<PracticeWithPieceAndSections>>
 
