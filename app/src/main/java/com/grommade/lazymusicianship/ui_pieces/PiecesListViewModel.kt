@@ -54,16 +54,14 @@ class PiecesListViewModel @Inject constructor(
         }
     }
 
-    private fun delete(piece: Piece) {
-        viewModelScope.launch {
-            deletePiece(DeletePiece.Params(piece)).first()
-                .doIfFailure { message, _ ->
-                    snackBarManager.addError(message ?: "Unknown error message")
-                }
-        }
+    private fun delete(piece: Piece) = viewModelScope.launch {
+        deletePiece(DeletePiece.Params(piece)).first()
+            .doIfFailure { message, _ ->
+                snackBarManager.addError(message ?: "Unknown error message")
+            }
     }
 
-    fun submitAction(action: PiecesListActions) {
-        viewModelScope.launch { pendingActions.emit(action) }
+    fun submitAction(action: PiecesListActions) = viewModelScope.launch {
+        pendingActions.emit(action)
     }
 }

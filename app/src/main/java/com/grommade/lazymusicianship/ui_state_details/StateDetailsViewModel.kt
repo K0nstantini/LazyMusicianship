@@ -58,13 +58,12 @@ class StateDetailsViewModel @Inject constructor(
         currentState.value = foo(currentState.value)
     }
 
-    fun save() {
-        CoroutineScope(Job()).launch {
-            saveStateStudy(SaveState.Params(currentState.value)).collect()
-        }
+    fun save() = CoroutineScope(Job()).launch {
+        saveStateStudy(SaveState.Params(currentState.value)).collect()
     }
 
-    fun submitAction(action: StateDetailsActions) {
-        viewModelScope.launch { pendingActions.emit(action) }
+    fun submitAction(action: StateDetailsActions) = viewModelScope.launch {
+        pendingActions.emit(action)
     }
+
 }

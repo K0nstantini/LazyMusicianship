@@ -37,10 +37,11 @@ class StatesViewModel @Inject constructor(
 
     init {
         observeStates(Unit)
+
         viewModelScope.launch {
             pendingActions.collect { action ->
                 when (action) {
-                    is StatesActions.Select -> selectState(action.id)
+                    is StatesActions.Select -> selectedState.value = action.id
                     is StatesActions.Delete -> delete(action.state)
                     StatesActions.ClearError -> snackBarManager.removeCurrentError()
                     else -> {
@@ -50,20 +51,14 @@ class StatesViewModel @Inject constructor(
         }
     }
 
-    private fun selectState(id: Long) {
-        selectedState.value = id
+    private fun delete(state: StateStudy) = viewModelScope.launch {
+        deleteStateStudy(DeleteState.Params(state)).first()
+            .doIfFailure { message, _ ->
+                snackBarManager.addError(message ?: "Unknown error message")
+            }
     }
 
-    private fun delete(state: StateStudy) {
-        viewModelScope.launch {
-            deleteStateStudy(DeleteState.Params(state)).first()
-                .doIfFailure { message, _ ->
-                    snackBarManager.addError(message ?: "Unknown error message")
-                }
-        }
-    }
-
-    fun submitAction(action: StatesActions) {
-        viewModelScope.launch { pendingActions.emit(action) }
+    fun submitAction(action: StatesActions) = viewModelScope.launch {
+        pendingActions.emit(action)
     }
 }

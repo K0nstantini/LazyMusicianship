@@ -3,7 +3,8 @@ package com.grommade.lazymusicianship.ui_practice
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grommade.lazymusicianship.data.entity.Practice
-import com.grommade.lazymusicianship.domain.repos.RepoPractice
+import com.grommade.lazymusicianship.domain.observers.ObservePractices
+import com.grommade.lazymusicianship.domain.use_cases.DeletePractice
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,22 +15,26 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PracticeViewModel @Inject constructor(
-    private val repoPractice: RepoPractice
+    observePractices: ObservePractices,
+    private val deletePractice: DeletePractice,
 ) : ViewModel() {
 
     private val pendingActions = MutableSharedFlow<PracticeActions>()
 
-    private val practices = repoPractice.getPracticesItemsFlow()
     private val selectedPractice = MutableStateFlow(0L)
 
-    val state = combine(practices, selectedPractice) { practicesList, selected ->
+    val state = combine(
+        observePractices.observe(), selectedPractice,
+    ) { practicesList, selected ->
         PracticeViewState(
             practices = practicesList,
-            selected = selected
+            selected = selected,
         )
     }
 
     init {
+        observePractices(Unit)
+
         viewModelScope.launch {
             pendingActions.collect { action ->
                 when (action) {
@@ -42,13 +47,11 @@ class PracticeViewModel @Inject constructor(
         }
     }
 
-    private fun delete(practice: Practice) {
-        viewModelScope.launch {
-            repoPractice.delete(practice)
-        }
+    private fun delete(practice: Practice) = viewModelScope.launch {
+        deletePractice(DeletePractice.Params(practice)).collect()
     }
 
-    fun submitAction(action: PracticeActions) {
-        viewModelScope.launch { pendingActions.emit(action) }
+    fun submitAction(action: PracticeActions) = viewModelScope.launch {
+        pendingActions.emit(action)
     }
 }

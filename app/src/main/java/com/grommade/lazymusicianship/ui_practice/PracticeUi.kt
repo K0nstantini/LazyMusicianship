@@ -69,7 +69,7 @@ fun PracticeUi(
             contentPadding = paddingValues,
             modifier = Modifier.fillMaxSize(),
         ) {
-            items(viewState.practices, key = { practice -> practice.practice.id }) { practiceItem -> // FIXME: change id
+            items(viewState.practices, key = { practice -> practice.practice.id }) { practiceItem ->
                 StateItem(
                     practiceItem = practiceItem,
                     selected = practiceItem.practice.id == viewState.selected,
@@ -130,13 +130,6 @@ fun StateItem(
                 text = practiceItem.practice.date.toString(),
                 style = MaterialTheme.typography.caption,
             )
-//            if (practiceItem) {
-//                Text(
-//                    text = piece.author,
-//                    maxLines = 1,
-//                    style = MaterialTheme.typography.caption,
-//                )
-//            }
         }
         if (selected) {
             DeleteIcon(delete)

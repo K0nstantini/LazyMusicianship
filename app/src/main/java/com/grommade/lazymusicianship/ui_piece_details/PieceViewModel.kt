@@ -59,12 +59,12 @@ class PieceViewModel @Inject constructor(
 
             pendingActions.collect { action ->
                 when (action) {
-                    is PieceActions.ChangeName -> changeName(action.value)
-                    is PieceActions.ChangeAuthor -> changeAuthor(action.value)
-                    is PieceActions.ChangeArranger -> changeArranger(action.value)
-                    is PieceActions.ChangeTime -> changeTime(action.value)
-                    is PieceActions.ChangeDescription -> changeDescription(action.value)
-                    is PieceActions.SelectSection -> selectSection(action.id)
+                    is PieceActions.ChangeName -> changePiece { copy(name = action.value) }
+                    is PieceActions.ChangeAuthor -> changePiece { copy(author = action.value) }
+                    is PieceActions.ChangeArranger -> changePiece { copy(arranger = action.value) }
+                    is PieceActions.ChangeTime -> changePiece { copy(time = action.value) }
+                    is PieceActions.ChangeDescription -> changePiece { copy(description = action.value) }
+                    is PieceActions.SelectSection -> selectedSection.value = action.id
                     is PieceActions.DeleteSection -> deleteSection(action.section)
                     PieceActions.ClearError -> snackBarManager.removeCurrentError()
                     else -> {
@@ -80,41 +80,15 @@ class PieceViewModel @Inject constructor(
             .doIfSuccess { currentPiece.value = it }
     }
 
-    private fun changeName(value: String) {
-        changePiece { currentPiece.value.copy(name = value) }
+    private fun deleteSection(section: Section) = viewModelScope.launch {
+        deleteSection(DeleteSection.Params(section)).first()
+            .doIfFailure { message, _ ->
+                snackBarManager.addError(message ?: "Unknown error message")
+            }
     }
 
-    private fun changeAuthor(value: String) {
-        changePiece { currentPiece.value.copy(author = value) }
-    }
-
-    private fun changeArranger(value: String) {
-        changePiece { currentPiece.value.copy(arranger = value) }
-    }
-
-    private fun changeTime(value: Int) {
-        changePiece { currentPiece.value.copy(time = value) }
-    }
-
-    private fun changeDescription(value: String) {
-        changePiece { currentPiece.value.copy(description = value) }
-    }
-
-    private fun selectSection(id: Long) {
-        selectedSection.value = id
-    }
-
-    private fun deleteSection(section: Section) {
-        viewModelScope.launch {
-            deleteSection(DeleteSection.Params(section)).first()
-                .doIfFailure { message, _ ->
-                    snackBarManager.addError(message ?: "Unknown error message")
-                }
-        }
-    }
-
-    private fun changePiece(function: () -> Piece) {
-        currentPiece.value = function()
+    private fun changePiece(foo: Piece.() -> Piece) {
+        currentPiece.value = foo(currentPiece.value)
     }
 
     suspend fun save(): Long {
@@ -123,7 +97,7 @@ class PieceViewModel @Inject constructor(
         return id
     }
 
-    fun submitAction(action: PieceActions) {
-        viewModelScope.launch { pendingActions.emit(action) }
+    fun submitAction(action: PieceActions) = viewModelScope.launch {
+        pendingActions.emit(action)
     }
 }
