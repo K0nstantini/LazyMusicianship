@@ -4,40 +4,44 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grommade.lazymusicianship.data.entity.*
-import com.grommade.lazymusicianship.domain.repos.RepoPiece
-import com.grommade.lazymusicianship.domain.repos.RepoPractice
-import com.grommade.lazymusicianship.domain.repos.RepoSection
-import com.grommade.lazymusicianship.domain.repos.RepoStateStudy
+import com.grommade.lazymusicianship.domain.observers.ObservePieces
+import com.grommade.lazymusicianship.domain.observers.ObserveSections
+import com.grommade.lazymusicianship.domain.observers.ObserveStates
+import com.grommade.lazymusicianship.domain.use_cases.GetPractice
+import com.grommade.lazymusicianship.domain.use_cases.SavePractice
 import com.grommade.lazymusicianship.util.Keys
+import com.grommade.lazymusicianship.util.doIfSuccess
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class PracticeDetailsViewModel @Inject constructor(
-    private val repoPractice: RepoPractice,
-    private val repoSection: RepoSection,
-    repoPiece: RepoPiece,
-    repoStateStudy: RepoStateStudy,
-    private val handle: SavedStateHandle
+    private val getPractice: GetPractice,
+    private val savePractice: SavePractice,
+    private val handle: SavedStateHandle,
+    observePieces: ObservePieces,
+    observeSections: ObserveSections,
+    observeStates: ObserveStates,
 ) : ViewModel() {
 
     private val pendingActions = MutableSharedFlow<PracticeDetailsActions>()
 
     private val currentPracticeItem = MutableStateFlow(PracticeWithPieceAndSections())
 
-    private val allPieces = repoPiece.getPiecesFlow()
     private val allSections = currentPracticeItem.flatMapLatest { pieceItem ->
-        repoSection.getSectionsFlow(pieceItem.piece.id)
+        observeSections(ObserveSections.Params(pieceItem.piece.id))
+        observeSections.observe()
     }
-    private val allStates = repoStateStudy.getStatesFlow()
 
     val state = combine(
         currentPracticeItem,
-        allPieces,
+        observePieces.observe(),
         allSections,
-        allStates
+        observeStates.observe()
     ) { practiceItem, pieces, sections, states ->
         PracticeDetailsViewState(
             practiceItem = practiceItem,
@@ -48,10 +52,10 @@ class PracticeDetailsViewModel @Inject constructor(
         )
     }
 
-    // FIXME
-    val navigateToBack = MutableSharedFlow<Boolean>()
-
     init {
+        observePieces(Unit)
+        observeStates(Unit)
+
         viewModelScope.launch {
             initPractice()
             pendingActions.collect { action ->
@@ -61,7 +65,6 @@ class PracticeDetailsViewModel @Inject constructor(
                     is PracticeDetailsActions.ChangeSectionFrom -> changeSectionFrom(action.section)
                     is PracticeDetailsActions.ChangeSectionTo -> changeSectionTo(action.section)
                     is PracticeDetailsActions.ChangeState -> changeStateStudy(action.state)
-                    PracticeDetailsActions.SaveAndClose -> save()
                     else -> {
                     }
                 }
@@ -71,9 +74,8 @@ class PracticeDetailsViewModel @Inject constructor(
 
     private suspend fun initPractice() {
         val practiceId = handle.get<Long>(Keys.PRACTICE_ID) ?: 0
-        repoPractice.getPracticeItem(practiceId)?.let { practiceItem ->
-            currentPracticeItem.value = practiceItem
-        }
+        getPractice(GetPractice.Params(practiceId)).first()
+            .doIfSuccess { currentPracticeItem.value = it }
     }
 
     private fun changePiece(piece: Piece) {
@@ -109,11 +111,8 @@ class PracticeDetailsViewModel @Inject constructor(
         currentPracticeItem.value = foo(currentPracticeItem.value)
     }
 
-    private fun save() {
-        viewModelScope.launch {
-            repoPractice.save(currentPracticeItem.value.practice)
-            navigateToBack.emit(true)
-        }
+    fun save() = CoroutineScope(Job()).launch {
+        savePractice(SavePractice.Params(currentPracticeItem.value.practice)).collect()
     }
 
     private fun sectionsNotCorrect(): Boolean {
@@ -125,7 +124,7 @@ class PracticeDetailsViewModel @Inject constructor(
         return oneEmpty || diffParent || lastMoreFirst
     }
 
-    fun submitAction(action: PracticeDetailsActions) {
-        viewModelScope.launch { pendingActions.emit(action) }
+    fun submitAction(action: PracticeDetailsActions) = viewModelScope.launch {
+        pendingActions.emit(action)
     }
 }

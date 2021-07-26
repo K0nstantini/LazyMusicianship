@@ -9,7 +9,6 @@ class SaveState @Inject constructor(
     private val repoStateStudy: RepoStateStudy
 ) : InputWorkUseCase<SaveState.Params>() {
 
-
     override suspend fun doWork(params: Params) {
         repoStateStudy.save(params.state)
     }

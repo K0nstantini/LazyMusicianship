@@ -43,10 +43,12 @@ fun StateDetailsUi(
     val viewState by rememberFlowWithLifecycle(viewModel.state)
         .collectAsState(initial = PracticeDetailsViewState.Empty)
 
-    viewModel.navigateToBack.collectAsState(null).value?.let { close() }
-
     PracticeDetailsUi(viewState) { action ->
         when (action) {
+            PracticeDetailsActions.SaveAndClose -> {
+                viewModel.save()
+                close()
+            }
             PracticeDetailsActions.Close -> close()
             else -> viewModel.submitAction(action)
         }
