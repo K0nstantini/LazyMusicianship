@@ -14,8 +14,7 @@ import com.grommade.lazymusicianship.data.entity.*
         StateStudy::class,
         Settings::class,
     ],
-    version = 1,
-    exportSchema = false
+    version = 2,
 )
 @TypeConverters(Converters::class)
 abstract class AppDataBase : RoomDatabase() {

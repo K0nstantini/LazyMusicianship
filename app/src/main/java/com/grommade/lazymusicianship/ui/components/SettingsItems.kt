@@ -186,6 +186,7 @@ fun SetItemTitle(text: String) {
 fun SetItemDefaultWithInputDialog(
     title: String,
     value: String,
+    hint: String = "",
     isTextValid: (String) -> Boolean = { true },
     callback: (String) -> Unit
 ) {
@@ -193,6 +194,7 @@ fun SetItemDefaultWithInputDialog(
         BuiltInputDialog(
             title = title,
             prefill = value,
+            hint = hint,
             isTextValid = isTextValid,
             callback = callback
         )

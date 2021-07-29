@@ -2,7 +2,10 @@ package com.grommade.lazymusicianship.ui_section_details
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -89,6 +92,13 @@ fun SectionUi(
                 stateSwitch = viewState.section.firstTime,
                 onClick = { actioner(SectionActions.ChangeNew(!viewState.section.firstTime)) },
                 onClickSwitch = { actioner(SectionActions.ChangeNew(it)) },
+            )
+            OutlinedTextField(
+                value = viewState.section.description,
+                label = { Text(stringResource(R.string.section_title_description)) },
+                maxLines = 3,
+                onValueChange = { actioner(SectionActions.ChangeDescription(it)) },
+                modifier = Modifier.fillMaxWidth()
             )
         }
     }

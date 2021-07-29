@@ -105,6 +105,15 @@ fun PracticeDetailsUi(
                 time = viewState.practiceItem.practice.elapsedTime,
                 changeTime = { time -> actioner(PracticeDetailsActions.ChangeTime(time)) }
             )
+
+            val successful = viewState.practiceItem.practice.successful
+            SetItemSwitch(
+                title = stringResource(R.string.practice_title_successful),
+                stateSwitch = successful,
+                onClick = { actioner(PracticeDetailsActions.ChangeSuccessful(!successful)) },
+                onClickSwitch = { actioner(PracticeDetailsActions.ChangeSuccessful(it)) },
+            )
+
             StateStudyItem(
                 stateName = viewState.practiceItem.stateStudy.name,
                 states = viewState.allStates,
@@ -115,18 +124,14 @@ fun PracticeDetailsUi(
                     title = stringResource(R.string.practice_title_tempo),
                     value = viewState.practiceItem.practice.tempo.toString(),
                     isTextValid = { text -> text.isDigitsOnly() }
-                ) { tempo ->
-                    actioner(PracticeDetailsActions.ChangeTempo(tempo.toIntOrNull() ?: 0))
-                }
+                ) { actioner(PracticeDetailsActions.ChangeTempo(it.toIntOrNull() ?: 0)) }
             }
             if (viewState.practiceItem.stateStudy.countNumberOfTimes) {
                 SetItemDefaultWithInputDialog(
                     title = stringResource(R.string.practice_title_count_times),
                     value = viewState.practiceItem.practice.countTimes.toString(),
                     isTextValid = { text -> text.isDigitsOnly() }
-                ) { times ->
-                    actioner(PracticeDetailsActions.ChangeCountTimes(times.toIntOrNull() ?: 0))
-                }
+                ) { actioner(PracticeDetailsActions.ChangeCountTimes(it.toIntOrNull() ?: 0)) }
             }
         }
     }
@@ -258,7 +263,7 @@ fun StateStudyItem(
 fun PracticeDetailsUiPreview() {
     val viewState = PracticeDetailsViewState(
         practiceItem = PracticeWithPieceAndSections(
-            Practice(id = 1, pieceId = 1, date = LocalDate.now()),
+            practice = Practice(id = 1, pieceId = 1, date = LocalDate.now()),
             piece = Piece(id = 1, name = "I just want you")
         )
     )

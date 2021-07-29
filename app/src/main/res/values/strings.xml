@@ -43,6 +43,7 @@
     <string name="hint_edit_text_beat">Beat</string>
     <string name="section_title_tempo">Tempo</string>
     <string name="section_title_new">New</string>
+    <string name="section_title_description">Description</string>
 
     <string name="snack_section_already_in_use">This section already in use</string>
 
@@ -57,6 +58,7 @@
     <string name="practice_title_section_to">Section to</string>
     <string name="practice_title_state_study">State</string>
     <string name="practice_title_elapsed_time">Elapsed time</string>
+    <string name="practice_title_successful">Successful</string>
     <string name="practice_title_tempo">Tempo</string>
     <string name="practice_title_count_times">Count times</string>
 

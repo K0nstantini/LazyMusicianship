@@ -1,14 +1,12 @@
 package com.grommade.lazymusicianship.ui.components
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import androidx.compose.material.AlertDialog
+import androidx.compose.material.Divider
+import androidx.compose.material.Text
+import androidx.compose.material.TextButton
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.grommade.lazymusicianship.ui.components.datepiker.datepicker
 import com.grommade.lazymusicianship.ui.components.material_dialogs.core.*
 import com.grommade.lazymusicianship.ui.components.timepicker.timepicker
@@ -32,67 +30,6 @@ fun BuiltSimpleOkCancelDialog(
             TextButton(
                 onClick = {
                     callback()
-                    close()
-                }
-            ) {
-                Text("Ok")
-            }
-        },
-        dismissButton = {
-            TextButton(
-                onClick = close
-            ) {
-                Text("Cancel")
-            }
-        }
-    )
-}
-
-@Composable
-fun BuiltInputDialogDel(
-    title: String,
-    value: String = "",
-    label: String = "",
-    isTextValid: (String) -> Boolean = { true },
-    callback: (String) -> Unit,
-    close: () -> Unit
-) {
-    var text by remember { mutableStateOf(value) }
-    val valid = remember(text) { isTextValid(text) }
-
-    AlertDialog(
-        onDismissRequest = close,
-        title = {
-            Text(
-                text = title,
-                color = MaterialTheme.colors.onSurface,
-                style = MaterialTheme.typography.h6,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 24.dp, end = 24.dp)
-                    .height(64.dp)
-                    .wrapContentHeight(Alignment.CenterVertically)
-                    .wrapContentWidth(Alignment.Start)
-            )
-        },
-        text = {
-            Column(modifier = Modifier.padding(start = 24.dp, end = 24.dp, top = 8.dp, bottom = 8.dp)) {
-                TextField(
-                    value = text,
-                    onValueChange = { text = it },
-                    label = { Text(label) },
-                    isError = !valid,
-                    singleLine = true,
-                    textStyle = TextStyle(MaterialTheme.colors.onBackground, fontSize = 16.sp),
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-
-        },
-        confirmButton = {
-            TextButton(
-                onClick = {
-                    callback(text)
                     close()
                 }
             ) {
@@ -197,7 +134,7 @@ fun MaterialDialog.BuiltInputDialog(
             prefill = prefill,
             isTextValid = isTextValid
         ) {
-            callback(it)
+            callback(it.trim())
         }
         SetButtonsOkCancel()
     }

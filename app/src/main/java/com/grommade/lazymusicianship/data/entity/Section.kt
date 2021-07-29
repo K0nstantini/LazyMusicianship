@@ -18,6 +18,7 @@ data class Section(
     val order: Int = 0,
     @ColumnInfo(name = "section_first_time") val firstTime: Boolean = true,
     @ColumnInfo(name = "section_tempo") val tempo: Int = 0,
+    @ColumnInfo(name = "section_description") val description: String = "",
 ) : AppEntity, Parcelable {
 
     fun getLevel(sections: List<Section>) = generateSequence(this) { section ->

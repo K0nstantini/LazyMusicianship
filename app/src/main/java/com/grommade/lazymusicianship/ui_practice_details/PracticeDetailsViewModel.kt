@@ -65,6 +65,7 @@ class PracticeDetailsViewModel @Inject constructor(
                     is PracticeDetailsActions.ChangeSectionFrom -> changeSectionFrom(action.section)
                     is PracticeDetailsActions.ChangeSectionTo -> changeSectionTo(action.section)
                     is PracticeDetailsActions.ChangeTime -> changePractice { copy(elapsedTime = action.value) }
+                    is PracticeDetailsActions.ChangeSuccessful -> changePractice { copy(successful = action.value) }
                     is PracticeDetailsActions.ChangeState -> changeStateStudy(action.state)
                     is PracticeDetailsActions.ChangeTempo -> changePractice { copy(tempo = action.value) }
                     is PracticeDetailsActions.ChangeCountTimes -> changePractice { copy(countTimes = action.value) }
@@ -90,8 +91,7 @@ class PracticeDetailsViewModel @Inject constructor(
         changePractice { copy(sectionIdFrom = section.id) }
         changePracticeItem { copy(sectionFrom = section) }
         if (currentPracticeItem.value.sectionTo == null) {
-            changePractice { copy(sectionIdTo = section.id) }
-            changePracticeItem { copy(sectionTo = section) }
+            changeSectionTo(section)
         }
     }
 

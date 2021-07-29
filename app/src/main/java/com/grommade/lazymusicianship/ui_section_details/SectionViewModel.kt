@@ -41,6 +41,7 @@ class SectionViewModel @Inject constructor(
                     is SectionActions.ChangeName -> changeSection { copy(name = action.value) }
                     is SectionActions.ChangeTempo -> changeSection { copy(tempo = action.value) }
                     is SectionActions.ChangeNew -> changeSection { copy(firstTime = action.value) }
+                    is SectionActions.ChangeDescription -> changeSection { copy(description = action.value) }
                     else -> {
                     }
                 }

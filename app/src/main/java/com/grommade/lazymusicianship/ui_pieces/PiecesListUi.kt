@@ -11,6 +11,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -24,6 +26,7 @@ import com.grommade.lazymusicianship.ui.common.rememberFlowWithLifecycle
 import com.grommade.lazymusicianship.ui.components.DeleteIcon
 import com.grommade.lazymusicianship.ui.components.FloatingAddActionButton
 import com.grommade.lazymusicianship.ui.components.MoreVertIcon
+import com.grommade.lazymusicianship.ui.theme.DarkBrown
 
 @Composable
 fun PiecesListUi(openPiece: (Long) -> Unit) {
@@ -150,17 +153,17 @@ fun PieceItem(
             .padding(start = 16.dp, top = 8.dp, bottom = 8.dp)
                 then modifier
     ) {
-        Column() {
+        Column {
             Text(
                 text = piece.name,
                 maxLines = 2,
-                style = MaterialTheme.typography.subtitle1,
+                style = MaterialTheme.typography.subtitle1.copy(fontWeight = FontWeight.SemiBold, color = DarkBrown),
             )
             if (hasAuthor) {
                 Text(
                     text = piece.author,
                     maxLines = 1,
-                    style = MaterialTheme.typography.caption,
+                    style = MaterialTheme.typography.caption.copy(fontStyle = FontStyle.Italic, color = Color.Black),
                 )
             }
         }

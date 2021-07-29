@@ -13,8 +13,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.insets.ui.Scaffold
 import com.grommade.lazymusicianship.R
@@ -88,7 +91,7 @@ fun PieceUi(
 fun PieceUi(
     viewState: PieceViewState,
     actioner: (PieceActions) -> Unit
-)  = Box(modifier = Modifier.fillMaxSize()) {
+) = Box(modifier = Modifier.fillMaxSize()) {
     Scaffold(
         topBar = {
             SaveCloseTopBar(
@@ -155,45 +158,20 @@ fun PieceInfo(
     piece: Piece,
     actioner: (PieceActions) -> Unit
 ) {
-    InfoItem(
+    SetItemDefaultWithInputDialog(
         title = stringResource(R.string.piece_title_author),
         value = piece.author,
-        changeInfo = { value: String -> actioner(PieceActions.ChangeAuthor(value)) }
+        callback = { actioner(PieceActions.ChangeAuthor(it)) }
     )
-    InfoItem(
+    SetItemDefaultWithInputDialog(
         title = stringResource(R.string.piece_title_arranger),
         value = piece.arranger,
-        changeInfo = { value: String -> actioner(PieceActions.ChangeArranger(value)) }
+        callback = { actioner(PieceActions.ChangeArranger(it)) }
     )
     TimeItem(
         title = stringResource(R.string.piece_title_time),
         value = piece.time,
         changeTime = { value: Int -> actioner(PieceActions.ChangeTime(value)) }
-    )
-}
-
-@Composable
-fun InfoItem(
-    title: String,
-    value: String,
-    isTextValid: (String) -> Boolean = { true },
-    changeInfo: (String) -> Unit
-) {
-    val alertDialog = remember { mutableStateOf(false) }
-    if (alertDialog.value) {
-        BuiltInputDialogDel(
-            title = title,
-            value = value,
-            isTextValid = isTextValid,
-            callback = changeInfo,
-            close = { alertDialog.value = false }
-        )
-    }
-
-    SetItemDefault(
-        title = title,
-        value = value,
-        onClick = { alertDialog.value = true }
     )
 }
 
@@ -257,6 +235,7 @@ fun SectionsScrollingContent(
                 name = section.name,
                 level = section.getLevel(sections),
                 selected = section.id == selectedSection,
+                description = section.description,
                 modifier = Modifier.fillParentMaxWidth(),
                 openSection = { actioner(PieceActions.OpenSection(section.id)) },
                 newSection = { actioner(PieceActions.NewSection(section.id)) },
@@ -272,6 +251,7 @@ fun SectionItem(
     name: String,
     level: Int,
     selected: Boolean,
+    description: String,
     modifier: Modifier,
     openSection: () -> Unit,
     newSection: () -> Unit,
@@ -298,10 +278,22 @@ fun SectionItem(
                 )
                 .padding(start = 32.dp) then modifier
         ) {
-            Text(
-                text = name,
-                style = MaterialTheme.typography.subtitle1.copy(color = MaterialTheme.colors.primaryVariant),
-            )
+            Column() {
+                Text(
+                    text = name,
+                    style = MaterialTheme.typography.subtitle1.copy(color = MaterialTheme.colors.primaryVariant),
+                )
+                if (description.isNotEmpty()) {
+                    Text(
+                        text = description,
+                        maxLines = 3,
+                        overflow = TextOverflow.Ellipsis,
+                        color = Color.DarkGray,
+                        fontSize = 12.sp,
+                        fontStyle = FontStyle.Italic
+                    )
+                }
+            }
             if (selected) {
                 Row() {
                     DeleteIcon(deleteSection)
@@ -323,31 +315,40 @@ fun PieceItemPreview() {
     val sections = listOf(
         Section(
             id = 1,
-            order = 0,
+            order = 1,
             name = "Intro",
             tempo = 120,
+            description = "I-V-I"
         ),
         Section(
             id = 2,
-            order = 1,
+            order = 2,
             name = "Verse 1",
+            description = "Very long description. Very long description. Very long description. Very long description. Very long description. Very long description. Very long description. Very long description. Very long description. Very long description. Very long description"
         ),
         Section(
             id = 3,
-            order = 0,
+            order = 1,
             name = "1",
             parentId = 2,
         ),
         Section(
             id = 4,
-            order = 1,
+            order = 2,
             name = "2",
             parentId = 2,
+            description = "I-V-I\nSomething\nMode"
         ),
         Section(
             id = 5,
-            order = 2,
+            order = 3,
+            name = "Verse 2",
+        ),
+        Section(
+            id = 6,
+            order = 4,
             name = "Outro",
+            description = "I-V-I\nSomething\nMode\nDescription"
         )
     )
     PieceUi(
