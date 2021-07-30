@@ -52,6 +52,13 @@
     <string name="main_menu_settings">Settings</string>
 
     <!--    Practice-->
+    <string name="practice_value_section">"Section: %s"</string>
+    <string name="practice_value_sections">"Sections: %s - %s"</string>
+    <string name="practice_value_state">"State: %s"</string>
+    <string name="practice_value_tempo">"Tempo: %s"</string>
+    <string name="practice_value_count_times">"Times: %s"</string>
+
+    <!--    Practice details-->
     <string name="practice_title_date">Date</string>
     <string name="practice_title_piece">Piece</string>
     <string name="practice_title_section_from">Section from</string>

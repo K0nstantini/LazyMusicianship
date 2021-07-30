@@ -15,16 +15,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.insets.ui.Scaffold
 import com.google.accompanist.insets.ui.TopAppBar
 import com.grommade.lazymusicianship.R
-import com.grommade.lazymusicianship.data.entity.Piece
-import com.grommade.lazymusicianship.data.entity.Practice
-import com.grommade.lazymusicianship.data.entity.PracticeWithPieceAndSections
-import com.grommade.lazymusicianship.data.entity.Section
+import com.grommade.lazymusicianship.data.entity.*
 import com.grommade.lazymusicianship.ui.common.rememberFlowWithLifecycle
 import com.grommade.lazymusicianship.ui.components.DeleteIcon
 import com.grommade.lazymusicianship.ui.components.FloatingAddActionButton
@@ -107,6 +106,26 @@ fun StateItem(
         false -> Color.Transparent
     }
 
+    val sectionFrom = practiceItem.sectionFrom?.name ?: ""
+    val sectionTo = practiceItem.sectionTo?.name ?: ""
+    val sections = when (practiceItem.sectionFrom) {
+        null -> ""
+        practiceItem.sectionTo -> stringResource(R.string.practice_value_section, sectionFrom)
+        else -> stringResource(R.string.practice_value_sections, sectionFrom, sectionTo)
+    }
+
+    val state = stringResource(R.string.practice_value_state, practiceItem.stateStudy.name) +
+            if (practiceItem.stateStudy.considerTempo) {
+                ". " + stringResource(R.string.practice_value_tempo, practiceItem.practice.tempo)
+            } else {
+                ""
+            } +
+            if (practiceItem.stateStudy.countNumberOfTimes) {
+                ". " + stringResource(R.string.practice_value_count_times, practiceItem.practice.countTimes)
+            } else {
+                ""
+            }
+
     Divider()
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -130,6 +149,20 @@ fun StateItem(
                 text = practiceItem.practice.date.toString(),
                 style = MaterialTheme.typography.caption,
             )
+            if (sections.isNotEmpty()) {
+                Text(
+                    text = sections,
+                    fontStyle = FontStyle.Italic,
+                    color = Color.Blue.copy(alpha = 0.7f),
+                    fontSize = 12.sp
+                )
+            }
+            Text(
+                text = state,
+                fontStyle = FontStyle.Italic,
+                fontSize = 12.sp
+            )
+
         }
         if (selected) {
             DeleteIcon(delete)
@@ -142,16 +175,17 @@ fun StateItem(
 fun PracticeUiPreview() {
     val practices = listOf(
         PracticeWithPieceAndSections(
-            practice = Practice(id = 1, pieceId = 1, date = LocalDate.now()),
+            practice = Practice(id = 1, pieceId = 1, date = LocalDate.now(), tempo = 120, countTimes = 5),
             piece = Piece(id = 1, name = "Knockin' on Heaven's Door"),
-            sectionFrom = Section(),
-            sectionTo = Section(),
+            sectionFrom = Section(name = "Intro"),
+            sectionTo = Section(name = "Intro"),
+            stateStudy = StateStudy(name = "In tempo", considerTempo = true, countNumberOfTimes = true)
         ),
         PracticeWithPieceAndSections(
             practice = Practice(id = 2, pieceId = 2, date = LocalDate.now().minusDays(1)),
             piece = Piece(id = 2, name = "Don't Cry"),
-            sectionFrom = Section(),
-            sectionTo = Section(),
+            sectionFrom = Section(name = "Verse 1"),
+            sectionTo = Section(name = "Verse 2"),
         ),
     )
     PracticeUi(PracticeViewState(practices)) {}
