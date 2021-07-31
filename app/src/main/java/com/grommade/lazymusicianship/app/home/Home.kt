@@ -7,9 +7,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.LibraryMusic
 import androidx.compose.material.icons.filled.School
+import androidx.compose.material.icons.outlined.BarChart
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.LibraryMusic
 import androidx.compose.material.icons.outlined.School
@@ -76,6 +78,9 @@ private fun NavController.currentScreenAsState(): State<Screen> {
                 destination.hierarchy.any { it.route == Screen.Practice.route } -> {
                     selectedItem.value = Screen.Practice
                 }
+                destination.hierarchy.any { it.route == Screen.Statistics.route } -> {
+                    selectedItem.value = Screen.Statistics
+                }
             }
         }
         addOnDestinationChangedListener(listener)
@@ -125,6 +130,15 @@ fun HomeBottomNavigation(
             contentDescription = stringResource(R.string.practice_title),
             selectedPainter = rememberVectorPainter(Icons.Filled.School),
             painter = rememberVectorPainter(Icons.Outlined.School),
+        )
+
+        HomeBottomNavigationItem(
+            label = stringResource(R.string.statistics_title),
+            selected = selectedNavigation == Screen.Statistics,
+            onClick = { onNavigationSelected(Screen.Statistics) },
+            contentDescription = stringResource(R.string.statistics_title),
+            selectedPainter = rememberVectorPainter(Icons.Filled.BarChart),
+            painter = rememberVectorPainter(Icons.Outlined.BarChart),
         )
 
     }

@@ -13,18 +13,21 @@ import com.grommade.lazymusicianship.ui_practice_details.PracticeDetailsUi
 import com.grommade.lazymusicianship.ui_section_details.SectionUi
 import com.grommade.lazymusicianship.ui_state_details.StateDetailsUi
 import com.grommade.lazymusicianship.ui_states.StatesUi
+import com.grommade.lazymusicianship.ui_statistics.StatisticsUi
 import com.grommade.lazymusicianship.util.Keys
 
 sealed class Screen(val route: String) {
-    object Main : Screen("mainroot")
-    object Pieces : Screen("piecesroot")
-    object Practice : Screen("practiceroot")
+    object Main : Screen("mainRoot")
+    object Pieces : Screen("piecesRoot")
+    object Practice : Screen("practiceRoot")
+    object Statistics : Screen("statisticsRoot")
 }
 
 private sealed class LeafScreen(val route: String) {
     object Main : LeafScreen("main")
     object Pieces : LeafScreen("pieces")
     object Practice : LeafScreen("practice")
+    object Statistics : LeafScreen("statistics")
 
     object PieceDetails : LeafScreen("piece/{${Keys.PIECE_ID}}") {
         fun createRoute(pieceId: Long): String = "piece/$pieceId"
@@ -60,6 +63,7 @@ fun AppNavigation(navController: NavHostController) {
         addMainTopLevel(navController)
         addPiecesTopLevel(navController)
         addPracticeTopLevel(navController)
+        addStatisticsTopLevel(navController)
     }
 }
 
@@ -95,6 +99,15 @@ private fun NavGraphBuilder.addPracticeTopLevel(navController: NavController) {
     }
 }
 
+private fun NavGraphBuilder.addStatisticsTopLevel(navController: NavController) {
+    navigation(
+        route = Screen.Statistics.route,
+        startDestination = LeafScreen.Statistics.route
+    ) {
+        addStatistics(navController)
+    }
+}
+
 private fun NavGraphBuilder.addMain(navController: NavController) {
     composable(LeafScreen.Main.route) {
         MainUi(
@@ -122,6 +135,14 @@ private fun NavGraphBuilder.addPractice(navController: NavController) {
         )
     }
 }
+
+private fun NavGraphBuilder.addStatistics(navController: NavController) {
+    composable(LeafScreen.Statistics.route) {
+        StatisticsUi()
+    }
+}
+
+/** =========================================== Leaf Screens ===================================================== */
 
 private fun NavGraphBuilder.addPieceDetails(navController: NavController) {
     composable(
