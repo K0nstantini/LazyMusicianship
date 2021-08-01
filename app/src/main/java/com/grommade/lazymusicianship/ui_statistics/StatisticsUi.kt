@@ -36,19 +36,9 @@ fun StatisticsUi(
     viewState: StatisticsViewState,
     actioner: (StatisticsActions) -> Unit
 ) {
-    val values = listOf(
-        "Mo" to 0.5f,
-        "To" to 1f,
-        "We" to 4.2f,
-        "Th" to 1.1f,
-        "Fr" to 6.5f,
-        "Sa" to 0f,
-        "Su" to 0.2f,
-    )
-
     Scaffold(modifier = Modifier.fillMaxSize()) {
         LineChart(
-            values = values,
+            values = viewState.timesByDays,
             textLabelY = "Hours",
             textLabelX = "Days",
             offsetTopLeft = Offset(64f, 64f),

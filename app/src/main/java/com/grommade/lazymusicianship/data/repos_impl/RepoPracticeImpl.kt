@@ -5,6 +5,7 @@ import com.grommade.lazymusicianship.data.entity.Practice
 import com.grommade.lazymusicianship.domain.repos.RepoPractice
 import com.grommade.lazymusicianship.util.AppCoroutineDispatchers
 import kotlinx.coroutines.withContext
+import java.time.LocalDate
 import javax.inject.Inject
 
 class RepoPracticeImpl @Inject constructor(
@@ -12,7 +13,11 @@ class RepoPracticeImpl @Inject constructor(
     private val dispatchers: AppCoroutineDispatchers
 ) : RepoPractice {
 
-    override fun getPracticesItemsFlow() = practiceDao.getPracticesItemsFlow()
+    override fun getPracticesItemsFlow() =
+        practiceDao.getPracticesItemsFlow()
+
+    override fun getTimesByDaysFlow(startDate: LocalDate, endDate: LocalDate) =
+        practiceDao.getTimesByDaysFlow(startDate, endDate)
 
     override suspend fun save(practice: Practice) = withContext(dispatchers.io) {
         practiceDao.insertOrUpdate(practice)

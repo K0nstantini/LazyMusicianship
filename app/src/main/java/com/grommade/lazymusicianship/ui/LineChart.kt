@@ -58,7 +58,7 @@ class LineChart(
     }
 
     private fun DrawScope.marksY() {
-        val maxValueY = values.maxOf { it.second }
+        val maxValueY = values.maxOfOrNull { it.second } ?: 0f
         val marksY = if (maxValueY < 1) listOf(1) else (0..maxValueY.toInt() + 1).toList()
 
         val offset = Offset(zeroPoint().x - spaceValuesAndY, zeroPoint().y + offsetValuesAndY)
@@ -168,6 +168,6 @@ class LineChart(
     private fun DrawScope.lengthY() = zeroPoint().y - endYPoint().y
     private fun DrawScope.lengthX() = endXPoint().x - zeroPoint().x
 
-    private fun DrawScope.intervalY() = lengthY() / (values.maxOf { it.second }.toInt() + 1)
+    private fun DrawScope.intervalY() = lengthY() / (values.maxOfOrNull { it.second }?.toInt() ?: 0 + 1)
     private fun DrawScope.intervalX() = lengthX() / (values.count() - 1)
 }
