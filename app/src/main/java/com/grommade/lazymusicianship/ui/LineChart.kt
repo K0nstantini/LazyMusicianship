@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.drawscope.rotate
@@ -19,6 +20,7 @@ class LineChart(
     private val textLabelX: String = "",
     private val offsetTopLeft: Offset,
     private val offsetBottomRight: Offset,
+    private val medium: Boolean = false
 ) {
 
     private val spaceLabelAndY = 80f
@@ -35,10 +37,10 @@ class LineChart(
             modifier = Modifier.fillMaxSize(),
             onDraw = {
                 axes()
-                marksY()
-                marksX()
-                labelsXY()
                 chart()
+                if (medium) {
+                    medium()
+                }
             }
         )
     }
@@ -46,6 +48,9 @@ class LineChart(
     private fun DrawScope.axes() {
         drawAxis(endYPoint())
         drawAxis(endXPoint())
+        marksY()
+        marksX()
+        labelsXY()
     }
 
     private fun DrawScope.drawAxis(offset: Offset) {
@@ -124,6 +129,19 @@ class LineChart(
             drawPoint(point)
             points.getOrNull(index + 1)?.let { drawSection(point, it) }
         }
+    }
+
+    private fun DrawScope.medium() {
+        val mediumValue = values.map { it.second }.average().toFloat()
+        val zeroPoint = zeroPoint()
+        val offsetY = zeroPoint.y - mediumValue * intervalY()
+        drawLine(
+            start = Offset(zeroPoint.x, offsetY),
+            end =  Offset(endXPoint().x, offsetY),
+            strokeWidth = 2f,
+            pathEffect = PathEffect.dashPathEffect(floatArrayOf(20f, 10f)),
+            color = Color.Magenta
+        )
     }
 
     private fun DrawScope.drawPoint(offset: Offset) {

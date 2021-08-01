@@ -43,6 +43,7 @@ fun StatisticsUi(
             textLabelX = "Days",
             offsetTopLeft = Offset(64f, 64f),
             offsetBottomRight = Offset(64f, 265f),
+            medium = true
         ).Built()
     }
 
