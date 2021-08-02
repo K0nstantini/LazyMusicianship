@@ -137,7 +137,7 @@ class LineChart(
         val offsetY = zeroPoint.y - mediumValue * intervalY()
         drawLine(
             start = Offset(zeroPoint.x, offsetY),
-            end =  Offset(endXPoint().x, offsetY),
+            end = Offset(endXPoint().x, offsetY),
             strokeWidth = 2f,
             pathEffect = PathEffect.dashPathEffect(floatArrayOf(20f, 10f)),
             color = Color.Magenta
@@ -186,6 +186,6 @@ class LineChart(
     private fun DrawScope.lengthY() = zeroPoint().y - endYPoint().y
     private fun DrawScope.lengthX() = endXPoint().x - zeroPoint().x
 
-    private fun DrawScope.intervalY() = lengthY() / (values.maxOfOrNull { it.second }?.toInt() ?: 0 + 1)
+    private fun DrawScope.intervalY() = lengthY() / ((values.maxOfOrNull { it.second }?.toInt() ?: 0) + 1)
     private fun DrawScope.intervalX() = lengthX() / (values.count() - 1)
 }

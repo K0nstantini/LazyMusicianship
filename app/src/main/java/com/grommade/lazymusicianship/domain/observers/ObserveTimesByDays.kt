@@ -14,8 +14,8 @@ class ObserveTimesByDays @Inject constructor(
 
     override fun createObservable(params: Params): Flow<List<Pair<LocalDate, Int>>> {
         return repoPractice.getTimesByDaysFlow(params.startDate, params.endDate).map { values ->
-            val startDate = getDate(values.firstOrNull(), params.startDate)
-            val endDate = getDate(values.lastOrNull(), params.endDate)
+            val startDate = getDate(values, params.startDate)
+            val endDate = getDate(values, params.endDate)
             val rangeDates = if (startDate == null || endDate == null) {
                 emptyList()
             } else {
@@ -34,13 +34,11 @@ class ObserveTimesByDays @Inject constructor(
         else -> listOf(startDate) + rangeDates(startDate.plusDays(1), endDate)
     }
 
-    private fun getDate(timesByDays: PracticeDao.TimesByDays?, date: LocalDate) = when {
-        date.isNotEmpty() -> date
-        timesByDays != null -> timesByDays.date
-        else -> null
+    private fun getDate(values: List<PracticeDao.TimesByDays>, date: LocalDate) = when (date) {
+        LocalDate.MIN -> values.firstOrNull()?.date
+        LocalDate.MAX -> LocalDate.now()
+        else -> date
     }
-
-    private fun LocalDate.isNotEmpty() = this > LocalDate.MIN && this < LocalDate.MAX
 
     data class Params(
         val startDate: LocalDate = LocalDate.MIN,

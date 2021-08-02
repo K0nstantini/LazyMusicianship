@@ -46,11 +46,20 @@ fun StatisticsUi(
             medium = true
         ).Built()
     }
-
 }
 
 @Preview
 @Composable
 fun StatisticsUiPreview() {
-    StatisticsUi(StatisticsViewState()) {}
+    val values = mutableListOf<Pair<String, Float>>()
+    val randomFloat = {
+        (0..3).random().toFloat() + (0..59).random().toFloat() / 60
+    }
+    for (i in 0..30) {
+        values.add(i.toString() to randomFloat())
+    }
+    val state = StatisticsViewState(
+        timesByDays = values
+    )
+    StatisticsUi(state) {}
 }
