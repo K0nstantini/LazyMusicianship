@@ -5,6 +5,7 @@ import com.grommade.lazymusicianship.util.SECONDS_IN_MINUTE
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import java.time.LocalDate
 import java.time.LocalTime
 
 fun String.toTime() =
@@ -26,6 +27,18 @@ fun LocalTime.toSeconds(): Int =
 
 fun LocalTime.toMinutes(): Int =
     hour * MINUTES_IN_HOUR + minute
+
+fun LocalDate.toString(default: String) = when {
+    this.isEmpty() -> default
+    else -> this.toString()
+}
+
+fun LocalDate.isEmpty() = when {
+    this == LocalDate.MIN || this == LocalDate.MAX -> true
+    else -> false
+}
+
+fun LocalDate.isNoEmpty() = !this.isEmpty()
 
 fun <T> delayFlow(timeout: Long, value: T): Flow<T> = flow {
     delay(timeout)

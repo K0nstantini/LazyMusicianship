@@ -36,5 +36,9 @@ class RepoStateStudyImpl @Inject constructor(
         stateStudyDao.getState(id)
     }
 
+    override suspend fun getAllStates() = withContext(dispatchers.io) {
+        stateStudyDao.getAllStates()
+    }
+
     override fun getStatesFlow() = stateStudyDao.getStatesFlow()
 }

@@ -11,6 +11,9 @@ abstract class StateStudyDao: EntityDao<StateStudy>() {
     @Query("SELECT * FROM state_study_table WHERE state_study_id = :id")
     abstract suspend fun getState(id: Long): StateStudy?
 
+    @Query("SELECT * FROM state_study_table")
+    abstract suspend fun getAllStates(): List<StateStudy>
+
     @Query("SELECT * FROM state_study_table ORDER BY name")
     abstract fun getStatesFlow(): Flow<List<StateStudy>>
 }

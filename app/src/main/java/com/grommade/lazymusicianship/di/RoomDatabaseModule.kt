@@ -3,7 +3,6 @@ package com.grommade.lazymusicianship.di
 import android.content.Context
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.grommade.lazymusicianship.data.AppDataBase
 import com.grommade.lazymusicianship.data.dao.SettingsDao
@@ -30,11 +29,11 @@ object RoomDatabaseModule {
         settingsDaoProvide: Provider<SettingsDao>,
     ): AppDataBase {
 
-        val MIGRATION_1_2 = object : Migration(1, 2) {
-            override fun migrate(database: SupportSQLiteDatabase) {
-                database.execSQL("ALTER TABLE practice_table ADD COLUMN successful INTEGER DEFAULT 1 NOT NULL")
-            }
-        }
+//        val MIGRATION_1_2 = object : Migration(1, 2) {
+//            override fun migrate(database: SupportSQLiteDatabase) {
+//                database.execSQL("ALTER TABLE practice_table ADD COLUMN successful INTEGER DEFAULT 1 NOT NULL")
+//            }
+//        }
 
         return Room.databaseBuilder(
             context,
@@ -42,7 +41,8 @@ object RoomDatabaseModule {
             "lazy_musicianship_2021"
 
         )
-            .addMigrations(MIGRATION_1_2)
+//            .addMigrations(MIGRATION_1_2)
+//            .fallbackToDestructiveMigration()
             .addCallback(
                 object : RoomDatabase.Callback() {
                     override fun onCreate(db: SupportSQLiteDatabase) {

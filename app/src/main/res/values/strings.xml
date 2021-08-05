@@ -88,6 +88,15 @@
     <!--    Settings items-->
     <string name="btn_clear">Clear</string>
 
+    <!--    Presets Date picker-->
+    <string name="preset_last_7_days">Last 7 days</string>
+    <string name="preset_last_30_days">Last 30 days</string>
+    <string name="preset_last_12_months">Last 12 months</string>
+    <string name="preset_week_to_date">Week to date</string>
+    <string name="preset_month_to_date">Month to date</string>
+    <string name="preset_year_to_date">Year to date</string>
+    <string name="preset_all_time">All time</string>
+
     <!--    Content Descriptions-->
     <string name="cd_more_vert_icon">More</string>
     <string name="cd_close_icon">Close</string>
@@ -96,5 +105,9 @@
     <string name="cd_add_icon">Add</string>
     <string name="cd_delete_icon">Delete</string>
     <string name="cd_settings_icon">Settings</string>
+    <string name="cd_filter_icon">Filter</string>
+    <string name="cd_expand_more_icon">Expand more</string>
+    <string name="cd_chevron_left_icon">Chevron left</string>
+    <string name="cd_chevron_right_icon">Chevron right</string>
 
 </resources>

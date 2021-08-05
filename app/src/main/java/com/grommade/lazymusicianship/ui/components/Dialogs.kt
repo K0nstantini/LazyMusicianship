@@ -18,7 +18,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 
 @Composable
-fun BuiltSimpleOkCancelDialog(
+fun BuiltSimpleOkCancelDialogDel(
     title: String,
     callback: () -> Unit,
     close: () -> Unit
@@ -47,9 +47,55 @@ fun BuiltSimpleOkCancelDialog(
 }
 
 @Composable
+fun MaterialDialog.BuiltSimpleOkCancelDialog(
+    title: String,
+    message: String = "",
+    callback: () -> Unit
+) {
+    build {
+        SetTitle(title, message)
+        SetButtonsOkCancel(callback)
+    }
+}
+
+@Composable
+fun MaterialDialog.BuiltCustomOkCancelDialog(
+    title: String,
+    message: String = "",
+    callback: () -> Unit,
+    body: @Composable () -> Unit
+) {
+    build {
+        SetTitle(title, message)
+        body()
+        SetButtonsOkCancel(callback)
+    }
+}
+
+@Composable
 fun MaterialDialog.BuiltDateDialog(callback: (LocalDate) -> Unit) {
     build {
         datepicker(onDateChange = callback)
+        SetButtonsOkCancel()
+    }
+}
+
+@Composable
+fun MaterialDialog.BuiltMultipleChoiceDialog(
+    title: String,
+    message: String = "",
+    list: List<String>,
+    initialSelection: List<Int> = emptyList(),
+    callback: (List<Int>) -> Unit
+) {
+    build {
+        SetTitle(title, message)
+        listItemsMultiChoice(
+            list = list,
+            initialSelection = initialSelection
+        ) { indexes ->
+            callback(indexes.sortedBy { it })
+        }
         SetButtonsOkCancel()
     }
 }

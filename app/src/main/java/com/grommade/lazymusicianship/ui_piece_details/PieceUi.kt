@@ -56,7 +56,7 @@ fun PieceUi(
 
     val confirmToWriteDialog = remember { mutableStateOf(false) }
     if (confirmToWriteDialog.value) {
-        BuiltSimpleOkCancelDialog(
+        BuiltSimpleOkCancelDialogDel(
             title = stringResource(R.string.alert_title_save_before_add_section),
             callback = {
                 scope.launch {

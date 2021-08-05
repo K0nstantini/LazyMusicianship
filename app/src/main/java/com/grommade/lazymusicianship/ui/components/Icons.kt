@@ -1,10 +1,9 @@
 package com.grommade.lazymusicianship.ui.components
 
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.outlined.FilterList
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.grommade.lazymusicianship.R
@@ -96,4 +95,43 @@ fun SaveIcon(
             contentDescription = stringResource(R.string.cd_save_icon)
         )
     }
+}
+
+@Composable
+fun FilterIcon(
+    pressed: Boolean = false,
+    callback: () -> Unit
+) {
+    IconButton(onClick = callback) {
+        Icon(
+            imageVector = if (pressed) Icons.Filled.FilterList else Icons.Outlined.FilterList,
+            contentDescription = stringResource(R.string.cd_filter_icon)
+        )
+    }
+}
+
+@Composable
+fun IconExpandMore() {
+    Icon(
+        imageVector = Icons.Default.ExpandMore,
+        contentDescription = stringResource(R.string.cd_expand_more_icon)
+    )
+}
+
+@Composable
+fun IconChevronRight(opacity: Float = LocalContentAlpha.current) {
+    Icon(
+        imageVector = Icons.Default.ChevronRight,
+        contentDescription = stringResource(R.string.cd_chevron_right_icon),
+        tint = LocalContentColor.current.copy(alpha = opacity)
+    )
+}
+
+@Composable
+fun IconChevronLeft(opacity: Float = LocalContentAlpha.current) {
+    Icon(
+        imageVector = Icons.Default.ChevronLeft,
+        contentDescription = stringResource(R.string.cd_chevron_left_icon),
+        tint = LocalContentColor.current.copy(alpha = opacity)
+    )
 }

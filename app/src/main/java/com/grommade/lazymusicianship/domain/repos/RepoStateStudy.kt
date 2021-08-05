@@ -8,5 +8,6 @@ interface RepoStateStudy {
     suspend fun save(state: StateStudy): Long
     suspend fun delete(state: StateStudy): ResultOf<Boolean>
     suspend fun getState(id: Long): StateStudy?
+    suspend fun getAllStates(): List<StateStudy>
     fun getStatesFlow(): Flow<List<StateStudy>>
 }
