@@ -26,7 +26,6 @@ import com.grommade.lazymusicianship.ui.common.rememberFlowWithLifecycle
 import com.grommade.lazymusicianship.ui.components.DeleteIcon
 import com.grommade.lazymusicianship.ui.components.FloatingAddActionButton
 import com.grommade.lazymusicianship.ui.components.MoreVertIcon
-import com.grommade.lazymusicianship.ui.theme.DarkBrown
 
 @Composable
 fun PiecesListUi(openPiece: (Long) -> Unit) {
@@ -157,7 +156,7 @@ fun PieceItem(
             Text(
                 text = piece.name,
                 maxLines = 2,
-                style = MaterialTheme.typography.subtitle1.copy(fontWeight = FontWeight.SemiBold, color = DarkBrown),
+                style = MaterialTheme.typography.subtitle1.copy(fontWeight = FontWeight.SemiBold, color = Color.DarkGray),
             )
             if (hasAuthor) {
                 Text(

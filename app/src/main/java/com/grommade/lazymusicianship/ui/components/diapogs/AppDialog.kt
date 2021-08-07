@@ -15,7 +15,7 @@ class AppDialog {
         showing.value = true
     }
 
-    private fun hide(focusManager: FocusManager? = null) {
+    fun hide(focusManager: FocusManager? = null) {
         focusManager?.clearFocus()
         showing.value = false
     }
@@ -30,10 +30,10 @@ class AppDialog {
     }
 
     companion object Colors {
-        val background = Color(0xFF282729)
-        val lightBackground = Color(0xFF313133)
-        val primaryText = Color(0xFFF8F7FA)
-        val secondaryText = Color(0xFFC9C8CC)
-        val primary = Color(0xFF328B36)
+        val backgroundColor = Color(0xFF282729)
+        val lightBackgroundColor = Color(0xFF313133)
+        val primaryTextColor = Color(0xFFF8F7FA)
+        val secondaryTextColor = Color(0xFFC9C8CC)
+        val primaryColor = Color(0xFF328B36)
     }
 }

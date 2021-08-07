@@ -88,7 +88,7 @@
     <!--    Settings items-->
     <string name="btn_clear">Clear</string>
 
-    <!--    Presets Date picker-->
+    <!--    Date picker-->
     <string name="preset_last_7_days">Last 7 days</string>
     <string name="preset_last_30_days">Last 30 days</string>
     <string name="preset_last_12_months">Last 12 months</string>
@@ -96,6 +96,11 @@
     <string name="preset_month_to_date">Month to date</string>
     <string name="preset_year_to_date">Year to date</string>
     <string name="preset_all_time">All time</string>
+
+    <string name="days_of_week">Mo Tu We Th Fr Sa Su</string>
+
+    <string name="calendar_positive_button">Set Date</string>
+    <string name="calendar_negative_button">Cancel</string>
 
     <!--    Content Descriptions-->
     <string name="cd_more_vert_icon">More</string>

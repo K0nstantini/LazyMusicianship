@@ -33,6 +33,16 @@ fun LocalDate.toString(default: String) = when {
     else -> this.toString()
 }
 
+fun LocalDate.sameDay(date: LocalDate) =
+    date.year == year && date.month == month && date.dayOfMonth == dayOfMonth
+
+fun LocalDate.sameMonth(date: LocalDate) =
+    date.year == year && date.month == month
+
+fun LocalDate.isToday() = sameDay(LocalDate.now())
+
+fun LocalDate.thisMonth() = sameMonth(LocalDate.now())
+
 fun LocalDate.isEmpty() = when {
     this == LocalDate.MIN || this == LocalDate.MAX -> true
     else -> false

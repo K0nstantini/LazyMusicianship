@@ -36,11 +36,11 @@ class LineChart(
         Canvas(
             modifier = Modifier.fillMaxSize(),
             onDraw = {
-                axes()
-                chart()
-                if (medium) {
-                    medium()
-                }
+//                axes()
+//                chart()
+//                if (medium) {
+//                    medium()
+//                }
             }
         )
     }
@@ -188,4 +188,5 @@ class LineChart(
 
     private fun DrawScope.intervalY() = lengthY() / ((values.maxOfOrNull { it.second }?.toInt() ?: 0) + 1)
     private fun DrawScope.intervalX() = lengthX() / (values.count() - 1)
+
 }
