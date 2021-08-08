@@ -5,7 +5,7 @@ import com.grommade.lazymusicianship.data.entity.StateStudy
 
 @Immutable
 data class StatisticsViewState(
-    val timesByDays: List<Pair<String, Float>> = emptyList(),
+    val chartValues: List<Pair<String, Float>> = emptyList(),
     val filter: StatisticsFilter = StatisticsFilter(),
     val allStatesStudy: List<StateStudy> = emptyList()
 ) {

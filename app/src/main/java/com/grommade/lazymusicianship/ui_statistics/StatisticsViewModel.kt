@@ -28,7 +28,7 @@ class StatisticsViewModel @Inject constructor(
         lineChartFilter
     ) { times, states, filter ->
         StatisticsViewState(
-            timesByDays = times.mapIndexed { index, pair ->
+            chartValues = times.mapIndexed { index, pair ->
                 Pair((index + 1).toString(), pair.second.toFloat() / 60)
             },
             filter = filter,

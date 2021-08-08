@@ -11,7 +11,10 @@ import androidx.compose.material.SnackbarDefaults.backgroundColor
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.FilterList
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,17 +27,10 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.insets.ui.Scaffold
 import com.grommade.lazymusicianship.R
-import com.grommade.lazymusicianship.data.entity.StateStudy
+import com.grommade.lazymusicianship.ui.charts.line_chart.LineChart
 import com.grommade.lazymusicianship.ui.common.rememberFlowWithLifecycle
-import com.grommade.lazymusicianship.ui.components.*
-import com.grommade.lazymusicianship.ui.components.diapogs.AppDialog
-import com.grommade.lazymusicianship.ui.components.diapogs.BuildPeriodDialog
-import com.grommade.lazymusicianship.ui.components.material_dialogs.core.MaterialDialog
 import com.grommade.lazymusicianship.ui.theme.LazyMusicianshipTheme
 import com.grommade.lazymusicianship.ui.theme.TextPurple
-import com.grommade.lazymusicianship.util.extentions.isNoEmpty
-import com.grommade.lazymusicianship.util.extentions.toString
-import java.time.LocalDate
 
 @Composable
 fun StatisticsUi() {
@@ -78,16 +74,8 @@ fun StatisticsUi(
             }
             Header()
             Filters()
+            ChartBox(viewState.chartValues)
         }
-
-//        LineChart(
-//            values = viewState.timesByDays,
-//            textLabelY = "Hours",
-//            textLabelX = "Days",
-//            offsetTopLeft = Offset(64f, 64f),
-//            offsetBottomRight = Offset(64f, 265f),
-//            medium = true
-//        ).Built()
     }
 }
 
@@ -104,7 +92,7 @@ fun ChartItem(
                 .padding(top = 8.dp),
             backgroundColor = color,
             shape = RoundedCornerShape(15.dp),
-            border = border()
+            border = BorderStroke(1.dp, color = TextPurple)
         ) {}
     }
 }
@@ -124,8 +112,8 @@ fun Filters() {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(32.dp)
-            .padding(horizontal = 16.dp),
+            .padding(start = 16.dp, end = 16.dp, top = 16.dp)
+            .height(32.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Row(horizontalArrangement = Arrangement.SpaceBetween) {
@@ -145,7 +133,7 @@ fun FilterByPeriod() {
             modifier = Modifier.padding(horizontal = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("By months",fontSize = 12.sp)
+            Text("By months", fontSize = 12.sp)
             Icon(
                 imageVector = Icons.Default.ExpandMore,
                 modifier = Modifier.padding(start = 4.dp),
@@ -157,7 +145,10 @@ fun FilterByPeriod() {
 
 @Composable
 fun FilterPeriod() {
-    SmoothBox(modifier = Modifier.padding(start = 16.dp),onClick = { /*TODO*/ }) {
+    SmoothBox(
+        modifier = Modifier.padding(start = 16.dp),
+        onClick = { /*TODO*/ }
+    ) {
         Text(
             text = "01.08.2021 - 06.08.2021",
             modifier = Modifier.padding(horizontal = 16.dp),
@@ -210,99 +201,95 @@ fun SmoothBox(
 }
 
 @Composable
-fun border() =
-    BorderStroke(1.dp, color = TextPurple)
-
-@Composable
-fun FilterDel(
-    viewState: StatisticsViewState,
-    actioner: (StatisticsActions) -> Unit
-) {
-    var dateStart by remember { mutableStateOf(LocalDate.MIN) }
-    var dateEnd by remember { mutableStateOf(LocalDate.MIN) }
-    var statesStudies by remember { mutableStateOf(emptyList<StateStudy>()) }
-
-    val dateStartDialog = remember { MaterialDialog() }.apply {
-        BuiltDateDialog() { dateStart = it }
-    }
-
-    val dateEndDialog = remember { MaterialDialog() }.apply {
-        BuiltDateDialog() { dateEnd = it }
-    }
-
-    val statesDialog = remember { MaterialDialog() }.apply {
-        BuiltMultipleChoiceDialog(
-            title = stringResource(R.string.states_title),
-            list = viewState.allStatesStudy.map { it.name })
-        { states ->
-            statesStudies = states.map { viewState.allStatesStudy.getOrElse(it) { StateStudy() } }
-        }
-    }
-
-    val filterDialog = remember { MaterialDialog() }.apply {
-        BuiltCustomOkCancelDialog(
-            title = "Filter",
-            callback = {}
-        ) {
-            Column(modifier = Modifier.padding(horizontal = 24.dp)) {
-                SetItemWithClear(
-                    title = "From",
-                    value = dateStart.toString("No restriction"),
-                    showClear = dateStart.isNoEmpty(),
-                    onClick = dateStartDialog::show,
-                    onClickClear = { dateStart = LocalDate.MIN }
-                )
-                SetItemWithClear(
-                    title = "To",
-                    value = dateEnd.toString("No restriction"),
-                    showClear = dateEnd.isNoEmpty(),
-                    onClick = dateEndDialog::show,
-                    onClickClear = { dateEnd = LocalDate.MIN }
-                )
-                SetItemDefault(
-                    title = "States",
-                    value = "All",
-                    onClick = statesDialog::show
-                )
+fun ChartBox(values: List<Pair<String, Float>>) {
+    val shape = RoundedCornerShape(30.dp)
+    Box(
+        modifier = Modifier
+            .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 80.dp)
+            .fillMaxSize()
+            .clip(shape)
+            .border(1.dp, TextPurple, shape)
+    ) {
+        if (values.isEmpty()) {
+            Text(
+                text = "No Data Available",
+                modifier = Modifier.align(Alignment.Center),
+                color = Color(0xFF2B2F44),
+            )
+        } else {
+            Column {
+                Stats()
+                Chart(values)
             }
         }
     }
+}
 
-    val myPeriod = remember { AppDialog() }.apply {
-        BuildPeriodDialog(
-            dateStart = LocalDate.now().minusDays(20),
-            dateEnd = LocalDate.now().minusDays(2)
-        ) { _, _ -> }
-    }
-
+@Composable
+fun Stats() {
+    val modifier = Modifier.fillMaxWidth()
     Row(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = modifier.padding(end = 32.dp, top = 8.dp),
         horizontalArrangement = Arrangement.End
     ) {
-        IconButton(onClick = myPeriod::show) {
-            Icon(
-                imageVector = Icons.Filled.FilterList,
-                contentDescription = stringResource(R.string.cd_filter_icon)
-            )
+        Box(modifier = Modifier.width(90.dp)) {
+            Column {
+                Row(
+                    modifier = modifier,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text12("Overall:")
+                    Text12("10.7h", Color(0xFFAAB694))
+                }
+                Row(
+                    modifier = modifier.padding(top = 4.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text12("Average:")
+                    Text12("1.0h", Color(0xFFAAB694))
+                }
+            }
         }
     }
+}
+
+@Composable
+fun Chart(values: List<Pair<String, Float>>) {
+    Box(
+        modifier = Modifier
+            .padding(start = 32.dp, end = 32.dp, top = 16.dp, bottom = 32.dp)
+            .fillMaxSize()
+    ) {
+        LineChart(
+            values = values,
+            labelsX = listOf(),
+            postfixY = "h"
+        ).Built()
+    }
+}
+
+@Composable
+fun Text12(
+    text: String,
+    color: Color = Color.Unspecified
+) {
+    Text(text, fontSize = 12.sp, color = color)
 }
 
 @Preview
 @Composable
 fun StatisticsUiPreview() {
-    val values = mutableListOf<Pair<String, Float>>()
-//    val randomFloat = {
-//        (0..3).random().toFloat() + (0..59).random().toFloat() / 60
-//    }
-//    for (i in 0..30) {
-//        values.add(i.toString() to randomFloat())
-//    }
-    values.add("1" to 3.1f)
-    values.add("2" to 0.3f)
-    values.add("3" to 4.1f)
+    val testValues: List<Pair<String, Float>> = listOf(
+            "01" to 0.9f,
+            "02" to 1.6f,
+            "03" to 2.1f,
+            "04" to 1.3f,
+            "05" to 2.6f,
+            "06" to 6.2f,
+            "07" to 4.8f,
+    )
     val state = StatisticsViewState(
-        timesByDays = values
+        chartValues = testValues
     )
     LazyMusicianshipTheme {
         StatisticsUi(state) {}
