@@ -11,10 +11,7 @@ import androidx.compose.material.SnackbarDefaults.backgroundColor
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.FilterList
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -28,9 +25,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.insets.ui.Scaffold
 import com.grommade.lazymusicianship.R
 import com.grommade.lazymusicianship.ui.charts.line_chart.LineChart
+import com.grommade.lazymusicianship.ui.charts.line_chart.OverTimeLineChart
 import com.grommade.lazymusicianship.ui.common.rememberFlowWithLifecycle
 import com.grommade.lazymusicianship.ui.theme.LazyMusicianshipTheme
 import com.grommade.lazymusicianship.ui.theme.TextPurple
+import java.time.LocalDate
 
 @Composable
 fun StatisticsUi() {
@@ -74,7 +73,7 @@ fun StatisticsUi(
             }
             Header()
             Filters()
-            ChartBox(viewState.chartValues)
+            ChartBox(viewState.overTimeChartData)
         }
     }
 }
@@ -201,7 +200,7 @@ fun SmoothBox(
 }
 
 @Composable
-fun ChartBox(values: List<Pair<String, Float>>) {
+fun ChartBox(values: List<Pair<LocalDate, Float>>) {
     val shape = RoundedCornerShape(30.dp)
     Box(
         modifier = Modifier
@@ -254,17 +253,14 @@ fun Stats() {
 }
 
 @Composable
-fun Chart(values: List<Pair<String, Float>>) {
+fun Chart(values: List<Pair<LocalDate, Float>>) {
     Box(
         modifier = Modifier
             .padding(start = 32.dp, end = 32.dp, top = 16.dp, bottom = 32.dp)
             .fillMaxSize()
     ) {
-        LineChart(
-            values = values,
-            labelsX = listOf(),
-            postfixY = "h"
-        ).Built()
+        val chart = remember { LineChart() }
+        chart.OverTimeLineChart(values)
     }
 }
 
@@ -276,20 +272,25 @@ fun Text12(
     Text(text, fontSize = 12.sp, color = color)
 }
 
+
 @Preview
 @Composable
-fun StatisticsUiPreview() {
-    val testValues: List<Pair<String, Float>> = listOf(
-            "01" to 0.9f,
-            "02" to 1.6f,
-            "03" to 2.1f,
-            "04" to 1.3f,
-            "05" to 2.6f,
-            "06" to 6.2f,
-            "07" to 4.8f,
-    )
+fun StatisticsUiPreview8() {
+
+    val dates = mutableListOf<Pair<LocalDate, Float>>()
+    for (i in 0..76) {
+        dates.add(LocalDate.now().minusDays(24).plusDays(i.toLong()) to 1.1f)
+    }
+//    val data = listOf(
+//        startDay.plusDays(1) to 0.5f,
+//        startDay.plusDays(2) to 1.1f,
+//        startDay.plusDays(3) to 2.2f,
+//        startDay.plusDays(4) to 0.3f,
+//        startDay.plusDays(5) to 1.5f,
+//        startDay to 2.7f,
+//    )
     val state = StatisticsViewState(
-        chartValues = testValues
+        overTimeChartData = dates
     )
     LazyMusicianshipTheme {
         StatisticsUi(state) {}

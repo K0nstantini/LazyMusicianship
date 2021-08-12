@@ -35,6 +35,7 @@ import com.grommade.lazymusicianship.ui.components.diapogs.AppDialog.Colors.seco
 import com.grommade.lazymusicianship.util.extentions.isEmpty
 import com.grommade.lazymusicianship.util.extentions.isToday
 import com.grommade.lazymusicianship.util.extentions.sameDay
+import com.grommade.lazymusicianship.util.extentions.stringMonth
 import java.time.LocalDate
 
 // FIXME: Rename package
@@ -128,7 +129,7 @@ private fun MonthYearHeader(date: LocalDate) {
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         IconChevronLeft(0.3f)
-        Text("$month ${date.year}")
+        Text("${date.stringMonth()} ${date.year}")
         IconChevronRight(0.3f)
     }
 }

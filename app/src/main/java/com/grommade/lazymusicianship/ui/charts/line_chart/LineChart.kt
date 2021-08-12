@@ -12,11 +12,13 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 
-class LineChart(
-    private val values: List<Pair<String, Float>>,
-    labelsX: List<Pair<String, Int>>,
-    private val postfixY: String = "",
+@Suppress("MemberVisibilityCanBePrivate")
+open class LineChart(
+//    private val _values: List<Pair<String, Float>> = emptyList()
 ) {
+
+    private var values = emptyList<Pair<String, Float>>()
+    private val postfixY: String = ""
 
     /** Определяет расстояние м-у осями и метками */
     private val offsetStartAndY = 35f
@@ -24,20 +26,39 @@ class LineChart(
 
     private val verticalOffsetLabelsY = 8f
     private val spaceValuesAndX = 50f
-    private val spaceValuesLabelAndX = 45f
+    private val spaceValuesLabelAndX = 50f
+
+    private val minSpaceBetweenValuesX = 5f
 
     private val netColor = Color(0xFF29224E)
     private val labelColor = Color(0xFF5C558D)
     private val chartColor1 = Color(0xFFFA3D75)
     private val chartColor2 = Color(0xFF8354F8)
 
-    private val countValuesX = values.count()
+    private val countValuesX: Int
+        get() = values.count()
 
-    //    private val maxY = values.maxOfOrNull { it.second } ?: 0f
-    private val countValuesY = (values.maxOfOrNull { it.second } ?: 0).toInt() + 1
+    private val countValuesY: Int
+        get() = ((values.maxOfOrNull { it.second } ?: 0).toInt() + 1)
+            .coerceAtMost(24)
 
     @Composable
-    fun Built() {
+    fun Built(
+        _values: List<Pair<String, Float>> = values,
+        content: DrawScope.() -> Unit
+    ) {
+        values = _values
+        Canvas(
+            modifier = Modifier.fillMaxSize(),
+            onDraw = {
+                content()
+            }
+        )
+    }
+
+    @Composable
+    fun BuiltDel(_values: List<Pair<String, Float>> = values) {
+        values = _values
         Canvas(
             modifier = Modifier.fillMaxSize(),
             onDraw = {
@@ -49,79 +70,134 @@ class LineChart(
         )
     }
 
-    private fun DrawScope.net() {
-        val countLinesX = if (countValuesX > 1) countValuesX else 0
+    /*private fun DrawScope.preparedValues(): List<LineChartData> {
+        val paint = Paint()
+        paint.textSize = 32f
+        paint.typeface = Typeface.DEFAULT
+        val lengthValues1 = values.sumOf { paint.measureText(it.valueX) * 1.5 }
+        if (lengthX() < lengthValues1) {
+            val preparedValues1 = values.map { it.copy(valueX = it.valueX1) }
+            val lengthValues2 = preparedValues1.sumOf { paint.measureText(it.valueX) * 1.5 }
+            return if (lengthX() < lengthValues2) {
+                preparedValues1.map { it.copy(valueX = it.valueX2) }
+            } else {
+                preparedValues1
+            }
+        }
+        return values
+    }*/
+
+    fun DrawScope.net(
+        countLinesX: Int = if (countValuesX > 1) countValuesX - 1 else 0,
+        countLinesY: Int = if (countValuesX > 1) countValuesY else 0,
+        lineThick: Float = 2f,
+        lineColor: Color = netColor // FIXME: Change
+    ) {
+        val drawAxis = { start: Offset, end: Offset ->
+            drawLine(
+                start = start,
+                end = end,
+                strokeWidth = lineThick,
+                color = lineColor
+            )
+        }
+
         for (ind in 0..countLinesX) {
             val x = zeroPoint().x + ind * intervalX()
-            drawAxis(
-                start = Offset(x, zeroPoint().y),
-                end = Offset(x, endYPoint().y)
-            )
+            drawAxis(Offset(x, zeroPoint().y), Offset(x, endYPoint().y))
         }
 
-        val countLinesY = if (countValuesY > 1) countValuesY else 0
         for (ind in 0..countLinesY) {
             val y = zeroPoint().y - ind * intervalY()
-            drawAxis(
-                start = Offset(zeroPoint().x, y),
-                end = Offset(endXPoint().x, y)
-            )
+            drawAxis(Offset(zeroPoint().x, y), Offset(endXPoint().x, y))
         }
     }
 
-    private fun DrawScope.drawAxis(
-        start: Offset,
-        end: Offset
-    ) {
-        drawLine(
-            start = start,
-            end = end,
-            strokeWidth = 2f,
-            color = netColor
-        )
-    }
 
-    private fun DrawScope.marksY() {
+    fun DrawScope.marksY(
+        textSize: Float = 32f,
+        textColor: Color = labelColor, // FIXME: Change
+        typeface: Typeface = Typeface.DEFAULT,
+        verticalOffset: Float = 8f,
+        horizontalOffset: Float = 35f,
+        transformValue: (Int) -> String = { it.toString() },
+    ) {
         for (ind in 1..countValuesY) {
             drawText(
-                text = ind.toString() + postfixY,
+                text = transformValue(ind),
                 offset = Offset(
-                    x = zeroPoint().x - offsetStartAndY,
-                    y = zeroPoint().y - intervalY() * ind + verticalOffsetLabelsY
+                    x = zeroPoint().x - horizontalOffset,
+                    y = zeroPoint().y - intervalY() * ind + verticalOffset
                 ),
-                textAlign = Paint.Align.RIGHT
+                size = textSize,
+                textColor = textColor,
+                type = typeface,
+                align = Paint.Align.RIGHT
             )
         }
     }
 
-    private fun DrawScope.marksX() {
-        val offset = Offset(zeroPoint().x, zeroPoint().y + spaceValuesAndX)
-
+    fun DrawScope.marksX(
+        textSize: Float = 32f,
+        textColor: Color = labelColor, // FIXME: Change
+        typeface: Typeface = Typeface.DEFAULT,
+        verticalOffset: Float = 50f,
+        align: Paint.Align = Paint.Align.CENTER
+    ) {
         values.forEachIndexed() { ind, value ->
             drawText(
                 text = value.first,
                 offset = Offset(
-                    x = offset.x + intervalX() * ind,
-                    y = offset.y
+                    x = zeroPoint().x + intervalX() * ind,
+                    y = zeroPoint().y + verticalOffset
                 ),
-                textAlign = Paint.Align.CENTER
+                size = textSize,
+                textColor = textColor,
+                type = typeface,
+                align = align
             )
         }
-        labelsX(offset.y + spaceValuesLabelAndX)
+
+        /*val offset = Offset(zeroPoint().x, zeroPoint().y + spaceValuesAndX)
+
+        val countLabels = values.count { it.first.isNotEmpty() }
+        values.forEachIndexed() { ind, value ->
+            val valueX = offset.x + intervalX() * ind
+            drawText(
+                text = value.first,
+                offset = offset.copy(x = valueX),
+                textAlign = if (values.count() == 1) Paint.Align.LEFT else Paint.Align.CENTER
+            )
+            if (value.first.isNotEmpty() && countLabels > 1) {
+                drawText(
+                    text = value.first,
+                    offset = Offset(
+                        x = offset.x + intervalX() * ind,
+                        y = offset.y + spaceValuesLabelAndX
+                    )
+                )
+            }
+        }
+        if (countLabels == 1) {
+            labelsX(
+                values.maxOf { it.first },
+                offset.y + spaceValuesLabelAndX
+            )
+        }*/
     }
 
-    private fun DrawScope.labelsX(y: Float) {
+    private fun DrawScope.labelsX(label: String, y: Float) {
         drawText(
-            text = "September",
+            text = label,
             offset = Offset(
                 x = zeroPoint().x + lengthX() / 2,
                 y = y
             ),
-            textAlign = Paint.Align.CENTER
+            align = Paint.Align.CENTER
         )
     }
 
-    private fun DrawScope.chart() {
+    fun DrawScope.chart() {
         val offset = { ind: Int, valueY: Float ->
             Offset(zeroPoint().x + intervalX() * ind, zeroPoint().y - intervalY() * valueY)
         }
@@ -158,9 +234,10 @@ class LineChart(
             )
 
             val maxY = points.minOf { it.y }
-            points
-                .filter { it.y == maxY }
-                .forEach { drawPoint(it) }
+            val countMax = points.filter { it.y == maxY }.count()
+            if (countMax == 1) {
+                drawPoint(points.first())
+            }
         }
     }
 
@@ -181,35 +258,43 @@ class LineChart(
     private fun DrawScope.drawText(
         text: String,
         offset: Offset,
-        textSize: Float = 32f,
-        typeface: Typeface = Typeface.DEFAULT,
-        textAlign: Paint.Align = Paint.Align.LEFT
-    ) {
-        val paint = Paint()
-        paint.textAlign = textAlign
-        paint.textSize = textSize
-        paint.typeface = typeface
-        paint.color = labelColor.toArgb()
+        size: Float = 32f,
+        type: Typeface = Typeface.DEFAULT,
+        textColor: Color = labelColor, // FIXME
+        align: Paint.Align = Paint.Align.LEFT
+    ): Float {
+        val paint = Paint().apply {
+            textAlign = align
+            textSize = size
+            typeface = type
+            color = textColor.toArgb()
+        }
         drawIntoCanvas {
             it.nativeCanvas.drawText(text, offset.x, offset.y, paint)
         }
+        // FIXME: Del
+        return offset.x + when (align) {
+            Paint.Align.LEFT -> paint.measureText(text)
+            Paint.Align.CENTER -> paint.measureText(text) / 2
+            Paint.Align.RIGHT -> 0f
+        }
     }
 
-    private fun DrawScope.zeroPoint() = Offset(0f + offsetStartAndY, size.height - offsetBottomAndX)
+    fun DrawScope.zeroPoint() = Offset(0f + offsetStartAndY, size.height - offsetBottomAndX)
 
-    private fun DrawScope.endYPoint() = Offset(zeroPoint().x, 0f)
-    private fun DrawScope.endXPoint() = Offset(size.width, zeroPoint().y)
+    fun DrawScope.endYPoint() = Offset(zeroPoint().x, 0f)
+    fun DrawScope.endXPoint() = Offset(size.width, zeroPoint().y)
 
-    private fun DrawScope.lengthY() = zeroPoint().y - endYPoint().y
-    private fun DrawScope.lengthX() = endXPoint().x - zeroPoint().x
+    fun DrawScope.lengthY() = zeroPoint().y - endYPoint().y
+    fun DrawScope.lengthX() = endXPoint().x - zeroPoint().x
 
 
-    private fun DrawScope.intervalY() = when (countValuesY) {
+    fun DrawScope.intervalY() = when (countValuesY) {
         0 -> lengthY()
         else -> lengthY() / countValuesY
     }
 
-    private fun DrawScope.intervalX() = when (countValuesX) {
+    fun DrawScope.intervalX() = when (countValuesX) {
         1 -> lengthX()
         else -> lengthX() / (countValuesX - 1)
     }
