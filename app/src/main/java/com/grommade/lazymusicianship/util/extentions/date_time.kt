@@ -5,6 +5,7 @@ import com.grommade.lazymusicianship.util.MONTHS_IN_YEAR
 import com.grommade.lazymusicianship.util.SECONDS_IN_MINUTE
 import java.time.LocalDate
 import java.time.LocalTime
+import java.time.temporal.ChronoUnit
 
 fun String.toTime() =
     dropLast(3).toInt() * 60 + this.drop(3).toInt()
@@ -61,3 +62,6 @@ fun LocalDate.stringDay() =
 
 fun LocalDate.diffMonths(date: LocalDate) =
     (monthValue - date.monthValue) + MONTHS_IN_YEAR * (year - date.year)
+
+fun LocalDate.diffDays(date: LocalDate) =
+    ChronoUnit.DAYS.between(this, date).toInt()

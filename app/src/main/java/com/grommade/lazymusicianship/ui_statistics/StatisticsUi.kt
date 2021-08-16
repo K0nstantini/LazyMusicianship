@@ -24,8 +24,10 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.insets.ui.Scaffold
 import com.grommade.lazymusicianship.R
-import com.grommade.lazymusicianship.ui.charts.line_chart.LineChart
-import com.grommade.lazymusicianship.ui.charts.line_chart.OverTimeLineChart
+import com.grommade.lazymusicianship.ui.charts.line_chart.transformLineChartText
+import com.grommade.lazymusicianship.ui.charts.line_chart_core.LineChart
+import com.grommade.lazymusicianship.ui.charts.line_chart_core.LineChartText
+import com.grommade.lazymusicianship.ui.charts.line_chart_core.LineChartTextFormat
 import com.grommade.lazymusicianship.ui.common.rememberFlowWithLifecycle
 import com.grommade.lazymusicianship.ui.theme.LazyMusicianshipTheme
 import com.grommade.lazymusicianship.ui.theme.TextPurple
@@ -254,15 +256,25 @@ fun Stats() {
 
 @Composable
 fun Chart(values: List<Pair<LocalDate, Float>>) {
-    Box(
-        modifier = Modifier
-            .padding(start = 32.dp, end = 32.dp, top = 16.dp, bottom = 32.dp)
-            .fillMaxSize()
-    ) {
-        val chart = remember { LineChart() }
-        chart.OverTimeLineChart(values)
+    val chart = remember { LineChart<LocalDate>() }
+
+    val transformY = { format: LineChartTextFormat, value: Float ->
+        val text = if (value == 0f) "" else value.toInt().toString() + "h"
+        LineChartText(text, format)
     }
+    val transformX = transformLineChartText(
+        dates = values.map { it.first },
+        intervalX = chart.intervalX
+    )
+
+    chart.Built(
+        values = values,
+        transformY = transformY,
+        transformX = transformX
+    )
+    chart.show()
 }
+
 
 @Composable
 fun Text12(
@@ -278,8 +290,8 @@ fun Text12(
 fun StatisticsUiPreview8() {
 
     val dates = mutableListOf<Pair<LocalDate, Float>>()
-    for (i in 0..76) {
-        dates.add(LocalDate.now().minusDays(24).plusDays(i.toLong()) to 1.1f)
+    for (i in 0..22) {
+        dates.add(LocalDate.now().minusDays(-120).plusDays(i.toLong()) to 3.2f)
     }
 //    val data = listOf(
 //        startDay.plusDays(1) to 0.5f,
