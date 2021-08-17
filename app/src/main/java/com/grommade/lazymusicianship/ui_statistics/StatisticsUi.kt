@@ -289,18 +289,22 @@ fun Text12(
 @Composable
 fun StatisticsUiPreview8() {
 
-    val dates = mutableListOf<Pair<LocalDate, Float>>()
-    for (i in 0..22) {
-        dates.add(LocalDate.now().minusDays(-120).plusDays(i.toLong()) to 3.2f)
-    }
-//    val data = listOf(
-//        startDay.plusDays(1) to 0.5f,
-//        startDay.plusDays(2) to 1.1f,
-//        startDay.plusDays(3) to 2.2f,
-//        startDay.plusDays(4) to 0.3f,
-//        startDay.plusDays(5) to 1.5f,
-//        startDay to 2.7f,
-//    )
+//    val dates = mutableListOf<Pair<LocalDate, Float>>()
+//    for (i in 0..15) {
+//        dates.add(LocalDate.now().minusDays(-120).plusDays(i.toLong()) to 3.2f)
+//    }
+    val startDay = LocalDate.now().plusDays(10)
+    var i = 0L
+    val dates = listOf(
+        startDay.plusDays(i++) to 0.5f,
+        startDay.plusDays(i++) to 1.1f,
+        startDay.plusDays(i++) to 2.2f,
+        startDay.plusDays(i++) to 0.4f,
+        startDay.plusDays(i++) to 1.5f,
+        startDay.plusDays(i++) to 2.5f,
+        startDay.plusDays(i++) to 3.5f,
+        startDay.plusDays(i++) to 3.2f,
+    )
     val state = StatisticsViewState(
         overTimeChartData = dates
     )

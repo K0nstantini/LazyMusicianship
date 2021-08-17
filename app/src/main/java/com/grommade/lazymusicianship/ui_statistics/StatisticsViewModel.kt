@@ -38,8 +38,8 @@ class StatisticsViewModel @Inject constructor(
 //                it.first to (it.second.toFloat() / 60)
 //            },
             // fixme
-            overTimeChartData = (0..99).map {
-                LocalDate.now().plusDays(it.toLong()) to (0..4).random().toFloat()
+            overTimeChartData = (0..32).map {
+                LocalDate.now().plusDays(it.toLong()) to ((0..4).random().toFloat() + (0..99).random().toFloat()/100)
             },
             filter = filter,
             allStatesStudy = states

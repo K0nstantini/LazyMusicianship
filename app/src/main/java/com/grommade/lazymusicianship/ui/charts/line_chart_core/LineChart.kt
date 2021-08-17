@@ -109,7 +109,7 @@ open class LineChart<T>(
         var lastY = zeroPoint.y
         val defaultFormat = LineChartTextFormat(
             align = Paint.Align.RIGHT,
-            horizontalOffset = - SPACE_MARKS_Y_AND_AXIS,
+            horizontalOffset = -SPACE_MARKS_Y_AND_AXIS,
             verticalOffset = VERTICAL_OFFSET_MARKS_Y
         )
         marksListY.forEachIndexed { ind, value ->
@@ -133,7 +133,7 @@ open class LineChart<T>(
         val defaultFormat = LineChartTextFormat(
             align = Paint.Align.CENTER,
             verticalOffset = 40f,
-            )
+        )
         data.map { it.first }.forEachIndexed() { ind, value ->
             val (text, format, postfix) = transform(defaultFormat, value, lastValue)
 
@@ -197,65 +197,55 @@ open class LineChart<T>(
         else -> measureText(text)
     }
 
-    companion object {
-        const val SPACE_MARKS_Y_AND_AXIS = 15f
-        const val VERTICAL_OFFSET_MARKS_Y = 8f
-    }
-
-    /** ============================ */
-
-    private var values = emptyList<Pair<String, Float>>()
-
-    private val chartColor1 = Color(0xFFFA3D75)
-    private val chartColor2 = Color(0xFF8354F8)
-
-    fun DrawScope.chart() {
+    private fun DrawScope.chart() {
         val offset = { ind: Int, valueY: Float ->
             Offset(zeroPoint.x + intervalX * ind, zeroPoint.y - intervalY * valueY)
         }
-        val points = values.mapIndexed { index, pair -> offset(index, pair.second) }
-        if (points.count() == 1) {
-            drawPoint(points.first())
-        } else {
-            val path = Path().apply {
-                moveTo(points.first().x, points.first().y)
-            }
+        val points = data.mapIndexed { index, pair -> offset(index, pair.second) }
 
-            for (i in 1 until points.size) {
-                val point = points[i]
-                val lastPoint = points[i - 1]
+        when (data.count()) {
+            0 -> return
+            1 -> drawPoint(points.first())
+            else -> drawCurve(points)
+        }
+    }
 
-                path.cubicTo(
-                    x1 = (point.x + lastPoint.x) / 2,
-                    y1 = lastPoint.y,
-                    x2 = (point.x + lastPoint.x) / 2,
-                    y2 = point.y,
-                    x3 = point.x,
-                    y3 = point.y
-                )
-            }
+    private fun DrawScope.drawCurve(points: List<Offset>) {
+        val path = Path()
+        path.moveTo(points.first().x, points.first().y)
 
-            val brush = Brush.verticalGradient(
-                listOf(chartColor1, chartColor2),
+        for (i in 1 until points.size) {
+            val point = points[i]
+            val lastPoint = points[i - 1]
+
+            path.cubicTo(
+                x1 = (point.x + lastPoint.x) / 2,
+                y1 = lastPoint.y,
+                x2 = (point.x + lastPoint.x) / 2,
+                y2 = point.y,
+                x3 = point.x,
+                y3 = point.y
             )
+        }
 
-            drawPath(
-                path = path,
-                brush = brush,
-                style = Stroke(width = 4f)
-            )
+        val brush = Brush.verticalGradient(listOf(colorGradient1, colorGradient2),)
 
-            val maxY = points.minOf { it.y }
-            val countMax = points.filter { it.y == maxY }.count()
-            if (countMax == 1) {
-                drawPoint(points.first())
-            }
+        drawPath(
+            path = path,
+            brush = brush,
+            style = Stroke(width = 4f)
+        )
+
+        val maxY = points.minOf { it.y }
+        val highs = points.filter { it.y == maxY }
+        if (highs.count() == 1) {
+            drawPoint(highs.first())
         }
     }
 
     private fun DrawScope.drawPoint(offset: Offset) {
         drawCircle(
-            color = chartColor1,
+            color = colorGradient1,
             center = offset,
             style = Stroke(width = 7f),
             radius = 10f,
@@ -265,6 +255,13 @@ open class LineChart<T>(
             center = offset,
             radius = 7f,
         )
+    }
+
+    companion object {
+        const val SPACE_MARKS_Y_AND_AXIS = 15f
+        const val VERTICAL_OFFSET_MARKS_Y = 8f
+        val colorGradient1 = Color(0xFFFA3D75) // fixme
+        val colorGradient2 = Color(0xFF8354F8) // fixme
     }
 }
 
