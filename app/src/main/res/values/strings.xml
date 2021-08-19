@@ -83,6 +83,17 @@
     <string name="state_title_count_number_of_times">Count number of times</string>
     <string name="state_title_completed">Completed</string>
 
+    <!--    ================================ Statistics ==================================================== -->
+
+    <!--    TimeChartMode-->
+    <string name="time_chart_mode_by_days">By days</string>
+    <string name="time_chart_mode_by_weeks">By weeks</string>
+    <string name="time_chart_mode_by_months">By months</string>
+    <string name="time_chart_mode_by_years">By years</string>
+
+    <!--    ================================================================================================ -->
+
+
     <string name="snack_state_already_in_use">This state already in use</string>
 
     <!--    Settings items-->

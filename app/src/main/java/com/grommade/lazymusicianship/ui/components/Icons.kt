@@ -118,20 +118,31 @@ fun IconExpandMore() {
     )
 }
 
+
 @Composable
-fun IconChevronRight(opacity: Float = LocalContentAlpha.current) {
-    Icon(
-        imageVector = Icons.Default.ChevronRight,
-        contentDescription = stringResource(R.string.cd_chevron_right_icon),
-        tint = LocalContentColor.current.copy(alpha = opacity)
-    )
+fun IconChevronLeft(
+    opacity: Float = LocalContentAlpha.current,
+    callback: () -> Unit
+) {
+    IconButton(onClick = callback) {
+        Icon(
+            imageVector = Icons.Default.ChevronLeft,
+            contentDescription = stringResource(R.string.cd_chevron_left_icon),
+            tint = LocalContentColor.current.copy(alpha = opacity),
+        )
+    }
 }
 
 @Composable
-fun IconChevronLeft(opacity: Float = LocalContentAlpha.current) {
-    Icon(
-        imageVector = Icons.Default.ChevronLeft,
-        contentDescription = stringResource(R.string.cd_chevron_left_icon),
-        tint = LocalContentColor.current.copy(alpha = opacity)
-    )
+fun IconChevronRight(
+    opacity: Float = LocalContentAlpha.current,
+    callback: () -> Unit
+) {
+    IconButton(onClick = callback) {
+        Icon(
+            imageVector = Icons.Default.ChevronRight,
+            contentDescription = stringResource(R.string.cd_chevron_right_icon),
+            tint = LocalContentColor.current.copy(alpha = opacity),
+        )
+    }
 }

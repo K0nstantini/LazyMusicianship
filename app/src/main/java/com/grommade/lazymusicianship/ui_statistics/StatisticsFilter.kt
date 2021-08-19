@@ -8,5 +8,6 @@ import java.time.LocalDate
 data class StatisticsFilter(
     val dateStart: LocalDate = LocalDate.MIN,
     val dateEnd: LocalDate = LocalDate.MAX,
+    val timeMode: TimeChartMode = TimeChartMode.BY_DAYS,
     val states: List<StateStudy> = emptyList(),
 )

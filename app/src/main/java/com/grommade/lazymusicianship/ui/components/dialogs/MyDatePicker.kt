@@ -1,4 +1,4 @@
-package com.grommade.lazymusicianship.ui.components.diapogs
+package com.grommade.lazymusicianship.ui.components.dialogs
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -27,16 +28,15 @@ import androidx.compose.ui.unit.sp
 import com.grommade.lazymusicianship.R
 import com.grommade.lazymusicianship.ui.components.IconChevronLeft
 import com.grommade.lazymusicianship.ui.components.IconChevronRight
-import com.grommade.lazymusicianship.ui.components.diapogs.AppDialog.Colors.backgroundColor
-import com.grommade.lazymusicianship.ui.components.diapogs.AppDialog.Colors.lightBackgroundColor
-import com.grommade.lazymusicianship.ui.components.diapogs.AppDialog.Colors.primaryColor
-import com.grommade.lazymusicianship.ui.components.diapogs.AppDialog.Colors.primaryTextColor
-import com.grommade.lazymusicianship.ui.components.diapogs.AppDialog.Colors.secondaryTextColor
-import com.grommade.lazymusicianship.util.extentions.isEmpty
-import com.grommade.lazymusicianship.util.extentions.isToday
-import com.grommade.lazymusicianship.util.extentions.sameDay
-import com.grommade.lazymusicianship.util.extentions.stringMonth
+import com.grommade.lazymusicianship.ui.components.dialogs.AppDialog.Colors.backgroundColor
+import com.grommade.lazymusicianship.ui.components.dialogs.AppDialog.Colors.lightBackgroundColor
+import com.grommade.lazymusicianship.ui.components.dialogs.AppDialog.Colors.primaryColor
+import com.grommade.lazymusicianship.ui.components.dialogs.AppDialog.Colors.primaryTextColor
+import com.grommade.lazymusicianship.ui.components.dialogs.AppDialog.Colors.secondaryTextColor
+import com.grommade.lazymusicianship.ui.components.timepicker.yearMonth
+import com.grommade.lazymusicianship.util.extentions.*
 import java.time.LocalDate
+import java.time.YearMonth
 
 // FIXME: Rename package
 
@@ -44,8 +44,8 @@ const val COUNT_DAYS_CALENDAR = 7 * 6
 
 @Composable
 fun AppDialog.BuildPeriodDialog(
-    dateStart: LocalDate,
-    dateEnd: LocalDate,
+    dateStart: LocalDate = LocalDate.MIN,
+    dateEnd: LocalDate = LocalDate.MAX,
     callback: (LocalDate, LocalDate) -> Unit
 ) {
     Build {
@@ -61,22 +61,25 @@ private fun AppDialog.DrawPeriod(
     val focusManager = LocalFocusManager.current
     val daysOfWeek = stringResource(R.string.days_of_week).split(' ')
 
-    val (dateStart, setDateStart) = remember {
+    val (dateStart, setDateStart) = remember { mutableStateOf(period.first) }
+    val (dateEnd, setDateEnd) = remember { mutableStateOf(period.second) }
+
+    val (monthStart, setMonthStart) = remember {
         mutableStateOf(
             when {
                 period.first.isEmpty() -> LocalDate.now().minusMonths(1)
                 else -> period.first
-            }
+            }.yearMonth
         )
     }
 
-    val (dateEnd, setDateEnd) = remember {
+    val (monthEnd, setMonthEnd) = remember {
         mutableStateOf(
             when {
                 period.first.isEmpty() && period.second.isEmpty() -> LocalDate.now()
                 period.second.isEmpty() -> dateStart.plusMonths(1)
                 else -> period.second
-            }
+            }.yearMonth
         )
     }
 
@@ -94,9 +97,10 @@ private fun AppDialog.DrawPeriod(
                 .background(backgroundColor)
         ) {
             Column(Modifier.padding(16.dp)) {
-                MonthBody(dateStart to dateEnd, dateStart, daysOfWeek, setDateStart)
-                MonthBody(dateStart to dateEnd, dateEnd, daysOfWeek, setDateEnd)
+                MonthBody(dateStart to dateEnd, dateStart, daysOfWeek, monthStart, setMonthStart, setDateStart)
+                MonthBody(dateStart to dateEnd, dateEnd, daysOfWeek, monthEnd, setMonthEnd, setDateEnd)
                 Confirmation(
+                    enabledOk = dateStart <= dateEnd,
                     onClickOk = {
                         callback(dateStart, dateEnd)
                         hide(focusManager)
@@ -113,41 +117,46 @@ private fun MonthBody(
     period: Pair<LocalDate, LocalDate>,
     date: LocalDate,
     daysOfWeek: List<String>,
-    setDate: (LocalDate) -> Unit
+    yearMonth: YearMonth,
+    setMonth: (YearMonth) -> Unit,
+    setDate: (LocalDate) -> Unit,
 ) {
-    MonthYearHeader(date)
-    MonthGrid(period, date, daysOfWeek, setDate)
+    MonthYearHeader(yearMonth, setMonth)
+    MonthGrid(period, daysOfWeek, yearMonth, setMonth, setDate)
+    ClearDate(
+        enabled = date.isNoEmpty(),
+        emptyValue = if (date == period.first) LocalDate.MIN else LocalDate.MAX,
+        setDate = setDate
+    )
     HorizontalDivider()
 }
 
 @Composable
-private fun MonthYearHeader(date: LocalDate) {
-    val month = date.month.name.lowercase().replaceFirstChar { it.uppercase() }
-
+private fun MonthYearHeader(
+    month: YearMonth,
+    setMonth: (YearMonth) -> Unit
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        IconChevronLeft(0.3f)
-        Text("${date.stringMonth()} ${date.year}")
-        IconChevronRight(0.3f)
+        IconChevronLeft(0.3f) { setMonth(month.minusMonths(1)) }
+        Text(month.asString())
+        IconChevronRight(0.3f) { setMonth(month.plusMonths(1)) }
     }
 }
 
 @Composable
 private fun MonthGrid(
     period: Pair<LocalDate, LocalDate>,
-    date: LocalDate,
     daysOfWeek: List<String>,
-    setDate: (LocalDate) -> Unit
+    yearMonth: YearMonth,
+    setMonth: (YearMonth) -> Unit,
+    setDate: (LocalDate) -> Unit,
 ) {
-    val currentDate = when {
-        date.isEmpty() -> LocalDate.now()
-        else -> date
-    }
-
-    val dates = getDatesOfSection(period, currentDate)
-    Column() {
+    val dates = getDatesOfSection(period, yearMonth)
+    Column {
         LazyVerticalGrid(cells = GridCells.Fixed(7)) {
             for (x in 0 until 7) {
                 item {
@@ -158,23 +167,46 @@ private fun MonthGrid(
             }
 
             items(dates) {
-                DateSelectionBox(it, setDate)
+                DateSelectionBox(it, setMonth, setDate)
             }
         }
     }
 }
 
 @Composable
+fun ClearDate(
+    enabled: Boolean,
+    emptyValue: LocalDate,
+    setDate: (LocalDate) -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.End
+    ) {
+        Text(
+            text = "Clear",
+            fontSize = 12.sp,
+            color = if (enabled) primaryColor else secondaryTextColor.copy(alpha = 0.4f),
+            modifier = Modifier.clickable(enabled = enabled) { setDate(emptyValue) }
+        )
+    }
+}
+
+@Composable
 private fun DateSelectionBox(
     dateState: DateState,
-    onClick: (LocalDate) -> Unit
+    setMonth: (YearMonth) -> Unit,
+    setDate: (LocalDate) -> Unit
 ) {
     Box(
         Modifier
             .size(36.dp)
             .clickable(
                 interactionSource = MutableInteractionSource(),
-                onClick = { onClick(dateState.date) },
+                onClick = {
+                    setDate(dateState.date)
+                    setMonth(dateState.date.yearMonth)
+                },
                 indication = null
             )
             .clip(dateState.shape)
@@ -197,6 +229,7 @@ private fun DateSelectionBox(
 
 @Composable
 private fun Confirmation(
+    enabledOk: Boolean,
     onClickOk: () -> Unit,
     onClickCancel: () -> Unit
 ) {
@@ -207,7 +240,7 @@ private fun Confirmation(
         horizontalArrangement = Arrangement.End
     ) {
         ButtonCancel(onClickCancel)
-        ButtonOk(onClickOk)
+        ButtonOk(enabledOk, onClickOk)
     }
 }
 
@@ -215,7 +248,9 @@ private fun Confirmation(
 private fun ButtonCancel(onClick: () -> Unit) {
     Button(
         onClick = onClick,
-        modifier = Modifier.padding(end = 8.dp),
+        modifier = Modifier
+            .padding(end = 8.dp)
+            .clip(RoundedCornerShape(8.dp)),
         colors = ButtonDefaults.buttonColors(
             backgroundColor = lightBackgroundColor,
             contentColor = secondaryTextColor
@@ -226,10 +261,19 @@ private fun ButtonCancel(onClick: () -> Unit) {
 }
 
 @Composable
-private fun ButtonOk(onClick: () -> Unit) {
+private fun ButtonOk(
+    enabled: Boolean,
+    onClick: () -> Unit
+) {
     Button(
         onClick = onClick,
-        colors = ButtonDefaults.buttonColors(backgroundColor = primaryColor),
+        modifier = Modifier.clip(RoundedCornerShape(8.dp)),
+        colors = ButtonDefaults.buttonColors(
+            backgroundColor = primaryColor,
+            disabledBackgroundColor = primaryTextColor.copy(alpha = 0.12f)
+                .compositeOver(primaryColor.copy(alpha = 0.32f))
+        ),
+        enabled = enabled,
     ) {
         Text(stringResource(R.string.calendar_positive_button))
     }
@@ -245,12 +289,12 @@ private fun HorizontalDivider() {
 
 private fun getDatesOfSection(
     period: Pair<LocalDate, LocalDate>,
-    date: LocalDate
+    yearMonth: YearMonth
 ): List<DateState> {
-    val monthDays = getDatesOfMonth(period, date, true)
-    val lastMonthDays = getDatesOfMonth(period, date.minusMonths(1))
+    val monthDays = getDatesOfMonth(period, yearMonth, true)
+    val lastMonthDays = getDatesOfMonth(period, yearMonth.minusMonths(1))
         .takeLast(monthDays.first().date.dayOfWeek.ordinal)
-    val nextMonthDays = getDatesOfMonth(period, date.plusMonths(1))
+    val nextMonthDays = getDatesOfMonth(period, yearMonth.plusMonths(1))
         .take(COUNT_DAYS_CALENDAR - monthDays.count() - lastMonthDays.count())
 
     return lastMonthDays + monthDays + nextMonthDays
@@ -259,18 +303,18 @@ private fun getDatesOfSection(
 
 private fun getDatesOfMonth(
     period: Pair<LocalDate, LocalDate>,
-    date: LocalDate,
-    currentMonth: Boolean = false
+    yearMonth: YearMonth,
+    dateBelongCurrentMonth: Boolean = false
 ): List<DateState> {
-    return (1..date.month.length(date.isLeapYear))
+    return (1..yearMonth.month.length(yearMonth.isLeapYear))
         .map {
-            val localDate = date.withDayOfMonth(it)
+            val shownDate = yearMonth.atEndOfMonth().withDayOfMonth(it)
             DateState(
-                date = localDate,
-                currentMonth = currentMonth,
-                selected = currentMonth && (localDate.isToday() || localDate.inside(period)),
-                isFirst = currentMonth && localDate.sameDay(period.first),
-                isLast = currentMonth && localDate.sameDay(period.second),
+                date = shownDate,
+                currentMonth = dateBelongCurrentMonth,
+                selected = dateBelongCurrentMonth && (shownDate.isToday() || shownDate.inside(period)),
+                isFirst = dateBelongCurrentMonth && shownDate.sameDay(period.first),
+                isLast = dateBelongCurrentMonth && shownDate.sameDay(period.second),
             )
         }
 }
@@ -311,6 +355,6 @@ data class DateState(
 @Composable
 private fun DrawPeriodPreview() {
     AppDialog().DrawPeriod(
-        LocalDate.now().plusDays(52) to LocalDate.MAX
+        LocalDate.now().minusDays(2) to LocalDate.now().plusDays(20)
     ) { _, _ -> }
 }

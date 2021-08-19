@@ -1,6 +1,7 @@
 package com.grommade.lazymusicianship.ui_statistics
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -16,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -29,8 +31,12 @@ import com.grommade.lazymusicianship.ui.charts.line_chart_core.LineChart
 import com.grommade.lazymusicianship.ui.charts.line_chart_core.LineChartText
 import com.grommade.lazymusicianship.ui.charts.line_chart_core.LineChartTextFormat
 import com.grommade.lazymusicianship.ui.common.rememberFlowWithLifecycle
+import com.grommade.lazymusicianship.ui.components.dialogs.AppDialog
+import com.grommade.lazymusicianship.ui.components.dialogs.BuildPeriodDialog
 import com.grommade.lazymusicianship.ui.theme.LazyMusicianshipTheme
 import com.grommade.lazymusicianship.ui.theme.TextPurple
+import com.grommade.lazymusicianship.util.extentions.isEmpty
+import com.grommade.lazymusicianship.util.extentions.toStringFormat
 import java.time.LocalDate
 
 @Composable
@@ -42,8 +48,6 @@ fun StatisticsUi() {
 fun StatisticsUi(viewModel: StatisticsViewModel) {
     val viewState by rememberFlowWithLifecycle(viewModel.state)
         .collectAsState(initial = StatisticsViewState.Empty)
-
-    val coroutineScope = rememberCoroutineScope()
 
     StatisticsUi(viewState) { action ->
         when (action) {
@@ -74,8 +78,8 @@ fun StatisticsUi(
                 ChartItem("Details")
             }
             Header()
-            Filters()
-            ChartBox(viewState.overTimeChartData)
+            Filters(viewState, actioner)
+            ChartBox(viewState.overTimeChartData, viewState.filter.timeMode)
         }
     }
 }
@@ -86,7 +90,7 @@ fun ChartItem(
     color: Color = MaterialTheme.colors.background,
 ) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(text, fontSize = 12.sp)
+        Text12(text)
         Card(
             modifier = Modifier
                 .size(height = 50.dp, width = 90.dp)
@@ -109,7 +113,16 @@ fun Header() {
 }
 
 @Composable
-fun Filters() {
+fun Filters(
+    viewState: StatisticsViewState,
+    actioner: (StatisticsActions) -> Unit
+) {
+    val filter = viewState.filter
+    val (dateStart, dateEnd, mode) = filter
+    val changeFilter = { flt: StatisticsFilter ->
+        actioner(StatisticsActions.ChangeFilter(flt))
+    }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -118,43 +131,81 @@ fun Filters() {
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Row(horizontalArrangement = Arrangement.SpaceBetween) {
-            FilterByPeriod()
-            FilterPeriod()
+            FilterByPeriod(mode) {
+                changeFilter(filter.copy(timeMode = it))
+            }
+            FilterPeriod(dateStart, dateEnd) { dateStart: LocalDate, dateEnd: LocalDate ->
+                changeFilter(filter.copy(dateStart = dateStart, dateEnd = dateEnd))
+            }
         }
         FilterOther()
     }
 }
 
 @Composable
-fun FilterByPeriod() {
+fun FilterByPeriod(
+    timeMode: TimeChartMode,
+    changeByPeriod: (TimeChartMode) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+    val items = TimeChartMode.values().map { it.getTitle(LocalContext.current) }
+
     SmoothBox(
         contentColor = Color(0xFFDE395A),
-        onClick = { /*TODO*/ }) {
+        onClick = { expanded = true }) {
         Row(
             modifier = Modifier.padding(horizontal = 8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("By months", fontSize = 12.sp)
+            Text12(items[timeMode.ordinal])
             Icon(
                 imageVector = Icons.Default.ExpandMore,
                 modifier = Modifier.padding(start = 4.dp),
                 contentDescription = stringResource(R.string.cd_expand_more_icon)
             )
         }
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.background(Color(0xFF0F1624))
+        ) {
+            items.forEachIndexed { ind, title ->
+                DropdownMenuItem(onClick = {
+                    changeByPeriod(TimeChartMode.values()[ind])
+                    expanded = false
+                }) {
+                    val color = if (ind == timeMode.ordinal) Color(0xFF69921F) else TextPurple
+                    Text12(title, color = color)
+                }
+            }
+        }
     }
 }
 
 @Composable
-fun FilterPeriod() {
+fun FilterPeriod(
+    dateStart: LocalDate,
+    dateEnd: LocalDate,
+    changePeriod: (LocalDate, LocalDate) -> Unit
+) {
+
+    val dialog = remember { AppDialog() }.apply {
+        BuildPeriodDialog(dateStart, dateEnd, changePeriod)
+    }
     SmoothBox(
         modifier = Modifier.padding(start = 16.dp),
-        onClick = { /*TODO*/ }
+        onClick = dialog::show
     ) {
-        Text(
-            text = "01.08.2021 - 06.08.2021",
-            modifier = Modifier.padding(horizontal = 16.dp),
-            fontSize = 12.sp
-        )
+        val dateText = {date: LocalDate ->
+            if (date.isEmpty()) "..." else date.toStringFormat()
+        }
+
+        val text = when {
+            dateStart.isEmpty() && dateEnd.isEmpty() -> "All time"
+            else -> "${dateText(dateStart)} - ${dateText(dateEnd)}"
+        }
+
+        Text12(text, Modifier.padding(horizontal = 16.dp))
     }
 }
 
@@ -202,7 +253,10 @@ fun SmoothBox(
 }
 
 @Composable
-fun ChartBox(values: List<Pair<LocalDate, Float>>) {
+fun ChartBox(
+    values: List<Pair<LocalDate, Float>>,
+    timeMode: TimeChartMode
+) {
     val shape = RoundedCornerShape(30.dp)
     Box(
         modifier = Modifier
@@ -220,7 +274,7 @@ fun ChartBox(values: List<Pair<LocalDate, Float>>) {
         } else {
             Column {
                 Stats()
-                Chart(values)
+                Chart(values, timeMode)
             }
         }
     }
@@ -240,14 +294,14 @@ fun Stats() {
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text12("Overall:")
-                    Text12("10.7h", Color(0xFFAAB694))
+                    Text12("10.7h", color = Color(0xFFAAB694))
                 }
                 Row(
                     modifier = modifier.padding(top = 4.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text12("Average:")
-                    Text12("1.0h", Color(0xFFAAB694))
+                    Text12("1.0h", color = Color(0xFFAAB694))
                 }
             }
         }
@@ -255,7 +309,10 @@ fun Stats() {
 }
 
 @Composable
-fun Chart(values: List<Pair<LocalDate, Float>>) {
+fun Chart(
+    values: List<Pair<LocalDate, Float>>,
+    timeMode: TimeChartMode
+) {
     val chart = remember { LineChart<LocalDate>() }
 
     val transformY = { format: LineChartTextFormat, value: Float ->
@@ -264,7 +321,8 @@ fun Chart(values: List<Pair<LocalDate, Float>>) {
     }
     val transformX = transformLineChartText(
         dates = values.map { it.first },
-        intervalX = chart.intervalX
+        intervalX = chart.intervalX,
+        mode = timeMode
     )
 
     chart.Built(
@@ -279,9 +337,15 @@ fun Chart(values: List<Pair<LocalDate, Float>>) {
 @Composable
 fun Text12(
     text: String,
+    modifier: Modifier = Modifier,
     color: Color = Color.Unspecified
 ) {
-    Text(text, fontSize = 12.sp, color = color)
+    Text(
+        text = text,
+        modifier = modifier,
+        fontSize = 12.sp,
+        color = color
+    )
 }
 
 
@@ -293,20 +357,32 @@ fun StatisticsUiPreview8() {
 //    for (i in 0..15) {
 //        dates.add(LocalDate.now().minusDays(-120).plusDays(i.toLong()) to 3.2f)
 //    }
-    val startDay = LocalDate.now().plusDays(10)
+//    val startDay = LocalDate.now().plusDays(10)
+//    var i = 0L
+//    val dates = listOf(
+//        startDay.plusDays(i++) to 0.5f,
+//        startDay.plusDays(i++) to 1.1f,
+//        startDay.plusDays(i++) to 2.2f,
+//        startDay.plusDays(i++) to 0.4f,
+//        startDay.plusDays(i++) to 1.5f,
+//        startDay.plusDays(i++) to 2.5f,
+//        startDay.plusDays(i++) to 3.5f,
+//        startDay.plusDays(i++) to 3.2f,
+//    )
+    val startDay = LocalDate.now().minusMonths(8)
     var i = 0L
     val dates = listOf(
-        startDay.plusDays(i++) to 0.5f,
-        startDay.plusDays(i++) to 1.1f,
-        startDay.plusDays(i++) to 2.2f,
-        startDay.plusDays(i++) to 0.4f,
-        startDay.plusDays(i++) to 1.5f,
-        startDay.plusDays(i++) to 2.5f,
-        startDay.plusDays(i++) to 3.5f,
-        startDay.plusDays(i++) to 3.2f,
+        startDay.plusYears(i++) to 0.5f,
+//        startDay.plusYears(i++) to 1.1f,
+//        startDay.plusYears(i++) to 2.2f,
+//        startDay.plusMonths(i++) to 0.4f,
+//        startDay.plusMonths(i++) to 1.5f,
+//        startDay.plusMonths(i++) to 2.5f,
+//        startDay.plusMonths(i++) to 3.5f,
+//        startDay.plusMonths(i++) to 3.2f,
     )
     val state = StatisticsViewState(
-        overTimeChartData = dates
+        overTimeChartData = dates,
     )
     LazyMusicianshipTheme {
         StatisticsUi(state) {}

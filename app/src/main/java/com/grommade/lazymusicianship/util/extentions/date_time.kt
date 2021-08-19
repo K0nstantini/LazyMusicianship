@@ -5,7 +5,10 @@ import com.grommade.lazymusicianship.util.MONTHS_IN_YEAR
 import com.grommade.lazymusicianship.util.SECONDS_IN_MINUTE
 import java.time.LocalDate
 import java.time.LocalTime
+import java.time.YearMonth
+import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
+import kotlin.math.abs
 
 fun String.toTime() =
     dropLast(3).toInt() * 60 + this.drop(3).toInt()
@@ -35,6 +38,12 @@ fun LocalDate.toString(default: String) = when {
 fun LocalDate.sameDay(date: LocalDate) =
     date.year == year && date.month == month && date.dayOfMonth == dayOfMonth
 
+fun LocalDate.sameWeek(date: LocalDate) = when {
+    this > date -> dayOfWeek.ordinal > date.dayOfWeek.ordinal
+    this < date -> dayOfWeek.ordinal < date.dayOfWeek.ordinal
+    else -> true
+} && abs(diffDays(date)) < 7
+
 fun LocalDate.sameMonth(date: LocalDate) = date.year == year && date.month == month
 
 fun LocalDate.sameYear(date: LocalDate) = date.year == year
@@ -55,6 +64,14 @@ fun LocalDate.stringYear() = "'" + year.toString().takeLast(2)
 fun LocalDate.stringMonth(short: Boolean = false): String {
     val value = month.name.lowercase().replaceFirstChar { it.uppercase() }
     return if (short) value.take(3) else value
+}
+
+fun LocalDate.toStringFormat(): String =
+    format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
+
+fun YearMonth.asString(): String {
+    val date = atEndOfMonth()
+    return "${date.stringMonth()} ${date.year}"
 }
 
 fun LocalDate.stringDay() =

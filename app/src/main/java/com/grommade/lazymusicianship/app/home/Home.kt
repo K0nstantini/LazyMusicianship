@@ -100,7 +100,7 @@ fun HomeBottomNavigation(
     modifier: Modifier = Modifier
 ) {
     BottomNavigation(
-        backgroundColor = MaterialTheme.colors.surface,
+        backgroundColor = MaterialTheme.colors.background,//MaterialTheme.colors.surface,
         contentColor = contentColorFor(MaterialTheme.colors.surface),
         contentPadding = rememberInsetsPaddingValues(LocalWindowInsets.current.navigationBars),
         modifier = modifier

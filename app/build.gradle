@@ -89,7 +89,7 @@ dependencies {
     kapt "androidx.room:room-compiler:$room_version"
 
     // Timber
-    implementation 'com.jakewharton.timber:timber:4.7.1'
+    implementation 'com.jakewharton.timber:timber:5.0.1'
 
     // Material icons
     implementation "androidx.compose.material:material-icons-extended:$compose_version"

@@ -4,7 +4,6 @@ import android.graphics.Paint
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -78,7 +77,7 @@ open class LineChart<T>(
         multiplierY: Float = 1f
     ) {
         data = values
-        marksListY = remember { getMarksY(multiplierY) }
+        marksListY = getMarksY(multiplierY)
 
         Canvas(
             modifier = Modifier.fillMaxSize(),
@@ -228,7 +227,7 @@ open class LineChart<T>(
             )
         }
 
-        val brush = Brush.verticalGradient(listOf(colorGradient1, colorGradient2),)
+        val brush = Brush.verticalGradient(listOf(colorGradient1, colorGradient2))
 
         drawPath(
             path = path,

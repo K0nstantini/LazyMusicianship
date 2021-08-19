@@ -6,8 +6,8 @@ import java.time.LocalDate
 class Converters {
 
     @TypeConverter
-    fun fromLocalDate(date: LocalDate) = date.toEpochDay()
+    fun fromLocalDate(date: LocalDate): Long = date.toEpochDay()
 
     @TypeConverter
-    fun toLocalDate(milli: Long) = LocalDate.ofEpochDay(milli)
+    fun toLocalDate(milli: Long): LocalDate = LocalDate.ofEpochDay(milli)
 }

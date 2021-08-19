@@ -32,7 +32,7 @@ abstract class PracticeDao : EntityDao<Practice>() {
         """
         SELECT date, sum(elapsedTime) as time 
         FROM practice_table
-        WHERE date >= :startDate AND  date <= :endDate
+        WHERE date >= :startDate AND date <= :endDate
         GROUP BY date ORDER BY date
         """
     )
