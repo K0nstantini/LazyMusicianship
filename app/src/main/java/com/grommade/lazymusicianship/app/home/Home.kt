@@ -31,6 +31,8 @@ import com.google.accompanist.insets.ui.Scaffold
 import com.grommade.lazymusicianship.AppNavigation
 import com.grommade.lazymusicianship.R
 import com.grommade.lazymusicianship.Screen
+import com.grommade.lazymusicianship.ui.theme.TextPurple
+import com.grommade.lazymusicianship.ui.theme.TextRed
 
 @Composable
 fun Home() {
@@ -159,6 +161,7 @@ private fun RowScope.HomeBottomNavigationItem(
                 Crossfade(targetState = selected) { selected ->
                     Icon(
                         painter = if (selected) selectedPainter else painter,
+                        tint = if (selected) TextRed else TextPurple,
                         contentDescription = contentDescription
                     )
                 }
@@ -169,7 +172,7 @@ private fun RowScope.HomeBottomNavigationItem(
                 )
             }
         },
-        label = { Text(label) },
+        label = { Text(label, color = if (selected) TextRed else TextPurple) },
         selected = selected,
         onClick = onClick,
     )
