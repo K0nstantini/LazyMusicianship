@@ -8,5 +8,9 @@ val Purple700 = Color(0xFF3700B3)
 val Teal200 = Color(0xFF03DAC5)
 
 val DarkPurple = Color(0xFF17142F)
-val TextPurple = Color(0xFF6760A7)
-val TextRed = Color(0xFFA73862)
+val LightPurple = Color(0xFF6760A7)
+val DarkRed = Color(0xFFA73862)
+
+val LightPurple1 = Color(0xFF635C8F) // Infected people
+val LightPurple2 = Color(0xFF726AB7) // COVID 19
+val LightPurple3 = Color(0xFF5B577C) // dashboard

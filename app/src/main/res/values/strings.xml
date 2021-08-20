@@ -11,6 +11,13 @@
     <string name="statistics_title">Statistics</string>
     <string name="states_title">Learning states</string>
 
+
+    <!--    ================================ Pieces List ==================================================== -->
+
+    <string name="pieces_unknown_author">Unknown</string>
+
+    <!--    ================================================================================================ -->
+
     <!--    Piece-->
     <string name="piece_hint_edit_text_name">Name</string>
 
@@ -125,5 +132,6 @@
     <string name="cd_expand_more_icon">Expand more</string>
     <string name="cd_chevron_left_icon">Chevron left</string>
     <string name="cd_chevron_right_icon">Chevron right</string>
+    <string name="cd_music_note_icon">Music note</string>
 
 </resources>

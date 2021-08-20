@@ -1,31 +1,37 @@
 package com.grommade.lazymusicianship.ui_pieces
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.insets.ui.Scaffold
 import com.google.accompanist.insets.ui.TopAppBar
-import com.grommade.lazymusicianship.BuildConfig
 import com.grommade.lazymusicianship.R
 import com.grommade.lazymusicianship.data.entity.Piece
 import com.grommade.lazymusicianship.ui.common.ShowSnackBar
 import com.grommade.lazymusicianship.ui.common.rememberFlowWithLifecycle
 import com.grommade.lazymusicianship.ui.components.DeleteIcon
 import com.grommade.lazymusicianship.ui.components.FloatingAddActionButton
+import com.grommade.lazymusicianship.ui.components.IconMusicNote
 import com.grommade.lazymusicianship.ui.components.MoreVertIcon
+import com.grommade.lazymusicianship.ui.theme.LazyMusicianshipTheme
+
+private const val Debug = false // fixme
 
 @Composable
 fun PiecesListUi(openPiece: (Long) -> Unit) {
@@ -59,7 +65,9 @@ fun PiecesListUi(
 ) = Box(modifier = Modifier.fillMaxSize()) {
     Scaffold(
         topBar = {
-            PiecesListTopBar { actioner(PiecesListActions.PopulateDB) }
+            if (Debug) {
+                PiecesListTopBar { actioner(PiecesListActions.PopulateDB) }
+            }
         },
         modifier = Modifier.fillMaxSize(),
         floatingActionButton = { FloatingAddActionButton { actioner(PiecesListActions.AddNew) } },
@@ -95,11 +103,7 @@ fun PiecesListTopBar(populateDB: () -> Unit) {
         modifier = Modifier.fillMaxWidth(),
         backgroundColor = MaterialTheme.colors.surface.copy(alpha = 0.97f),
         contentColor = MaterialTheme.colors.onSurface,
-        actions = {
-            if (BuildConfig.DEBUG) {
-                PiecesListDropdownMenu(populateDB)
-            }
-        }
+        actions = { PiecesListDropdownMenu(populateDB) }
     )
 }
 
@@ -133,18 +137,12 @@ fun PieceItem(
     openPiece: () -> Unit,
     deletePiece: () -> Unit
 ) {
-    val hasAuthor = piece.author.isNotEmpty()
-    val backgroundColor = when (selected) {
-        true -> Color.LightGray
-        false -> Color.Transparent
-    }
-
-    Divider()
+    Divider(color = Color(0x8029224E))
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
-            .background(color = backgroundColor)
+            .background(color = if (selected) Color(0xFF645D90) else Color.Transparent)
             .combinedClickable(
                 onClick = openPiece,
                 onLongClick = selectPiece
@@ -152,23 +150,68 @@ fun PieceItem(
             .padding(start = 16.dp, top = 8.dp, bottom = 8.dp)
                 then modifier
     ) {
-        Column {
-            Text(
-                text = piece.name,
-                maxLines = 2,
-                style = MaterialTheme.typography.subtitle1.copy(fontWeight = FontWeight.SemiBold, color = Color.DarkGray),
-            )
-            if (hasAuthor) {
-                Text(
-                    text = piece.author,
-                    maxLines = 1,
-                    style = MaterialTheme.typography.caption.copy(fontStyle = FontStyle.Italic, color = Color.Black),
-                )
-            }
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            ItemIcon()
+            ItemInfo(piece.name, piece.author, selected)
         }
         if (selected) {
             DeleteIcon(deletePiece)
         }
+    }
+}
+
+@Composable
+fun ItemIcon() {
+    Box(
+        modifier = Modifier
+            .size(50.dp)
+            .clip(CircleShape)
+            .border(1.dp, Color(0xFF645D90), CircleShape)
+            .background(Color(0xFF150F41)),
+        contentAlignment = Alignment.Center
+    ) {
+        IconMusicNote(Color(0xFFDE395A))
+    }
+}
+
+@Composable
+fun ItemInfo(
+    name: String,
+    author: String,
+    selected: Boolean
+) {
+    val headerColor = Color(0xFFB1AFCD).let {
+        if (selected) it else it.copy(alpha = 0.8f)
+    } // fixme
+
+    val recentnessColor = if (selected) Color(0xCCB1AFCD) else Color(0xCC645D90) // fixme
+
+    Column(
+        modifier = Modifier.padding(start = 32.dp)
+    ) {
+        Text(
+            text = name,
+            maxLines = 2,
+            fontSize = 18.sp,
+            color = headerColor,
+            fontWeight = FontWeight.SemiBold,
+        )
+        Text(
+            text = author.ifEmpty { stringResource(R.string.pieces_unknown_author) },
+            maxLines = 1,
+            fontSize = 12.sp,
+            color = Color(0xFFAAB694),
+            modifier = Modifier.padding(top = 6.dp)
+        )
+        Text(
+            text = "5 days ago",
+            maxLines = 1,
+            fontSize = 10.sp,
+            color = recentnessColor,
+            modifier = Modifier.padding(top = 8.dp)
+        )
     }
 }
 
@@ -179,19 +222,24 @@ fun PiecesListUiPreview() {
         Piece(id = 1, name = "Sherlock (BBC) Main Theme", author = "David Arnold & Michael Price"),
         Piece(id = 2, name = "Elfen Lied"),
         Piece(id = 3, name = "Let It Be", author = "Beatles"),
+        Piece(id = 4, name = "Rape me", author = "Nirvana"),
     )
-    PiecesListUi(PiecesListViewState(pieces = list, selectedPiece = 2)) {}
+    LazyMusicianshipTheme {
+        PiecesListUi(PiecesListViewState(pieces = list, selectedPiece = 2)) {}
+    }
 }
 
 @Preview
 @Composable
 fun PieceItemPreview() {
-    PieceItem(
-        piece = Piece(name = "Sherlock (BBC) Main Theme"),
-        selected = false,
-        modifier = Modifier,
-        selectPiece = {},
-        openPiece = {},
-        deletePiece = {}
-    )
+    LazyMusicianshipTheme {
+        PieceItem(
+            piece = Piece(name = "Sherlock (BBC) Main Theme"),
+            selected = false,
+            modifier = Modifier,
+            selectPiece = {},
+            openPiece = {},
+            deletePiece = {}
+        )
+    }
 }

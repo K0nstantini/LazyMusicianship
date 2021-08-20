@@ -5,6 +5,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material.icons.outlined.FilterList
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import com.grommade.lazymusicianship.R
 
@@ -115,6 +116,15 @@ fun IconExpandMore() {
     Icon(
         imageVector = Icons.Default.ExpandMore,
         contentDescription = stringResource(R.string.cd_expand_more_icon)
+    )
+}
+
+@Composable
+fun IconMusicNote(color: Color = LocalContentColor.current.copy(alpha = LocalContentAlpha.current)) {
+    Icon(
+        imageVector = Icons.Default.MusicNote,
+        contentDescription = stringResource(R.string.cd_music_note_icon),
+        tint = color
     )
 }
 

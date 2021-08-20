@@ -34,7 +34,7 @@ import com.grommade.lazymusicianship.ui.common.rememberFlowWithLifecycle
 import com.grommade.lazymusicianship.ui.components.dialogs.AppDialog
 import com.grommade.lazymusicianship.ui.components.dialogs.BuildPeriodDialog
 import com.grommade.lazymusicianship.ui.theme.LazyMusicianshipTheme
-import com.grommade.lazymusicianship.ui.theme.TextPurple
+import com.grommade.lazymusicianship.ui.theme.LightPurple
 import com.grommade.lazymusicianship.util.extentions.isEmpty
 import com.grommade.lazymusicianship.util.extentions.toStringFormat
 import java.time.LocalDate
@@ -63,7 +63,7 @@ fun StatisticsUi(
 ) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        contentColor = TextPurple
+        contentColor = LightPurple
     ) {
 
         Column {
@@ -97,7 +97,7 @@ fun ChartItem(
                 .padding(top = 8.dp),
             backgroundColor = color,
             shape = RoundedCornerShape(15.dp),
-            border = BorderStroke(1.dp, color = TextPurple)
+            border = BorderStroke(1.dp, color = LightPurple)
         ) {}
     }
 }
@@ -174,7 +174,7 @@ fun FilterByPeriod(
                     changeByPeriod(TimeChartMode.values()[ind])
                     expanded = false
                 }) {
-                    val color = if (ind == timeMode.ordinal) Color(0xFF69921F) else TextPurple
+                    val color = if (ind == timeMode.ordinal) Color(0xFF69921F) else LightPurple
                     Text12(title, color = color)
                 }
             }
@@ -243,7 +243,7 @@ fun SmoothBox(
             modifier = modifier
                 .clip(shape)
                 .fillMaxHeight()
-                .border(1.dp, TextPurple, shape)
+                .border(1.dp, LightPurple, shape)
                 .clickable(onClick = onClick),
             contentAlignment = Alignment.Center
         ) {
@@ -263,7 +263,7 @@ fun ChartBox(
             .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 80.dp)
             .fillMaxSize()
             .clip(shape)
-            .border(1.dp, TextPurple, shape)
+            .border(1.dp, LightPurple, shape)
     ) {
         if (values.isEmpty()) {
             Text(
