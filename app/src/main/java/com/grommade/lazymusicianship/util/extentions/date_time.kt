@@ -53,7 +53,7 @@ fun LocalDate.isToday() = sameDay(LocalDate.now())
 fun LocalDate.thisMonth() = sameMonth(LocalDate.now())
 
 fun LocalDate.isEmpty() = when {
-    this == LocalDate.MIN || this == LocalDate.MAX -> true
+    this == LocalDate.MIN || this == LocalDate.MAX || this.toEpochDay() == 0L -> true
     else -> false
 }
 

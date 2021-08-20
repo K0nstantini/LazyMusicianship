@@ -49,4 +49,5 @@ class RepoPieceImpl @Inject constructor(
 
     override fun getPiecesFlow() = pieceDao.getPiecesFlow()
 
+    override fun getPiecesWithRecentnessFlow() = pieceDao.getPiecesWithRecentnessFlow()
 }

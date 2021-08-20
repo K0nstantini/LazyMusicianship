@@ -28,7 +28,8 @@ fun DeleteIcon(
     IconButton(onClick = callback) {
         Icon(
             imageVector = Icons.Default.Delete,
-            contentDescription = stringResource(R.string.cd_delete_icon)
+            contentDescription = stringResource(R.string.cd_delete_icon),
+            tint = Color.DarkGray
         )
     }
 }

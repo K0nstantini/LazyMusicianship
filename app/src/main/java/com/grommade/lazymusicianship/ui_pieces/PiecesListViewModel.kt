@@ -3,7 +3,7 @@ package com.grommade.lazymusicianship.ui_pieces
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grommade.lazymusicianship.data.entity.Piece
-import com.grommade.lazymusicianship.domain.observers.ObservePieces
+import com.grommade.lazymusicianship.domain.observers.ObservePiecesWithRecentness
 import com.grommade.lazymusicianship.domain.use_cases.DeletePiece
 import com.grommade.lazymusicianship.domain.use_cases.PopulateDBWithPieces
 import com.grommade.lazymusicianship.ui.common.SnackBarManager
@@ -17,7 +17,7 @@ import javax.inject.Inject
 class PiecesListViewModel @Inject constructor(
     private val deletePiece: DeletePiece,
     private val snackBarManager: SnackBarManager,
-    observePieces: ObservePieces,
+    observePieces: ObservePiecesWithRecentness,
     populateDBWithPieces: PopulateDBWithPieces
 ) : ViewModel() {
 

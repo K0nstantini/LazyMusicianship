@@ -23,6 +23,7 @@ import com.google.accompanist.insets.ui.Scaffold
 import com.google.accompanist.insets.ui.TopAppBar
 import com.grommade.lazymusicianship.R
 import com.grommade.lazymusicianship.data.entity.Piece
+import com.grommade.lazymusicianship.data.entity.PieceWithRecentness
 import com.grommade.lazymusicianship.ui.common.ShowSnackBar
 import com.grommade.lazymusicianship.ui.common.rememberFlowWithLifecycle
 import com.grommade.lazymusicianship.ui.components.DeleteIcon
@@ -30,6 +31,9 @@ import com.grommade.lazymusicianship.ui.components.FloatingAddActionButton
 import com.grommade.lazymusicianship.ui.components.IconMusicNote
 import com.grommade.lazymusicianship.ui.components.MoreVertIcon
 import com.grommade.lazymusicianship.ui.theme.LazyMusicianshipTheme
+import com.grommade.lazymusicianship.util.extentions.diffDays
+import com.grommade.lazymusicianship.util.extentions.isEmpty
+import java.time.LocalDate
 
 private const val Debug = false // fixme
 
@@ -76,9 +80,11 @@ fun PiecesListUi(
             contentPadding = paddingValues,
             modifier = Modifier.fillMaxSize(),
         ) {
-            items(viewState.pieces, key = { piece -> piece.id }) { piece ->
+            items(viewState.pieces, key = { piece -> piece.piece.id }) { item ->
+                val (piece, recentness) = item
                 PieceItem(
                     piece = piece,
+                    recentness = recentness,
                     selected = piece.id == viewState.selectedPiece,
                     modifier = Modifier.fillParentMaxWidth(),
                     selectPiece = { actioner(PiecesListActions.SelectPiece(piece.id)) },
@@ -131,6 +137,7 @@ fun PiecesListDropdownMenu(populateDB: () -> Unit) {
 @Composable
 fun PieceItem(
     piece: Piece,
+    recentness: LocalDate,
     selected: Boolean,
     modifier: Modifier,
     selectPiece: () -> Unit,
@@ -154,7 +161,7 @@ fun PieceItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             ItemIcon()
-            ItemInfo(piece.name, piece.author, selected)
+            ItemInfo(piece.name, piece.author, recentness, selected)
         }
         if (selected) {
             DeleteIcon(deletePiece)
@@ -180,6 +187,7 @@ fun ItemIcon() {
 fun ItemInfo(
     name: String,
     author: String,
+    recentness: LocalDate,
     selected: Boolean
 ) {
     val headerColor = Color(0xFFB1AFCD).let {
@@ -187,6 +195,11 @@ fun ItemInfo(
     } // fixme
 
     val recentnessColor = if (selected) Color(0xCCB1AFCD) else Color(0xCC645D90) // fixme
+
+    val textDays = when{
+        recentness.isEmpty() -> stringResource(R.string.pieces_no_recentness)
+        else -> stringResource(R.string.pieces_recentness, recentness.diffDays(LocalDate.now()))
+    }
 
     Column(
         modifier = Modifier.padding(start = 32.dp)
@@ -206,7 +219,7 @@ fun ItemInfo(
             modifier = Modifier.padding(top = 6.dp)
         )
         Text(
-            text = "5 days ago",
+            text = textDays,
             maxLines = 1,
             fontSize = 10.sp,
             color = recentnessColor,
@@ -223,12 +236,13 @@ fun PiecesListUiPreview() {
         Piece(id = 2, name = "Elfen Lied"),
         Piece(id = 3, name = "Let It Be", author = "Beatles"),
         Piece(id = 4, name = "Rape me", author = "Nirvana"),
-    )
+    ).map { PieceWithRecentness(it) }
     LazyMusicianshipTheme {
         PiecesListUi(PiecesListViewState(pieces = list, selectedPiece = 2)) {}
     }
 }
 
+/*
 @Preview
 @Composable
 fun PieceItemPreview() {
@@ -242,4 +256,4 @@ fun PieceItemPreview() {
             deletePiece = {}
         )
     }
-}
+}*/
