@@ -8,6 +8,8 @@ import java.time.LocalDate
 data class StatisticsViewState(
     val overTimeChartData: List<Pair<LocalDate, Float>> = emptyList(),
     val filter: StatisticsFilter = StatisticsFilter(),
+    val overallTime: Float = 0f,
+    val averageTime: Float = 0f,
     val allStatesStudy: List<StateStudy> = emptyList()
 ) {
     companion object {

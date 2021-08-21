@@ -21,8 +21,11 @@ abstract class PieceDao : EntityDao<Piece>() {
         """
         SELECT piece.*, practice.last_date AS recentness 
         FROM piece_table AS piece
-        LEFT JOIN (SELECT practice_piece_id AS piece_id, max(date) AS last_date
-        FROM practice_table) AS practice
+        LEFT JOIN (
+            SELECT practice_piece_id AS piece_id, max(date) AS last_date 
+            FROM practice_table 
+            GROUP BY practice_piece_id
+        ) AS practice
         ON piece.piece_id = practice.piece_id
 		ORDER BY piece.piece_name
         """

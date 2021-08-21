@@ -27,11 +27,15 @@ class StatisticsViewModel @Inject constructor(
         observeStates.observe(),
         filter
     ) { times, states, filter ->
+        val sumTime = times.sumOf { it.second }.toFloat() / 60
+
         StatisticsViewState(
             overTimeChartData = times.map {
                 it.first to (it.second.toFloat() / 60)
             },
             filter = filter,
+            overallTime = sumTime,
+            averageTime = sumTime / times.count(),
             allStatesStudy = states
         )
     }

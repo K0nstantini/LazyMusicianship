@@ -17,6 +17,7 @@ import androidx.constraintlayout.compose.Dimension
 import com.grommade.lazymusicianship.R
 import com.grommade.lazymusicianship.ui.components.material_dialogs.core.MaterialDialog
 import com.grommade.lazymusicianship.ui.theme.LazyMusicianshipTheme
+import com.grommade.lazymusicianship.ui.theme.LightPurple
 
 /** ======================================= Items ================================================================== */
 
@@ -90,7 +91,7 @@ private fun SetItemBody(
                 ) {
                     Text(
                         text = if (enabled) value else "-",
-                        style = MaterialTheme.typography.body2.copy(color = Color.DarkGray)
+                        style = MaterialTheme.typography.body2.copy(color = LightPurple)
                     )
                     if (showClear) {
                         Text(

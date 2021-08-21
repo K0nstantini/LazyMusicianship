@@ -94,6 +94,12 @@
 
     <!--    ================================ Statistics ==================================================== -->
 
+    <!--    TimeChart title-->
+    <string name="time_chart_title_overall_time">Overall:</string>
+    <string name="time_chart_overall_time">%sh</string>
+    <string name="time_chart_title_average_time">Average:</string>
+    <string name="time_chart_average_time">%sh</string>
+
     <!--    TimeChartMode-->
     <string name="time_chart_mode_by_days">By days</string>
     <string name="time_chart_mode_by_weeks">By weeks</string>

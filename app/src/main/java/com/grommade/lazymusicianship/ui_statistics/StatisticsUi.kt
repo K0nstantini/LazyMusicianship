@@ -33,6 +33,7 @@ import com.grommade.lazymusicianship.ui.charts.line_chart_core.LineChartTextForm
 import com.grommade.lazymusicianship.ui.common.rememberFlowWithLifecycle
 import com.grommade.lazymusicianship.ui.components.dialogs.AppDialog
 import com.grommade.lazymusicianship.ui.components.dialogs.BuildPeriodDialog
+import com.grommade.lazymusicianship.ui.theme.DarkYellow
 import com.grommade.lazymusicianship.ui.theme.LazyMusicianshipTheme
 import com.grommade.lazymusicianship.ui.theme.LightPurple
 import com.grommade.lazymusicianship.util.extentions.isEmpty
@@ -61,6 +62,8 @@ fun StatisticsUi(
     viewState: StatisticsViewState,
     actioner: (StatisticsActions) -> Unit
 ) {
+    val (values, filter, overallTime, averageTime) = viewState
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         contentColor = LightPurple
@@ -78,8 +81,8 @@ fun StatisticsUi(
                 ChartItem("Details")
             }
             Header()
-            Filters(viewState, actioner)
-            ChartBox(viewState.overTimeChartData, viewState.filter.timeMode)
+            Filters(filter, actioner)
+            ChartBox(values, filter.timeMode, overallTime, averageTime)
         }
     }
 }
@@ -114,10 +117,9 @@ fun Header() {
 
 @Composable
 fun Filters(
-    viewState: StatisticsViewState,
+    filter: StatisticsFilter,
     actioner: (StatisticsActions) -> Unit
 ) {
-    val filter = viewState.filter
     val (dateStart, dateEnd, mode) = filter
     val changeFilter = { flt: StatisticsFilter ->
         actioner(StatisticsActions.ChangeFilter(flt))
@@ -196,7 +198,7 @@ fun FilterPeriod(
         modifier = Modifier.padding(start = 16.dp),
         onClick = dialog::show
     ) {
-        val dateText = {date: LocalDate ->
+        val dateText = { date: LocalDate ->
             if (date.isEmpty()) "..." else date.toStringFormat()
         }
 
@@ -255,7 +257,9 @@ fun SmoothBox(
 @Composable
 fun ChartBox(
     values: List<Pair<LocalDate, Float>>,
-    timeMode: TimeChartMode
+    timeMode: TimeChartMode,
+    overallTime: Float,
+    averageTime: Float
 ) {
     val shape = RoundedCornerShape(30.dp)
     Box(
@@ -273,7 +277,7 @@ fun ChartBox(
             )
         } else {
             Column {
-                Stats()
+                Stats(overallTime, averageTime)
                 Chart(values, timeMode)
             }
         }
@@ -281,8 +285,15 @@ fun ChartBox(
 }
 
 @Composable
-fun Stats() {
+fun Stats(
+    overallTime: Float,
+    averageTime: Float
+) {
     val modifier = Modifier.fillMaxWidth()
+
+    val round = {value: Float ->
+        "%.1f".format(value).replace(",", ".")
+    }
     Row(
         modifier = modifier.padding(end = 32.dp, top = 8.dp),
         horizontalArrangement = Arrangement.End
@@ -293,15 +304,15 @@ fun Stats() {
                     modifier = modifier,
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text12("Overall:")
-                    Text12("10.7h", color = Color(0xFFAAB694))
+                    Text12(stringResource(R.string.time_chart_title_overall_time))
+                    Text12(stringResource(R.string.time_chart_overall_time, round(overallTime)), color = DarkYellow)
                 }
                 Row(
                     modifier = modifier.padding(top = 4.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text12("Average:")
-                    Text12("1.0h", color = Color(0xFFAAB694))
+                    Text12(stringResource(R.string.time_chart_title_average_time))
+                    Text12(stringResource(R.string.time_chart_average_time, round(averageTime)), color = DarkYellow)
                 }
             }
         }

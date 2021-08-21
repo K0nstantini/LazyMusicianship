@@ -21,12 +21,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.insets.ui.Scaffold
-import com.google.accompanist.insets.ui.TopAppBar
 import com.grommade.lazymusicianship.R
 import com.grommade.lazymusicianship.data.entity.*
 import com.grommade.lazymusicianship.ui.common.rememberFlowWithLifecycle
 import com.grommade.lazymusicianship.ui.components.DeleteIcon
 import com.grommade.lazymusicianship.ui.components.FloatingAddActionButton
+import com.grommade.lazymusicianship.ui.theme.DarkRed
+import com.grommade.lazymusicianship.ui.theme.LazyMusicianshipTheme
+import com.grommade.lazymusicianship.util.extentions.toStringFormat
 import java.time.LocalDate
 
 @Composable
@@ -60,7 +62,6 @@ fun PracticeUi(
     actioner: (PracticeActions) -> Unit
 ) {
     Scaffold(
-        topBar = { PracticeTopBar() },
         floatingActionButton = { FloatingAddActionButton { actioner(PracticeActions.AddNew) } },
         modifier = Modifier.fillMaxSize()
     ) { paddingValues ->
@@ -80,16 +81,6 @@ fun PracticeUi(
             }
         }
     }
-}
-
-@Composable
-fun PracticeTopBar() {
-    TopAppBar(
-        title = { Text(stringResource(R.string.practice_title)) },
-        modifier = Modifier.fillMaxWidth(),
-        backgroundColor = MaterialTheme.colors.surface.copy(alpha = 0.97f),
-        contentColor = MaterialTheme.colors.onSurface,
-    )
 }
 
 @Composable
@@ -146,14 +137,14 @@ fun StateItem(
                 style = MaterialTheme.typography.subtitle1,
             )
             Text(
-                text = practiceItem.practice.date.toString(),
+                text = practiceItem.practice.date.toStringFormat(),
                 style = MaterialTheme.typography.caption,
             )
             if (sections.isNotEmpty()) {
                 Text(
                     text = sections,
                     fontStyle = FontStyle.Italic,
-                    color = Color.Blue.copy(alpha = 0.7f),
+                    color = DarkRed,
                     fontSize = 12.sp
                 )
             }
@@ -188,6 +179,8 @@ fun PracticeUiPreview() {
             sectionTo = Section(name = "Verse 2"),
         ),
     )
-    PracticeUi(PracticeViewState(practices)) {}
+    LazyMusicianshipTheme {
+        PracticeUi(PracticeViewState(practices)) {}
+    }
 }
 

@@ -23,6 +23,7 @@ import com.grommade.lazymusicianship.data.entity.*
 import com.grommade.lazymusicianship.ui.common.rememberFlowWithLifecycle
 import com.grommade.lazymusicianship.ui.components.*
 import com.grommade.lazymusicianship.ui.components.material_dialogs.core.MaterialDialog
+import com.grommade.lazymusicianship.ui.theme.LazyMusicianshipTheme
 import com.grommade.lazymusicianship.util.extentions.toStrTime
 import java.time.LocalDate
 
@@ -267,8 +268,11 @@ fun PracticeDetailsUiPreview() {
             piece = Piece(id = 1, name = "I just want you")
         )
     )
-    PracticeDetailsUi(
-        viewState = viewState,
-        actioner = {}
-    )
+    LazyMusicianshipTheme {
+        PracticeDetailsUi(
+            viewState = viewState,
+            actioner = {}
+        )
+    }
+
 }
