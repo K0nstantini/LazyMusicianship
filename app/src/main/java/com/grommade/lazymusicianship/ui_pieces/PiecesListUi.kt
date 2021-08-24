@@ -30,6 +30,7 @@ import com.grommade.lazymusicianship.ui.components.DeleteIcon
 import com.grommade.lazymusicianship.ui.components.FloatingAddActionButton
 import com.grommade.lazymusicianship.ui.components.IconMusicNote
 import com.grommade.lazymusicianship.ui.components.MoreVertIcon
+import com.grommade.lazymusicianship.ui.theme.DarkBlue
 import com.grommade.lazymusicianship.ui.theme.LazyMusicianshipTheme
 import com.grommade.lazymusicianship.util.extentions.diffDays
 import com.grommade.lazymusicianship.util.extentions.isEmpty
@@ -176,7 +177,7 @@ fun ItemIcon() {
             .size(50.dp)
             .clip(CircleShape)
             .border(1.dp, Color(0xFF645D90), CircleShape)
-            .background(Color(0xFF150F41)),
+            .background(DarkBlue),
         contentAlignment = Alignment.Center
     ) {
         IconMusicNote(Color(0xFFDE395A))

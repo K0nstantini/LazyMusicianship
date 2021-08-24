@@ -5,15 +5,16 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.Card
+import androidx.compose.material.Tab
+import androidx.compose.material.TabRow
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -27,6 +28,7 @@ import com.grommade.lazymusicianship.ui.common.ShowSnackBar
 import com.grommade.lazymusicianship.ui.common.rememberFlowWithLifecycle
 import com.grommade.lazymusicianship.ui.components.*
 import com.grommade.lazymusicianship.ui.components.material_dialogs.core.MaterialDialog
+import com.grommade.lazymusicianship.ui.theme.*
 import com.grommade.lazymusicianship.util.extentions.toStrTime
 import kotlinx.coroutines.launch
 
@@ -100,6 +102,7 @@ fun PieceUi(
                 close = { actioner(PieceActions.Close) }
             )
         },
+        floatingActionButton = { FloatingAddActionButton { actioner(PieceActions.NewSection(0)) } },
         modifier = Modifier.fillMaxSize(),
     ) { paddingValues ->
         Column(
@@ -114,19 +117,20 @@ fun PieceUi(
                 actioner(PieceActions.ChangeName(value))
             }
 
-            var state by remember { mutableStateOf(0) }
+            var state by remember { mutableStateOf(1) } // fixme
             val titles = listOf(
                 stringResource(R.string.tab_sections),
                 stringResource(R.string.tab_info),
-                stringResource(R.string.tab_description),
             )
             TabRow(
                 selectedTabIndex = state,
+                contentColor = DarkRed,
                 backgroundColor = Color.Transparent
             ) {
                 titles.forEachIndexed { index, title ->
+                    val tabColor = if (state == index) DarkRed else LightPurple1
                     Tab(
-                        text = { Text(title) },
+                        text = { Text(title, color = tabColor) },
                         selected = state == index,
                         onClick = { state = index }
                     )
@@ -139,9 +143,6 @@ fun PieceUi(
                     actioner = actioner
                 )
                 1 -> PieceInfo(viewState.piece, actioner)
-                2 -> PieceDescription(viewState.piece.description) { value: String ->
-                    actioner(PieceActions.ChangeDescription(value))
-                }
             }
         }
     }
@@ -192,44 +193,17 @@ fun TimeItem(
 }
 
 @Composable
-fun PieceDescription(
-    description: String,
-    changeDescription: (String) -> Unit
-) {
-    OutlinedTextField(
-        value = description,
-        onValueChange = changeDescription,
-        modifier = Modifier.fillMaxSize()
-    )
-}
-
-@Composable
 fun SectionsScrollingContent(
     sections: List<Section>,
     selectedSection: Long,
     actioner: (PieceActions) -> Unit
 ) {
 
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.End
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 8.dp)
     ) {
-        IconButton(
-            onClick = { actioner(PieceActions.NewSection(0)) },
-            modifier = Modifier
-                .padding(vertical = 4.dp)
-                .padding(end = 8.dp)
-                .size(24.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Filled.Add,
-                contentDescription = stringResource(R.string.cd_add_icon),
-                tint = MaterialTheme.colors.secondaryVariant,
-            )
-        }
-    }
-
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
         items(sections) { section ->
             SectionItem(
                 name = section.name,
@@ -258,15 +232,14 @@ fun SectionItem(
     selectSection: () -> Unit,
     deleteSection: () -> Unit
 ) {
-    val backgroundColor = when (selected) {
-        true -> Color.LightGray
-        false -> Color(0xFFb2fab4)
-    }
+    val backgroundColor = if (selected) LightPurple2 else LightPurple1
+    val border = if (selected) BorderStroke(width = 1.dp, color = DarkRed) else null
     val padding = (level * 8).dp
+
     Card(
-        border = BorderStroke(width = 1.dp, color = Color.LightGray),
+        border = border,
         backgroundColor = backgroundColor,
-        modifier = Modifier.padding(start = padding, bottom = 8.dp)
+        modifier = Modifier.padding(start = padding, top = 8.dp)
     ) {
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,
@@ -278,30 +251,43 @@ fun SectionItem(
                 )
                 .padding(start = 32.dp) then modifier
         ) {
-            Column() {
-                Text(
-                    text = name,
-                    style = MaterialTheme.typography.subtitle1.copy(color = MaterialTheme.colors.primaryVariant),
-                )
+            Column(modifier = Modifier.padding(vertical = 6.dp)) {
+                SectionItemName(name)
                 if (description.isNotEmpty()) {
-                    Text(
-                        text = description,
-                        maxLines = 3,
-                        overflow = TextOverflow.Ellipsis,
-                        color = Color.DarkGray,
-                        fontSize = 12.sp,
-                        fontStyle = FontStyle.Italic
-                    )
+                    SectionItemDetails(description)
                 }
             }
             if (selected) {
-                Row() {
+                Row {
                     DeleteIcon(deleteSection)
                     AddIcon(newSection)
                 }
             }
         }
     }
+}
+
+@Composable
+fun SectionItemName(name: String) {
+    Text(
+        text = name,
+        maxLines = 2,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 14.sp,
+        color = DarkPurple,
+    )
+}
+
+@Composable
+fun SectionItemDetails(info: String) {
+    Text(
+        text = info,
+        maxLines = 3,
+        overflow = TextOverflow.Ellipsis,
+        color = DarkBlue,
+        fontSize = 12.sp,
+        modifier = Modifier.padding(top = 6.dp)
+    )
 }
 
 @Preview
@@ -351,8 +337,10 @@ fun PieceItemPreview() {
             description = "I-V-I\nSomething\nMode\nDescription"
         )
     )
-    PieceUi(
-        viewState = PieceViewState(piece, sections),
-        actioner = {}
-    )
+    LazyMusicianshipTheme {
+        PieceUi(
+            viewState = PieceViewState(piece, sections, selectedSection = 4),
+            actioner = {}
+        )
+    }
 }

@@ -15,8 +15,7 @@ fun SaveCloseTopBar(
     TopAppBar(
         title = { },
         modifier = Modifier.fillMaxWidth(),
-        backgroundColor = MaterialTheme.colors.surface.copy(alpha = 0.97f),
-        contentColor = MaterialTheme.colors.onSurface,
+        backgroundColor = MaterialTheme.colors.background,
         navigationIcon = { NavigationCloseIcon(close) },
         actions = { SaveIcon(saveEnabled, save) }
     )

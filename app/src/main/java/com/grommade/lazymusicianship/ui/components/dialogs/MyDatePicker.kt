@@ -40,7 +40,7 @@ import java.time.YearMonth
 
 // FIXME: Rename package
 
-const val COUNT_DAYS_CALENDAR = 7 * 6
+private const val COUNT_DAYS_CALENDAR = 7 * 6
 
 @Composable
 fun AppDialog.BuildPeriodDialog(
@@ -160,7 +160,7 @@ private fun MonthGrid(
         LazyVerticalGrid(cells = GridCells.Fixed(7)) {
             for (x in 0 until 7) {
                 item {
-                    Box(Modifier.size(36.dp), contentAlignment = Alignment.Center) {
+                    Box(Modifier.size(32.dp), contentAlignment = Alignment.Center) {
                         Text(daysOfWeek.getOrElse(x) { "" })
                     }
                 }
@@ -200,7 +200,7 @@ private fun DateSelectionBox(
 ) {
     Box(
         Modifier
-            .size(36.dp)
+            .size(32.dp)
             .clickable(
                 interactionSource = MutableInteractionSource(),
                 onClick = {
