@@ -2,6 +2,7 @@ package com.grommade.lazymusicianship.data.dao
 
 import androidx.room.Dao
 import androidx.room.Query
+import androidx.room.Transaction
 import com.grommade.lazymusicianship.data.entity.Practice
 import com.grommade.lazymusicianship.data.entity.PracticeWithPieceAndSections
 import kotlinx.coroutines.flow.Flow
@@ -10,6 +11,7 @@ import java.time.LocalDate
 @Dao
 abstract class PracticeDao : EntityDao<Practice>() {
 
+    @Transaction
     @Query("SELECT * FROM practice_table WHERE practice_id = :id")
     abstract suspend fun getPracticeItem(id: Long): PracticeWithPieceAndSections?
 
@@ -25,6 +27,7 @@ abstract class PracticeDao : EntityDao<Practice>() {
     )
     abstract suspend fun getCountPracticesBySectionsId(sectionsId: List<Long>): Int
 
+    @Transaction
     @Query("SELECT * FROM practice_table ORDER BY date DESC, practice_id DESC")
     abstract fun getPracticesItemsFlow(): Flow<List<PracticeWithPieceAndSections>>
 

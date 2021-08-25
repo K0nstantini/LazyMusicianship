@@ -1,17 +1,18 @@
 package com.grommade.lazymusicianship.ui_piece_details
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Card
-import androidx.compose.material.Tab
-import androidx.compose.material.TabRow
-import androidx.compose.material.Text
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -94,6 +95,9 @@ fun PieceUi(
     viewState: PieceViewState,
     actioner: (PieceActions) -> Unit
 ) = Box(modifier = Modifier.fillMaxSize()) {
+
+    var state by remember { mutableStateOf(1) } // fixme
+
     Scaffold(
         topBar = {
             SaveCloseTopBar(
@@ -102,7 +106,11 @@ fun PieceUi(
                 close = { actioner(PieceActions.Close) }
             )
         },
-        floatingActionButton = { FloatingAddActionButton { actioner(PieceActions.NewSection(0)) } },
+        floatingActionButton = {
+            if (state == 0) {
+                FloatingAddActionButton { actioner(PieceActions.NewSection(0)) }
+            }
+        },
         modifier = Modifier.fillMaxSize(),
     ) { paddingValues ->
         Column(
@@ -117,7 +125,6 @@ fun PieceUi(
                 actioner(PieceActions.ChangeName(value))
             }
 
-            var state by remember { mutableStateOf(1) } // fixme
             val titles = listOf(
                 stringResource(R.string.tab_sections),
                 stringResource(R.string.tab_info),
@@ -159,36 +166,132 @@ fun PieceInfo(
     piece: Piece,
     actioner: (PieceActions) -> Unit
 ) {
-    SetItemDefaultWithInputDialog(
-        title = stringResource(R.string.piece_title_author),
-        value = piece.author,
-        callback = { actioner(PieceActions.ChangeAuthor(it)) }
-    )
-    SetItemDefaultWithInputDialog(
-        title = stringResource(R.string.piece_title_arranger),
-        value = piece.arranger,
-        callback = { actioner(PieceActions.ChangeArranger(it)) }
-    )
-    TimeItem(
-        title = stringResource(R.string.piece_title_time),
-        value = piece.time,
-        changeTime = { value: Int -> actioner(PieceActions.ChangeTime(value)) }
-    )
+    AuthorAndArrangerFields(piece, actioner)
+
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 16.dp)
+    ) {
+
+        val modifier = Modifier
+            .clip(RoundedCornerShape(8.dp))
+            .border(1.dp, DarkBlue2, RoundedCornerShape(8.dp))
+            .weight(1f)
+            .height(55.dp)
+
+        TimeField(piece.time, modifier) { actioner(PieceActions.ChangeTime(it)) }
+        FinishedField(true, modifier) { actioner(PieceActions.ChangeFinished(it)) }
+    }
+
+    DescriptionField(piece.description) { actioner(PieceActions.ChangeDescription(it)) }
 }
 
 @Composable
-fun TimeItem(
-    title: String,
-    value: Int,
+fun AuthorAndArrangerFields(
+    piece: Piece,
+    actioner: (PieceActions) -> Unit,
+) {
+    val style = LocalTextStyle.current.copy(fontSize = 14.sp, color = LightPurple2)
+    val modifier = Modifier.padding(top = 8.dp)
+
+    AppOutlinedTextField(
+        text = piece.author,
+        style = style,
+        label = stringResource(R.string.piece_title_author),
+        modifier = modifier
+    ) { actioner(PieceActions.ChangeAuthor(it)) }
+
+    AppOutlinedTextField(
+        text = piece.arranger,
+        style = style,
+        label = stringResource(R.string.piece_title_arranger),
+        modifier = modifier
+    ) { actioner(PieceActions.ChangeArranger(it)) }
+}
+
+@Composable
+fun TimeField(
+    time: Int,
+    modifier: Modifier,
     changeTime: (Int) -> Unit
 ) {
-    val alertDialog = remember { MaterialDialog() }
-        .apply { BuiltTimeDialog(value, changeTime, true) }
+    val timeDialog = remember { MaterialDialog() }.apply {
+        BuiltTimeDialog(time, changeTime, true)
+    }
+    Box(
+        modifier = Modifier
+            .padding(end = 8.dp)
+            .clickable(onClick = timeDialog::show) then modifier
+    ) {
+        Column(
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .padding(start = 16.dp)
+        ) {
+            Text(
+                text = stringResource(R.string.piece_title_time),
+                fontSize = 14.sp,
+                color = LightPurple2,
+                fontWeight = FontWeight.SemiBold,
+            )
+            Text(
+                text = time.toStrTime(),
+                fontSize = 12.sp,
+                color = if (time == 0) DarkYellow.copy(alpha = 0.5f) else DarkYellow,
+                fontWeight = FontWeight.SemiBold,
+            )
+        }
+    }
+}
 
-    SetItemDefault(
-        title = title,
-        value = value.toStrTime(),
-        onClick = alertDialog::show
+@Composable
+fun FinishedField(
+    finished: Boolean,
+    modifier: Modifier,
+    changeFinished: (Boolean) -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .padding(start = 8.dp)
+            .clickable(onClick = { changeFinished(!finished) }) then modifier
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.Center)
+                .padding(horizontal = 16.dp)
+        ) {
+            Text(stringResource(R.string.piece_title_finished), color = LightPurple2)
+            AppSwitch(
+                checked = finished,
+                onCheckedChange = changeFinished,
+                enabled = true,
+                modifier = Modifier.padding(start = 16.dp)
+            )
+        }
+    }
+}
+
+@Composable
+private fun DescriptionField(
+    description: String,
+    changeDescription: (String) -> Unit
+) {
+    OutlinedTextField(
+        value = description,
+        onValueChange = changeDescription,
+        label = { Text(stringResource(R.string.piece_title_description), color = Color(0x809290AD)) },
+        colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.Transparent),
+        textStyle = LocalTextStyle.current.copy(fontSize = 14.sp, color = LightPurple2),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 8.dp, bottom = 16.dp),
+        shape = RoundedCornerShape(8.dp)
     )
 }
 
@@ -296,7 +399,7 @@ fun PieceItemPreview() {
     val piece = Piece(
         name = "Sweet Harmony",
         author = "The Beloved",
-        arranger = "Eiro Nareth"
+        arranger = "Unknown"
     )
     val sections = listOf(
         Section(

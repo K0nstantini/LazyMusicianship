@@ -1,6 +1,7 @@
 package com.grommade.lazymusicianship.ui.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
@@ -9,9 +10,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.grommade.lazymusicianship.R
+import com.grommade.lazymusicianship.ui.theme.DarkWhite
 import com.grommade.lazymusicianship.ui.theme.LazyMusicianshipTheme
 
 @Composable
@@ -19,15 +23,35 @@ fun TextFieldName(
     text: String,
     changeText: (String) -> Unit
 ) {
+    AppOutlinedTextField(
+        text = text,
+        label = stringResource(R.string.piece_hint_edit_text_name),
+        style = LocalTextStyle.current.copy(fontSize = 18.sp, color = DarkWhite),
+        emptyError = true,
+        modifier = Modifier.fillMaxWidth(),
+        changeText = changeText
+    )
+}
+
+@Composable
+fun AppOutlinedTextField(
+    text: String,
+    modifier: Modifier = Modifier,
+    label: String = "",
+    style: TextStyle =  LocalTextStyle.current,
+    emptyError: Boolean = false,
+    changeText: (String) -> Unit
+) {
     OutlinedTextField(
         value = text,
         onValueChange = changeText,
-        label = { Text(stringResource(R.string.piece_hint_edit_text_name), color = Color(0x809290AD)) },
+        label = { Text(label, color = Color(0x809290AD)) }, // fixme
         colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.Transparent),
-        isError = text.isEmpty(),
+        isError = emptyError,
         singleLine = true,
-        textStyle = LocalTextStyle.current.copy(fontSize = 18.sp, color = Color(0xFF9290AD)),
-        modifier = Modifier.fillMaxWidth()
+        textStyle = style,
+        modifier = modifier.fillMaxWidth() then modifier,
+        shape = RoundedCornerShape(8.dp)
     )
 }
 

@@ -28,6 +28,8 @@
     <string name="piece_title_tempo">Tempo</string>
     <string name="piece_title_time">Time</string>
     <string name="piece_title_new">New</string>
+    <string name="piece_title_finished">Finished</string>
+    <string name="piece_title_description">Description</string>
 
     <string name="piece_hint_edit_text_author">Author</string>
     <string name="piece_hint_edit_text_arranger">Arranger</string>
@@ -36,7 +38,6 @@
 
     <string name="tab_sections">Sections</string>
     <string name="tab_info">Info</string>
-    <string name="tab_description">Description</string>
 
     <string name="section_item_beat">Beat: %s</string>
     <string name="section_item_bars">Bars: %s</string>

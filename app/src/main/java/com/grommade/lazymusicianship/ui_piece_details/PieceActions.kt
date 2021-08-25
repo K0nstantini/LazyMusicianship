@@ -7,6 +7,7 @@ sealed class PieceActions {
     data class ChangeAuthor(val value: String): PieceActions()
     data class ChangeArranger(val value: String): PieceActions()
     data class ChangeTime(val value: Int): PieceActions()
+    data class ChangeFinished(val value: Boolean): PieceActions()
     data class ChangeDescription(val value: String): PieceActions()
     data class OpenSection(val sectionId: Long): PieceActions()
     data class NewSection(val parentId: Long): PieceActions()
