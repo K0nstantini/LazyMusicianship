@@ -30,10 +30,7 @@ import com.grommade.lazymusicianship.ui.components.DeleteIcon
 import com.grommade.lazymusicianship.ui.components.FloatingAddActionButton
 import com.grommade.lazymusicianship.ui.components.IconMusicNote
 import com.grommade.lazymusicianship.ui.components.MoreVertIcon
-import com.grommade.lazymusicianship.ui.theme.DarkBlue
-import com.grommade.lazymusicianship.ui.theme.DarkGreen
-import com.grommade.lazymusicianship.ui.theme.DarkRed
-import com.grommade.lazymusicianship.ui.theme.LazyMusicianshipTheme
+import com.grommade.lazymusicianship.ui.theme.*
 import com.grommade.lazymusicianship.util.extentions.diffDays
 import com.grommade.lazymusicianship.util.extentions.isEmpty
 import java.time.LocalDate
@@ -87,6 +84,7 @@ fun PiecesListUi(
                 val (piece, recentness) = item
                 PieceItem(
                     piece = piece,
+                    inStudying = viewState.inStudying.contains(piece),
                     recentness = recentness,
                     selected = piece.id == viewState.selectedPiece,
                     modifier = Modifier.fillParentMaxWidth(),
@@ -140,6 +138,7 @@ fun PiecesListDropdownMenu(populateDB: () -> Unit) {
 @Composable
 fun PieceItem(
     piece: Piece,
+    inStudying: Boolean,
     recentness: LocalDate,
     selected: Boolean,
     modifier: Modifier,
@@ -163,7 +162,7 @@ fun PieceItem(
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
-            ItemIcon(piece.finished)
+            ItemIcon(piece.finished, inStudying)
             ItemInfo(piece.name, piece.author, recentness, selected)
         }
         if (selected) {
@@ -173,7 +172,10 @@ fun PieceItem(
 }
 
 @Composable
-fun ItemIcon(finished: Boolean) {
+fun ItemIcon(
+    finished: Boolean,
+    inStudying: Boolean
+) {
     Box(
         modifier = Modifier
             .size(50.dp)
@@ -184,9 +186,9 @@ fun ItemIcon(finished: Boolean) {
     ) {
         val color = when {
             finished -> DarkGreen
-            else -> DarkRed
+            inStudying -> DarkRed
+            else -> WhitePurple
         }
-//        IconMusicNote(Color(0xFFDE395A))
         IconMusicNote(color)
     }
 }
@@ -198,7 +200,7 @@ fun ItemInfo(
     recentness: LocalDate,
     selected: Boolean
 ) {
-    val headerColor = Color(0xFFB1AFCD).let {
+    val headerColor = WhitePurple.let {
         if (selected) it else it.copy(alpha = 0.8f)
     } // fixme
 
