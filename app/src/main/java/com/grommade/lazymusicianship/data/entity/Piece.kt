@@ -10,6 +10,7 @@ import androidx.room.PrimaryKey
 data class Piece(
     @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "piece_id") override val id: Long = 0,
     @ColumnInfo(name = "piece_name") val name: String = "",
+    val finished: Boolean = false,
     val author: String = "",
     val arranger: String = "",
     val time: Int = 0,

@@ -183,7 +183,7 @@ fun PieceInfo(
             .height(55.dp)
 
         TimeField(piece.time, modifier) { actioner(PieceActions.ChangeTime(it)) }
-        FinishedField(true, modifier) { actioner(PieceActions.ChangeFinished(it)) }
+        FinishedField(piece.finished, modifier) { actioner(PieceActions.ChangeFinished(it)) }
     }
 
     DescriptionField(piece.description) { actioner(PieceActions.ChangeDescription(it)) }

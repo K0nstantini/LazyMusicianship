@@ -19,6 +19,7 @@ val DarkRed = Color(0xFFA73862)
 val DarkYellow = Color(0xFFAAB694)
 val DarkGray = Color(0xFF222222)
 val DarkWhite = Color(0xFFCECEEA)
+val DarkGreen = Color(0xFF69921F)
 
 val LightPurple3 = Color(0xFF635C8F) // Infected people
 val LightPurple4 = Color(0xFF726AB7) // COVID 19

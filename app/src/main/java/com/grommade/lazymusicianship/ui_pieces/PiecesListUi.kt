@@ -31,6 +31,8 @@ import com.grommade.lazymusicianship.ui.components.FloatingAddActionButton
 import com.grommade.lazymusicianship.ui.components.IconMusicNote
 import com.grommade.lazymusicianship.ui.components.MoreVertIcon
 import com.grommade.lazymusicianship.ui.theme.DarkBlue
+import com.grommade.lazymusicianship.ui.theme.DarkGreen
+import com.grommade.lazymusicianship.ui.theme.DarkRed
 import com.grommade.lazymusicianship.ui.theme.LazyMusicianshipTheme
 import com.grommade.lazymusicianship.util.extentions.diffDays
 import com.grommade.lazymusicianship.util.extentions.isEmpty
@@ -161,7 +163,7 @@ fun PieceItem(
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
-            ItemIcon()
+            ItemIcon(piece.finished)
             ItemInfo(piece.name, piece.author, recentness, selected)
         }
         if (selected) {
@@ -171,7 +173,7 @@ fun PieceItem(
 }
 
 @Composable
-fun ItemIcon() {
+fun ItemIcon(finished: Boolean) {
     Box(
         modifier = Modifier
             .size(50.dp)
@@ -180,7 +182,12 @@ fun ItemIcon() {
             .background(DarkBlue),
         contentAlignment = Alignment.Center
     ) {
-        IconMusicNote(Color(0xFFDE395A))
+        val color = when {
+            finished -> DarkGreen
+            else -> DarkRed
+        }
+//        IconMusicNote(Color(0xFFDE395A))
+        IconMusicNote(color)
     }
 }
 
@@ -197,7 +204,7 @@ fun ItemInfo(
 
     val recentnessColor = if (selected) Color(0xCCB1AFCD) else Color(0xCC645D90) // fixme
 
-    val textDays = when{
+    val textDays = when {
         recentness.isEmpty() -> stringResource(R.string.pieces_no_recentness)
         else -> stringResource(R.string.pieces_recentness, recentness.diffDays(LocalDate.now()))
     }
@@ -233,8 +240,8 @@ fun ItemInfo(
 @Composable
 fun PiecesListUiPreview() {
     val list = listOf(
-        Piece(id = 1, name = "Sherlock (BBC) Main Theme", author = "David Arnold & Michael Price"),
-        Piece(id = 2, name = "Elfen Lied"),
+        Piece(id = 1, name = "Sherlock (BBC) Main Theme", author = "David Arnold & Michael Price", finished = true),
+        Piece(id = 2, name = "Elfen Lied", finished = true),
         Piece(id = 3, name = "Let It Be", author = "Beatles"),
         Piece(id = 4, name = "Rape me", author = "Nirvana"),
     ).map { PieceWithRecentness(it) }
@@ -242,19 +249,3 @@ fun PiecesListUiPreview() {
         PiecesListUi(PiecesListViewState(pieces = list, selectedPiece = 2)) {}
     }
 }
-
-/*
-@Preview
-@Composable
-fun PieceItemPreview() {
-    LazyMusicianshipTheme {
-        PieceItem(
-            piece = Piece(name = "Sherlock (BBC) Main Theme"),
-            selected = false,
-            modifier = Modifier,
-            selectPiece = {},
-            openPiece = {},
-            deletePiece = {}
-        )
-    }
-}*/

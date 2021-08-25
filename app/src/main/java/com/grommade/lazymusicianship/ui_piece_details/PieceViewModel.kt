@@ -63,6 +63,7 @@ class PieceViewModel @Inject constructor(
                     is PieceActions.ChangeAuthor -> changePiece { copy(author = action.value) }
                     is PieceActions.ChangeArranger -> changePiece { copy(arranger = action.value) }
                     is PieceActions.ChangeTime -> changePiece { copy(time = action.value) }
+                    is PieceActions.ChangeFinished -> changePiece { copy(finished = action.value) }
                     is PieceActions.ChangeDescription -> changePiece { copy(description = action.value) }
                     is PieceActions.SelectSection -> selectedSection.value = action.id
                     is PieceActions.DeleteSection -> deleteSection(action.section)
