@@ -43,12 +43,14 @@ class PracticeDetailsViewModel @Inject constructor(
         allSections,
         observeStates.observe()
     ) { practiceItem, pieces, sections, states ->
+        val errorSections = sectionsNotCorrect()
         PracticeDetailsViewState(
             practiceItem = practiceItem,
             allPieces = pieces,
             allSections = sections,
             allStates = states,
-            errorSections = sectionsNotCorrect()
+            errorSections = errorSections,
+            saveEnabled = with(practiceItem) { !(piece.isNew || errorSections || stateStudy.isNew) }
         )
     }
 
@@ -68,7 +70,7 @@ class PracticeDetailsViewModel @Inject constructor(
                     is PracticeDetailsActions.ChangeSuccessful -> changePractice { copy(successful = action.value) }
                     is PracticeDetailsActions.ChangeState -> changeStateStudy(action.state)
                     is PracticeDetailsActions.ChangeTempo -> changePractice { copy(tempo = action.value) }
-                    is PracticeDetailsActions.ChangeCountTimes -> changePractice { copy(countTimes = action.value) }
+                    is PracticeDetailsActions.ChangeNumberTimes -> changePractice { copy(countTimes = action.value) }
                     else -> {
                     }
                 }

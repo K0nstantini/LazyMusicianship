@@ -1,5 +1,6 @@
 package com.grommade.lazymusicianship.util.extentions
 
+import com.grommade.lazymusicianship.util.MILLI_IN_SECOND
 import com.grommade.lazymusicianship.util.MINUTES_IN_HOUR
 import com.grommade.lazymusicianship.util.MONTHS_IN_YEAR
 import com.grommade.lazymusicianship.util.SECONDS_IN_MINUTE
@@ -9,14 +10,30 @@ import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import kotlin.math.abs
+import kotlin.math.roundToInt
 
 fun String.toTime() =
     dropLast(3).toInt() * 60 + this.drop(3).toInt()
 
-fun Int.toStrTime(): String {
-    return (this / 60).toString().padStart(2, '0') + ':' +
-            (this % 60).toString().padStart(2, '0')
+fun Int.minutesToStrTime(): String {
+    return (this / MINUTES_IN_HOUR).toString().padStart(2, '0') + ':' +
+            (this % MINUTES_IN_HOUR).toString().padStart(2, '0')
 }
+
+fun Int.secondsToStrTime(): String {
+    return (this / (MINUTES_IN_HOUR * SECONDS_IN_MINUTE)).toString().padStart(2, '0') + ':' +
+            (this / SECONDS_IN_MINUTE).toString().padStart(2, '0') + ':' +
+            (this % SECONDS_IN_MINUTE).toString().padStart(2, '0')
+}
+
+fun Long.milliToSeconds() = (this / MILLI_IN_SECOND).toInt()
+
+fun Long.milliToMinutes(round: Boolean = false) = when (round) {
+    true -> ((this / MILLI_IN_SECOND).toFloat() / SECONDS_IN_MINUTE).roundToInt()
+    false -> (this / MILLI_IN_SECOND / SECONDS_IN_MINUTE).toInt()
+}
+
+fun Int.minutesToMilli() = this.toLong() * SECONDS_IN_MINUTE * MILLI_IN_SECOND
 
 fun Int.secondsToLocalTime(): LocalTime =
     LocalTime.of(0, this / SECONDS_IN_MINUTE, this % SECONDS_IN_MINUTE)

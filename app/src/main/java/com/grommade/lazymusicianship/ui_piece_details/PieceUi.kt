@@ -30,7 +30,7 @@ import com.grommade.lazymusicianship.ui.common.rememberFlowWithLifecycle
 import com.grommade.lazymusicianship.ui.components.*
 import com.grommade.lazymusicianship.ui.components.material_dialogs.core.MaterialDialog
 import com.grommade.lazymusicianship.ui.theme.*
-import com.grommade.lazymusicianship.util.extentions.toStrTime
+import com.grommade.lazymusicianship.util.extentions.minutesToStrTime
 import kotlinx.coroutines.launch
 
 @Composable
@@ -96,7 +96,7 @@ fun PieceUi(
     actioner: (PieceActions) -> Unit
 ) = Box(modifier = Modifier.fillMaxSize()) {
 
-    var state by remember { mutableStateOf(1) } // fixme
+    var state by remember { mutableStateOf(0) } // fixme
 
     Scaffold(
         topBar = {
@@ -194,19 +194,16 @@ fun AuthorAndArrangerFields(
     piece: Piece,
     actioner: (PieceActions) -> Unit,
 ) {
-    val style = LocalTextStyle.current.copy(fontSize = 14.sp, color = LightPurple2)
     val modifier = Modifier.padding(top = 8.dp)
 
     AppOutlinedTextField(
         text = piece.author,
-        style = style,
         label = stringResource(R.string.piece_title_author),
         modifier = modifier
     ) { actioner(PieceActions.ChangeAuthor(it)) }
 
     AppOutlinedTextField(
         text = piece.arranger,
-        style = style,
         label = stringResource(R.string.piece_title_arranger),
         modifier = modifier
     ) { actioner(PieceActions.ChangeArranger(it)) }
@@ -238,7 +235,7 @@ fun TimeField(
                 fontWeight = FontWeight.SemiBold,
             )
             Text(
-                text = time.toStrTime(),
+                text = time.minutesToStrTime(),
                 fontSize = 12.sp,
                 color = if (time == 0) DarkYellow.copy(alpha = 0.5f) else DarkYellow,
                 fontWeight = FontWeight.SemiBold,

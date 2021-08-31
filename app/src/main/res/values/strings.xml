@@ -77,8 +77,8 @@
     <string name="practice_title_state_study">State</string>
     <string name="practice_title_elapsed_time">Elapsed time</string>
     <string name="practice_title_successful">Successful</string>
-    <string name="practice_title_tempo">Tempo</string>
-    <string name="practice_title_count_times">Count times</string>
+    <string name="practice_title_tempo">Beat</string>
+    <string name="practice_title_number_times">Number times</string>
 
     <string name="practice_alert_list_pieces">Pieces</string>
     <string name="practice_alert_list_sections">Sections</string>
@@ -115,6 +115,13 @@
     <!--    Settings items-->
     <string name="btn_clear">Clear</string>
 
+
+    <!--    ================================ UI Components ==================================================== -->
+
+    <!--    Timer-->
+    <string name="ui_components_timer_title">Time</string>
+
+
     <!--    Date picker-->
     <string name="preset_last_7_days">Last 7 days</string>
     <string name="preset_last_30_days">Last 30 days</string>
@@ -129,6 +136,8 @@
     <string name="calendar_positive_button">Set Date</string>
     <string name="calendar_negative_button">Cancel</string>
 
+    <!--    ================================================================================================ -->
+
     <!--    Content Descriptions-->
     <string name="cd_more_vert_icon">More</string>
     <string name="cd_close_icon">Close</string>
@@ -142,5 +151,7 @@
     <string name="cd_chevron_left_icon">Chevron left</string>
     <string name="cd_chevron_right_icon">Chevron right</string>
     <string name="cd_music_note_icon">Music note</string>
+    <string name="cd_restore_icon">Restore</string>
+    <string name="cd_play_icon">Play</string>
 
 </resources>

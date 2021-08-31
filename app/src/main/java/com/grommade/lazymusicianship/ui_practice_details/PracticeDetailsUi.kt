@@ -1,30 +1,26 @@
 package com.grommade.lazymusicianship.ui_practice_details
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.text.isDigitsOnly
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.insets.ui.Scaffold
+import com.grommade.lazymusicianship.AppTimer
 import com.grommade.lazymusicianship.R
 import com.grommade.lazymusicianship.data.entity.*
+import com.grommade.lazymusicianship.ui.AppTimerBox
 import com.grommade.lazymusicianship.ui.common.rememberFlowWithLifecycle
 import com.grommade.lazymusicianship.ui.components.*
 import com.grommade.lazymusicianship.ui.components.material_dialogs.core.MaterialDialog
 import com.grommade.lazymusicianship.ui.theme.LazyMusicianshipTheme
-import com.grommade.lazymusicianship.util.extentions.toStrTime
+import com.grommade.lazymusicianship.util.extentions.toStringFormat
 import java.time.LocalDate
 
 @Composable
@@ -63,93 +59,168 @@ fun PracticeDetailsUi(
     viewState: PracticeDetailsViewState,
     actioner: (PracticeDetailsActions) -> Unit
 ) {
+
+    val practice = viewState.practiceItem.practice
+
     Scaffold(
         topBar = {
-            val enabled = with(viewState.practiceItem) { !(piece.isNew || viewState.errorSections || stateStudy.isNew) }
             SaveCloseTopBar(
-                saveEnabled = enabled,
+                saveEnabled = viewState.saveEnabled,
                 save = { actioner(PracticeDetailsActions.SaveAndClose) },
                 close = { actioner(PracticeDetailsActions.Close) }
             )
         },
         modifier = Modifier.fillMaxSize(),
     ) { paddingValues ->
+
         Column(
             Modifier
                 .padding(paddingValues)
-                .padding(
-                    start = 16.dp,
-                    end = 8.dp
-                )
+                .padding(start = 16.dp, end = 8.dp)
         ) {
-            DateItem(
-                date = viewState.practiceItem.practice.date,
-                changeDate = { date -> actioner(PracticeDetailsActions.ChangeDate(date)) }
-            )
-            PieceItem(
-                pieceName = viewState.practiceItem.piece.name,
-                pieces = viewState.allPieces,
-                changePiece = { piece -> actioner(PracticeDetailsActions.ChangePiece(piece)) }
-            )
-            SectionsItems(
-                practiceItem = viewState.practiceItem,
-                sections = viewState.allSections,
-                actioner = actioner
-            )
-            if (viewState.errorSections) {
-                Text(
-                    text = stringResource(R.string.practice_sections_error),
-                    style = MaterialTheme.typography.caption.copy(color = Color.Red, fontStyle = FontStyle.Italic)
-                )
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                DateItem(practice.date) { actioner(PracticeDetailsActions.ChangeDate(it)) }
+                TimeItem(practice.elapsedTime) { actioner(PracticeDetailsActions.ChangeTime(it)) }
             }
-            TimeItem(
-                time = viewState.practiceItem.practice.elapsedTime,
-                changeTime = { time -> actioner(PracticeDetailsActions.ChangeTime(time)) }
-            )
 
-            val successful = viewState.practiceItem.practice.successful
-            SetItemSwitch(
-                title = stringResource(R.string.practice_title_successful),
-                stateSwitch = successful,
-                onClick = { actioner(PracticeDetailsActions.ChangeSuccessful(!successful)) },
-                onClickSwitch = { actioner(PracticeDetailsActions.ChangeSuccessful(it)) },
-            )
+            StateItem(
+                state = viewState.practiceItem.stateStudy,
+                states = viewState.allStates
+            ) { actioner(PracticeDetailsActions.ChangeState(it)) }
 
-            StateStudyItem(
-                stateName = viewState.practiceItem.stateStudy.name,
-                states = viewState.allStates,
-                changeStudy = { state -> actioner(PracticeDetailsActions.ChangeState(state)) }
-            )
             if (viewState.practiceItem.stateStudy.considerTempo) {
-                SetItemDefaultWithInputDialog(
-                    title = stringResource(R.string.practice_title_tempo),
-                    value = viewState.practiceItem.practice.tempo.toString(),
-                    isTextValid = { text -> text.isDigitsOnly() }
-                ) { actioner(PracticeDetailsActions.ChangeTempo(it.toIntOrNull() ?: 0)) }
-            }
-            if (viewState.practiceItem.stateStudy.countNumberOfTimes) {
-                SetItemDefaultWithInputDialog(
-                    title = stringResource(R.string.practice_title_count_times),
-                    value = viewState.practiceItem.practice.countTimes.toString(),
-                    isTextValid = { text -> text.isDigitsOnly() }
-                ) { actioner(PracticeDetailsActions.ChangeCountTimes(it.toIntOrNull() ?: 0)) }
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    TempoItem(practice.tempo) { actioner(PracticeDetailsActions.ChangeTempo(it)) }
+                    NumberTimesItem(practice.countTimes) { actioner(PracticeDetailsActions.ChangeNumberTimes(it)) }
+                }
             }
         }
+
+/*Column {
+    PieceItem(
+        pieceName = viewState.practiceItem.piece.name,
+        pieces = viewState.allPieces,
+        changePiece = { piece -> actioner(PracticeDetailsActions.ChangePiece(piece)) }
+    )
+    SectionsItems(
+        practiceItem = viewState.practiceItem,
+        sections = viewState.allSections,
+        actioner = actioner
+    )
+    if (viewState.errorSections) {
+        Text(
+            text = stringResource(R.string.practice_sections_error),
+            style = MaterialTheme.typography.caption.copy(color = Color.Red, fontStyle = FontStyle.Italic)
+        )
+    }
+
+    val successful = viewState.practiceItem.practice.successful
+    SetItemSwitch(
+        title = stringResource(R.string.practice_title_successful),
+        stateSwitch = successful,
+        onClick = { actioner(PracticeDetailsActions.ChangeSuccessful(!successful)) },
+        onClickSwitch = { actioner(PracticeDetailsActions.ChangeSuccessful(it)) },
+    )
+}*/
     }
 }
 
 @Composable
-fun DateItem(
+fun RowScope.DateItem(
     date: LocalDate,
     changeDate: (LocalDate) -> Unit
 ) {
-    val dateDialog = remember { MaterialDialog() }.apply {
-        BuiltDateDialog(changeDate)
-    }
-    SetItemDefault(
+    SetDateValue(
         title = stringResource(R.string.practice_title_date),
-        value = date.toString(),
-        onClick = dateDialog::show
+        value = date.toStringFormat(),
+        modifier = Modifier
+            .weight(1f)
+            .padding(end = 8.dp),
+        onClick = changeDate
+    )
+}
+
+@Composable
+fun RowScope.TimeItem(
+    time: Int,
+    changeTime: (Int) -> Unit
+) {
+    val timer = remember { AppTimer() }
+    AppTimerBox(
+        modifier = Modifier
+            .weight(1f)
+            .padding(start = 8.dp),
+        value = time,
+        timer = timer,
+        changeTime = changeTime,
+    )
+}
+
+@Composable
+fun StateItem(
+    state: StateStudy,
+    states: List<StateStudy>,
+    changeState: (StateStudy) -> Unit
+) {
+    val listDialog = remember { MaterialDialog() }.apply {
+        BuiltListDialog(
+            title = stringResource(R.string.practice_alert_state_study),
+            list = states.map { it.name },
+            callback = { index -> changeState(states.getOrElse(index) { StateStudy() }) }
+        )
+    }
+
+    SetDefaultValue(
+        title = stringResource(R.string.practice_alert_state_study),
+        value = state.name,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 8.dp),
+        onClick = listDialog::show
+    )
+}
+
+@Composable
+fun RowScope.TempoItem(
+    tempo: Int,
+    changeTempo: (Int) -> Unit
+) {
+    AppOutlinedTextField(
+        text = tempo.toString(),
+        modifier = Modifier
+            .weight(1f)
+            .padding(end = 8.dp),
+        label = stringResource(R.string.practice_title_tempo),
+        changeText = {
+            if (it.isDigitsOnly()) {
+                changeTempo(it.toIntOrNull() ?: 0)
+            }
+        }
+    )
+}
+
+@Composable
+fun RowScope.NumberTimesItem(
+    times: Int,
+    changeTimes: (Int) -> Unit
+) {
+    AppOutlinedTextField(
+        text = times.toString(),
+        modifier = Modifier
+            .weight(1f)
+            .padding(start = 8.dp),
+        label = stringResource(R.string.practice_title_number_times),
+        changeText = {
+            if (it.isDigitsOnly()) {
+                changeTimes(it.toIntOrNull() ?: 0)
+            }
+        }
     )
 }
 
@@ -222,50 +293,14 @@ fun SectionItem(
     )
 }
 
-@Composable
-fun TimeItem(
-    time: Int,
-    changeTime: (Int) -> Unit
-) {
-    val timeDialog = remember { MaterialDialog() }.apply {
-        BuiltTimeDialog(time, changeTime)
-    }
-
-    SetItemDefault(
-        title = stringResource(R.string.practice_title_elapsed_time),
-        value = time.toStrTime(),
-        onClick = timeDialog::show
-    )
-}
-
-@Composable
-fun StateStudyItem(
-    stateName: String,
-    states: List<StateStudy>,
-    changeStudy: (StateStudy) -> Unit
-) {
-    val listDialog = remember { MaterialDialog() }.apply {
-        BuiltListDialog(
-            title = stringResource(R.string.practice_alert_state_study),
-            list = states.map { it.name },
-            callback = { index -> changeStudy(states.getOrElse(index) { StateStudy() }) }
-        )
-    }
-
-    SetItemDefault(
-        title = stringResource(R.string.practice_title_state_study),
-        value = stateName,
-        onClick = listDialog::show
-    )
-}
-
 @Preview
 @Composable
 fun PracticeDetailsUiPreview() {
     val viewState = PracticeDetailsViewState(
         practiceItem = PracticeWithPieceAndSections(
             practice = Practice(id = 1, pieceId = 1, date = LocalDate.now()),
-            piece = Piece(id = 1, name = "I just want you")
+            piece = Piece(id = 1, name = "I just want you"),
+            stateStudy = StateStudy(id = 1, name = "In tempo", considerTempo = true)
         )
     )
     LazyMusicianshipTheme {

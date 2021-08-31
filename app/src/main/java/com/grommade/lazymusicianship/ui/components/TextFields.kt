@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.sp
 import com.grommade.lazymusicianship.R
 import com.grommade.lazymusicianship.ui.theme.DarkWhite
 import com.grommade.lazymusicianship.ui.theme.LazyMusicianshipTheme
+import com.grommade.lazymusicianship.ui.theme.LightPurple2
 
 @Composable
 fun TextFieldName(
@@ -27,7 +28,7 @@ fun TextFieldName(
         text = text,
         label = stringResource(R.string.piece_hint_edit_text_name),
         style = LocalTextStyle.current.copy(fontSize = 18.sp, color = DarkWhite),
-        emptyError = true,
+        isError = true,
         modifier = Modifier.fillMaxWidth(),
         changeText = changeText
     )
@@ -38,8 +39,8 @@ fun AppOutlinedTextField(
     text: String,
     modifier: Modifier = Modifier,
     label: String = "",
-    style: TextStyle =  LocalTextStyle.current,
-    emptyError: Boolean = false,
+    style: TextStyle =  LocalTextStyle.current.copy(fontSize = 14.sp, color = LightPurple2),
+    isError: Boolean = false,
     changeText: (String) -> Unit
 ) {
     OutlinedTextField(
@@ -47,10 +48,10 @@ fun AppOutlinedTextField(
         onValueChange = changeText,
         label = { Text(label, color = Color(0x809290AD)) }, // fixme
         colors = TextFieldDefaults.textFieldColors(backgroundColor = Color.Transparent),
-        isError = emptyError,
+        isError = isError,
         singleLine = true,
         textStyle = style,
-        modifier = modifier.fillMaxWidth() then modifier,
+        modifier = modifier,
         shape = RoundedCornerShape(8.dp)
     )
 }

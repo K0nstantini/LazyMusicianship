@@ -13,6 +13,7 @@ data class PracticeDetailsViewState(
     val allSections: List<Section> = emptyList(),
     val allStates: List<StateStudy> = emptyList(),
     val errorSections: Boolean = false,
+    val saveEnabled: Boolean = false,
 ) {
     companion object {
         val Empty = PracticeDetailsViewState()

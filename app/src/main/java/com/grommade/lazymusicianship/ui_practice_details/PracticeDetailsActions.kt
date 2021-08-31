@@ -14,7 +14,7 @@ sealed class PracticeDetailsActions {
     data class ChangeSuccessful(val value: Boolean) : PracticeDetailsActions()
     data class ChangeState(val state: StateStudy) : PracticeDetailsActions()
     data class ChangeTempo(val value: Int) : PracticeDetailsActions()
-    data class ChangeCountTimes(val value: Int) : PracticeDetailsActions()
+    data class ChangeNumberTimes(val value: Int) : PracticeDetailsActions()
     object SaveAndClose : PracticeDetailsActions()
     object Close : PracticeDetailsActions()
 }
