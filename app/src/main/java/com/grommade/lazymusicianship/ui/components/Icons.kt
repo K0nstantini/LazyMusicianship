@@ -134,7 +134,7 @@ fun IconMusicNote(color: Color = LocalContentColor.current.copy(alpha = LocalCon
     Icon(
         imageVector = Icons.Default.MusicNote,
         contentDescription = stringResource(R.string.cd_music_note_icon),
-        tint = color
+        tint = color,
     )
 }
 

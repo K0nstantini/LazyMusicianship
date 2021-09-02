@@ -72,8 +72,6 @@
     <!--    Practice details-->
     <string name="practice_title_date">Date</string>
     <string name="practice_title_piece">Piece</string>
-    <string name="practice_title_section_from">Section from</string>
-    <string name="practice_title_section_to">Section to</string>
     <string name="practice_title_state_study">State</string>
     <string name="practice_title_elapsed_time">Elapsed time</string>
     <string name="practice_title_successful">Successful</string>

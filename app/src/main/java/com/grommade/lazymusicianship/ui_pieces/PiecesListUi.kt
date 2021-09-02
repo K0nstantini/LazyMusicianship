@@ -189,7 +189,7 @@ fun ItemIcon(
             inStudying -> DarkRed
             else -> WhitePurple
         }
-        IconMusicNote(color)
+        IconMusicNote(color = color)
     }
 }
 

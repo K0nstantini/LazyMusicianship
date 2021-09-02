@@ -1,5 +1,6 @@
 package com.grommade.lazymusicianship.ui_practice_details
 
+import androidx.compose.ui.state.ToggleableState
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -37,20 +38,22 @@ class PracticeDetailsViewModel @Inject constructor(
         observeSections.observe()
     }
 
+    private val stateSections = MutableStateFlow(mapOf<Section, ToggleableState>())
+
     val state = combine(
         currentPracticeItem,
         observePieces.observe(),
+        stateSections,
         allSections,
         observeStates.observe()
-    ) { practiceItem, pieces, sections, states ->
-        val errorSections = sectionsNotCorrect()
+    ) { practiceItem, pieces, selected, sections, states ->
         PracticeDetailsViewState(
             practiceItem = practiceItem,
+            selectedSections = selected,
             allPieces = pieces,
             allSections = sections,
             allStates = states,
-            errorSections = errorSections,
-            saveEnabled = with(practiceItem) { !(piece.isNew || errorSections || stateStudy.isNew) }
+            saveEnabled = with(practiceItem) { !(piece.isNew || stateStudy.isNew) }
         )
     }
 
@@ -64,10 +67,8 @@ class PracticeDetailsViewModel @Inject constructor(
                 when (action) {
                     is PracticeDetailsActions.ChangeDate -> changePractice { copy(date = action.date) }
                     is PracticeDetailsActions.ChangePiece -> changePiece(action.piece)
-                    is PracticeDetailsActions.ChangeSectionFrom -> changeSectionFrom(action.section)
-                    is PracticeDetailsActions.ChangeSectionTo -> changeSectionTo(action.section)
+                    is PracticeDetailsActions.SelectSection -> selectSection(action.section)
                     is PracticeDetailsActions.ChangeTime -> changePractice { copy(elapsedTime = action.value) }
-                    is PracticeDetailsActions.ChangeSuccessful -> changePractice { copy(successful = action.value) }
                     is PracticeDetailsActions.ChangeState -> changeStateStudy(action.state)
                     is PracticeDetailsActions.ChangeTempo -> changePractice { copy(tempo = action.value) }
                     is PracticeDetailsActions.ChangeNumberTimes -> changePractice { copy(countTimes = action.value) }
@@ -89,18 +90,14 @@ class PracticeDetailsViewModel @Inject constructor(
         changePracticeItem { copy(piece = piece, sectionFrom = null, sectionTo = null) }
     }
 
-    private fun changeSectionFrom(section: Section) {
-        changePractice { copy(sectionIdFrom = section.id) }
-        changePracticeItem { copy(sectionFrom = section) }
-        if (currentPracticeItem.value.sectionTo == null) {
-            changeSectionTo(section)
+    private fun selectSection(section: Section) {
+        val newState = when (stateSections.value.getOrDefault(section, ToggleableState.Off)) {
+            ToggleableState.Off -> ToggleableState.On
+            else -> ToggleableState.Off
         }
+        stateSections.value = stateSections.value.filterKeys { it != section } + (section to newState)
     }
 
-    private fun changeSectionTo(section: Section) {
-        changePractice { copy(sectionIdTo = section.id) }
-        changePracticeItem { copy(sectionTo = section) }
-    }
 
     private fun changeStateStudy(state: StateStudy) {
         changePractice { copy(stateId = state.id) }
@@ -118,15 +115,6 @@ class PracticeDetailsViewModel @Inject constructor(
 
     fun save() = CoroutineScope(Job()).launch {
         savePractice(SavePractice.Params(currentPracticeItem.value.practice)).collect()
-    }
-
-    private fun sectionsNotCorrect(): Boolean {
-        val sectionFrom = currentPracticeItem.value.sectionFrom ?: Section()
-        val sectionTo = currentPracticeItem.value.sectionTo ?: Section()
-        val oneEmpty = sectionFrom.isNew xor sectionTo.isNew
-        val diffParent = sectionFrom.parentId != sectionTo.parentId
-        val lastMoreFirst = sectionFrom.order > sectionTo.order
-        return oneEmpty || diffParent || lastMoreFirst
     }
 
     fun submitAction(action: PracticeDetailsActions) = viewModelScope.launch {

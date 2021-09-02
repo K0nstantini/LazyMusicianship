@@ -2,6 +2,7 @@ package com.grommade.lazymusicianship.ui.charts.line_chart_core
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import com.grommade.lazymusicianship.ui.theme.DarkPurple2
 
 data class LineChartAxes(
     val offsetBottomLeft: Offset = Offset(OFFSET_LEFT, OFFSET_BOTTOM), // todo: add auto mode
@@ -17,6 +18,6 @@ data class LineChartAxes(
         const val OFFSET_TOP = 70f
         const val OFFSET_RIGHT = 70f
         const val THICK = 2f
-        val axesColor = Color(0xFF29224E) // fixme
+        val axesColor = DarkPurple2
     }
 }
