@@ -13,6 +13,7 @@ sealed class PracticeDetailsActions {
     data class ChangeState(val state: StateStudy) : PracticeDetailsActions()
     data class ChangeTempo(val value: Int) : PracticeDetailsActions()
     data class ChangeNumberTimes(val value: Int) : PracticeDetailsActions()
+    object SelectPiece : PracticeDetailsActions()
     object SaveAndClose : PracticeDetailsActions()
     object Close : PracticeDetailsActions()
 }

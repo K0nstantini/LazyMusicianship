@@ -1,18 +1,21 @@
 package com.grommade.lazymusicianship.ui_practice_details
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.Checkbox
 import androidx.compose.material.CheckboxDefaults
 import androidx.compose.material.Text
-import androidx.compose.material.TriStateCheckbox
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -83,14 +86,12 @@ private fun PracticeDetailsUi(
         modifier = Modifier.fillMaxSize(),
     ) { paddingValues ->
 
-        Column(
-            Modifier
-                .padding(paddingValues)
-                .padding(start = 16.dp, end = 8.dp)
-        ) {
+        val modifier = Modifier.padding(start = 16.dp, end = 8.dp)
+
+        Column(Modifier.padding(paddingValues)) {
             Row(
                 horizontalArrangement = Arrangement.SpaceBetween,
-                modifier = Modifier.fillMaxWidth()
+                modifier = modifier.fillMaxWidth()
             ) {
                 DateItem(practice.date) { actioner(PracticeDetailsActions.ChangeDate(it)) }
                 TimeItem(practice.elapsedTime) { actioner(PracticeDetailsActions.ChangeTime(it)) }
@@ -98,13 +99,14 @@ private fun PracticeDetailsUi(
 
             StateItem(
                 state = viewState.practiceItem.stateStudy,
-                states = viewState.allStates
+                states = viewState.allStates,
+                modifier = modifier,
             ) { actioner(PracticeDetailsActions.ChangeState(it)) }
 
             if (viewState.practiceItem.stateStudy.considerTempo) {
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = modifier.fillMaxWidth()
                 ) {
                     TempoItem(practice.tempo) { actioner(PracticeDetailsActions.ChangeTempo(it)) }
                     NumberTimesItem(practice.countTimes) { actioner(PracticeDetailsActions.ChangeNumberTimes(it)) }
@@ -113,9 +115,13 @@ private fun PracticeDetailsUi(
 
             PieceItem(
                 pieceName = viewState.practiceItem.piece.name,
+                pieces = viewState.allPieces,
                 sections = viewState.allSections,
-                stateSections = viewState.selectedSections
-            ) { actioner(PracticeDetailsActions.SelectSection(it)) }
+                selectedPiece = viewState.selectedPiece,
+                selectedSections = viewState.selectedSections,
+                modifier = modifier,
+                actioner = actioner
+            )
         }
 
 /*Column {
@@ -123,14 +129,6 @@ private fun PracticeDetailsUi(
         pieceName = viewState.practiceItem.piece.name,
         pieces = viewState.allPieces,
         changePiece = { piece -> actioner(PracticeDetailsActions.ChangePiece(piece)) }
-    )
-
-    val successful = viewState.practiceItem.practice.successful
-    SetItemSwitch(
-        title = stringResource(R.string.practice_title_successful),
-        stateSwitch = successful,
-        onClick = { actioner(PracticeDetailsActions.ChangeSuccessful(!successful)) },
-        onClickSwitch = { actioner(PracticeDetailsActions.ChangeSuccessful(it)) },
     )
 }*/
     }
@@ -171,6 +169,7 @@ private fun RowScope.TimeItem(
 private fun StateItem(
     state: StateStudy,
     states: List<StateStudy>,
+    modifier: Modifier,
     changeState: (StateStudy) -> Unit
 ) {
     val listDialog = remember { MaterialDialog() }.apply {
@@ -184,7 +183,7 @@ private fun StateItem(
     SetDefaultValue(
         title = stringResource(R.string.practice_alert_state_study),
         value = state.name,
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .padding(top = 8.dp),
         onClick = listDialog::show
@@ -232,22 +231,40 @@ private fun RowScope.NumberTimesItem(
 @Composable
 private fun PieceItem(
     pieceName: String,
+    pieces: List<Piece>,
     sections: List<Section>,
-    stateSections: Map<Section, ToggleableState>,
-    selectSection: (Section) -> Unit
+    selectedPiece: Boolean,
+    selectedSections: List<Section>,
+    modifier: Modifier,
+    actioner: (PracticeDetailsActions) -> Unit
 ) {
 
     val widthSections = remember { mutableStateMapOf(0 to X_LEVEL_1) }
 
     Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.Bottom,
-        modifier = Modifier.padding(top = 8.dp)
+        modifier = modifier.fillMaxWidth()
     ) {
-        IconMusicNote(color = DarkRed)
-        Text(pieceName, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = DarkRed)
+        Row(
+            verticalAlignment = Alignment.Bottom,
+            modifier = Modifier.padding(top = 8.dp)
+        ) {
+            IconMusicNote(color = DarkRed)
+            PieceText(pieceName, pieces) { actioner(PracticeDetailsActions.ChangePiece(it)) }
+
+        }
+        Checkbox(
+            checked = selectedPiece,
+            onCheckedChange = { actioner(PracticeDetailsActions.SelectPiece) },
+            colors = CheckboxDefaults.colors(
+                checkedColor = DarkRed,
+                uncheckedColor = LightPurple1
+            )
+        )
     }
 
-    Box(modifier = Modifier.size(16.dp)) {
+    Box(modifier = modifier.size(16.dp)) {
         Canvas(
             modifier = Modifier.fillMaxSize(),
             onDraw = {
@@ -259,23 +276,47 @@ private fun PieceItem(
         )
     }
 
-    sections.forEach {
+    sections.forEach { section ->
         SectionItem(
-            section = it,
+            section = section,
             sections = sections,
-            state = stateSections.getOrDefault(it, ToggleableState.Off),
+            selected = selectedSections.contains(section),
             widthSections = widthSections,
-            selectSection = selectSection
+            modifier = modifier,
+        ) { actioner(PracticeDetailsActions.SelectSection(it)) }
+    }
+}
+
+@Composable
+private fun PieceText(
+    pieceName: String,
+    pieces: List<Piece>,
+    changePiece: (Piece) -> Unit
+) {
+    val listDialog = remember { MaterialDialog() }.apply {
+        BuiltListDialog(
+            title = stringResource(R.string.practice_alert_list_pieces),
+            list = pieces.map { it.name },
+            callback = { index -> changePiece(pieces.getOrElse(index) { Piece() }) }
         )
     }
+
+    Text(
+        text = pieceName,
+        fontSize = 16.sp,
+        fontWeight = FontWeight.Bold,
+        color = DarkRed,
+        modifier = Modifier.clickable(onClick = listDialog::show)
+    )
 }
 
 @Composable
 private fun SectionItem(
     section: Section,
     sections: List<Section>,
-    state: ToggleableState,
+    selected: Boolean,
     widthSections: SnapshotStateMap<Int, Float>,
+    modifier: Modifier,
     selectSection: (Section) -> Unit
 ) {
     val hasChildren = sections.hasChildren(section)
@@ -284,9 +325,14 @@ private fun SectionItem(
 
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(if (selected) DarkRed.copy(0.3f) else Color.Transparent)
     ) {
-        Row {
+        Row(
+            verticalAlignment = CenterVertically,
+            modifier = modifier
+        ) {
             Box(modifier = Modifier.size(width = width.dp, height = 32.dp)) {
                 Canvas(
                     modifier = Modifier.fillMaxSize(),
@@ -300,30 +346,38 @@ private fun SectionItem(
                 )
             }
 
-            TextSections(section, hasChildren)
+            TextSection(
+                section = section,
+                highlight = hasChildren || selected
+            ) { selectSection(section) }
         }
-        TriStateCheckbox(
-            state = state,
-            onClick = { selectSection(section) },
+        Checkbox(
+            checked = selected,
+            onCheckedChange = { selectSection(section) },
             colors = CheckboxDefaults.colors(
-                checkedColor = DarkRed,
+                checkedColor = LightPurple1,
                 uncheckedColor = LightPurple1
-            )
+            ),
+            modifier = modifier
         )
     }
 }
 
 @Composable
-private fun TextSections(
+private fun RowScope.TextSection(
     section: Section,
-    hasChildren: Boolean
+    highlight: Boolean,
+    onClick: (Section) -> Unit
 ) {
     Text(
         text = section.name,
         fontSize = 14.sp,
         fontWeight = FontWeight.Medium,
-        color = if (hasChildren) WhitePurple else LightPurple1,
-        modifier = Modifier.padding(start = 8.dp)
+        color = if (highlight) WhitePurple else LightPurple1,
+        modifier = Modifier
+            .padding(start = 8.dp)
+            .align(CenterVertically)
+            .clickable { onClick(section) }
     )
 }
 
@@ -332,20 +386,23 @@ private fun DrawScope.drawVerticalLines(
     sections: List<Section>,
     widthSections: SnapshotStateMap<Int, Float>,
 ) {
-    val yHorizontalLine = size.height / 3
+    val yHorizontalLine = size.height / 2
 
     var cSection: Section? = section
     while (cSection != null) {
         val level = cSection.getLevel(sections)
+        val hasNext = sections.hasNext(cSection)
         val firstSection = cSection.order == 1
         val x = widthSections.getOrDefault(level, 0f)
         val yStart = if (firstSection || sections.hasPrev(cSection)) 0f else yHorizontalLine
-        val yEnd = if (sections.hasNext(cSection)) size.height else yHorizontalLine
+        val yEnd = if (hasNext) size.height else yHorizontalLine
 
-        drawLine(
-            start = Offset(x, yStart),
-            end = Offset(x, yEnd),
-        )
+        if (section == cSection || hasNext) {
+            drawLine(
+                start = Offset(x, yStart),
+                end = Offset(x, yEnd),
+            )
+        }
 
         cSection = sections.getParent(cSection)
     }
@@ -363,7 +420,7 @@ private fun DrawScope.drawHorizontalLines(
     hasChildren: Boolean,
     widthSections: SnapshotStateMap<Int, Float>,
 ) {
-    val yHorizontalLine = size.height / 3
+    val yHorizontalLine = size.height / 2
     val x = widthSections.getOrDefault(level, 0f)
     drawLine(
         start = Offset(x, yHorizontalLine),
@@ -399,71 +456,29 @@ private fun DrawScope.drawCircle(
     )
 }
 
-@Composable
-private fun PieceItem(
-    pieceName: String,
-    pieces: List<Piece>,
-    changePiece: (Piece) -> Unit
-) {
-    val listDialog = remember { MaterialDialog() }.apply {
-        BuiltListDialog(
-            title = stringResource(R.string.practice_alert_list_pieces),
-            list = pieces.map { it.name },
-            callback = { index -> changePiece(pieces.getOrElse(index) { Piece() }) }
-        )
-    }
-
-    SetItemDefault(
-        title = stringResource(R.string.practice_title_piece),
-        value = pieceName,
-        onClick = listDialog::show
-    )
-}
-
-@Composable
-private fun SectionItem(
-    title: String,
-    sectionName: String,
-    enabled: Boolean,
-    sections: List<Section>,
-    changeSection: (Section) -> Unit
-) {
-    val listDialog = remember { MaterialDialog() }.apply {
-        BuiltListDialog(
-            title = stringResource(R.string.practice_alert_list_sections),
-            list = sections.map { it.name },
-            callback = { index -> changeSection(sections.getOrElse(index) { Section() }) }
-        )
-    }
-    SetItemWithClear(
-        title = title,
-        value = sectionName,
-        enabled = enabled,
-        showClear = sectionName.isNotEmpty(),
-        onClickClear = { changeSection(Section()) },
-        onClick = listDialog::show
-    )
-}
-
 @Preview
 @Composable
 fun PracticeDetailsUiPreview() {
+
+    val allSections = listOf(
+        Section(id = 1, name = "Intro", order = 1),
+        Section(id = 2, name = "Verse 1", order = 2),
+        Section(id = 3, name = "Part I", parentId = 2, order = 1),
+        Section(id = 4, name = "Part II", parentId = 2, order = 2),
+        Section(id = 5, name = "1", parentId = 4, order = 1),
+        Section(id = 6, name = "2", parentId = 4, order = 2),
+        Section(id = 7, name = "Part III", parentId = 2, order = 3),
+//        Section(id = 8, name = "Verse 2", order = 3),
+    )
+
     val viewState = PracticeDetailsViewState(
         practiceItem = PracticeWithPieceAndSections(
             practice = Practice(id = 1, pieceId = 1, date = LocalDate.now()),
             piece = Piece(id = 1, name = "I just want you"),
             stateStudy = StateStudy(id = 1, name = "In tempo", considerTempo = true),
         ),
-        allSections = listOf(
-            Section(id = 1, name = "Intro", order = 1),
-            Section(id = 2, name = "Verse 1", order = 2),
-            Section(id = 3, name = "Part I", parentId = 2, order = 1),
-            Section(id = 4, name = "Part II", parentId = 2, order = 2),
-            Section(id = 5, name = "1", parentId = 4, order = 1),
-            Section(id = 6, name = "2", parentId = 4, order = 2),
-            Section(id = 7, name = "Part III", parentId = 2, order = 3),
-            Section(id = 8, name = "Verse 2", order = 3),
-        )
+        allSections = allSections,
+        selectedSections = allSections.filter { it.id == 6L }
     )
     LazyMusicianshipTheme {
         PracticeDetailsUi(

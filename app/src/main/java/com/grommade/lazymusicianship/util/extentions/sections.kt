@@ -8,14 +8,23 @@ fun List<Section>.hasNext(section: Section) =
 fun List<Section>.hasPrev(section: Section) =
     any { sameLevel(it, section) && it.order < section.order }
 
-private fun List<Section>.sameLevel(s1: Section, s2: Section) =
-    s1.getLevel(this) == s2.getLevel(this)
+private fun sameLevel(s1: Section, s2: Section) =
+    s1.parentId == s2.parentId
+
+fun List<Section>.sameLevel(): Boolean {
+    if (isEmpty()) {
+        return true
+    }
+    val parentId = first().parentId
+    return all { it.parentId == parentId }
+}
 
 fun List<Section>.hasChildren(section: Section) =
     any { it.parentId == section.id }
 
 fun List<Section>.children(section: Section) =
     filter { it.parentId == section.id }
+
 
 fun List<Section>.getParent(section: Section) =
     find { it.id == section.parentId }

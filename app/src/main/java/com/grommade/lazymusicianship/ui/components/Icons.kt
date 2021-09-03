@@ -103,7 +103,7 @@ fun SaveIcon(
         Icon(
             imageVector = Icons.Filled.Save,
             contentDescription = stringResource(R.string.cd_save_icon),
-            tint = DarkYellow
+            tint = if (enabled) DarkYellow else DarkYellow.copy(alpha = 0.3f)
         )
     }
 }
