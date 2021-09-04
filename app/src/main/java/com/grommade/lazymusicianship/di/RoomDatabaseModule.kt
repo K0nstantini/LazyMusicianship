@@ -30,9 +30,49 @@ object RoomDatabaseModule {
         settingsDaoProvide: Provider<SettingsDao>,
     ): AppDataBase {
 
-        val MIGRATION_2_3 = object : Migration(2, 3) {
+        val MIGRATION_3_4 = object : Migration(3, 4) {
             override fun migrate(database: SupportSQLiteDatabase) {
-                database.execSQL("ALTER TABLE piece_table ADD COLUMN finished INTEGER DEFAULT 0 NOT NULL")
+
+                // Create the new table
+                database.execSQL(
+                    """
+                        CREATE TABLE practice_table_new (
+                            practice_id INTEGER PRIMARY KEY AUTOINCREMENT DEFAULT 0 NOT NULL,
+                            practice_piece_id INTEGER DEFAULT 0 NOT NULL,
+                            practice_section_id_from INTEGER DEFAULT 0 NOT NULL,
+                            practice_section_id_to INTEGER DEFAULT 0 NOT NULL,
+                            practice_state_id INTEGER DEFAULT 0 NOT NULL,
+                            date INTEGER DEFAULT 0 NOT NULL,
+                            elapsedTime INTEGER DEFAULT 0 NOT NULL,
+                            practice_tempo INTEGER DEFAULT 0 NOT NULL,
+                            countTimes INTEGER DEFAULT 0 NOT NULL
+                        )
+                        """
+                )
+
+                // Copy the data
+                database.execSQL(
+                    """
+                        INSERT INTO practice_table_new
+                        SELECT
+                            practice_id,
+                            practice_piece_id,
+                            practice_section_id_from,
+                            practice_section_id_to,
+                            practice_state_id,
+                            date,
+                            elapsedTime,
+                            practice_tempo,
+                            countTimes
+                        FROM practice_table
+                        """
+                )
+
+                // Remove the old table
+                database.execSQL("DROP TABLE practice_table")
+
+                // Change the table name to the correct one
+                database.execSQL("ALTER TABLE practice_table_new RENAME TO practice_table")
             }
         }
 
@@ -42,7 +82,7 @@ object RoomDatabaseModule {
             "lazy_musicianship_2021"
 
         )
-            .addMigrations(MIGRATION_2_3)
+            .addMigrations(MIGRATION_3_4)
 //            .fallbackToDestructiveMigration()
             .addCallback(
                 object : RoomDatabase.Callback() {

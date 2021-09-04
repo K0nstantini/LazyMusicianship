@@ -18,5 +18,4 @@ data class Practice(
     val elapsedTime: Int = 0,
     @ColumnInfo(name = "practice_tempo") val tempo: Int = 0,
     val countTimes: Int = 0,
-    val successful: Boolean = true, // todo: del
 ) : AppEntity
