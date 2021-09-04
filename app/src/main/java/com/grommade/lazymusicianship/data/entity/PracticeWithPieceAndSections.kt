@@ -18,4 +18,6 @@ data class PracticeWithPieceAndSections(
 
     @Relation(parentColumn = "practice_section_id_to", entityColumn = "section_id", entity = Section::class)
     val sectionTo: Section? = null,
+
+//    val sections: List<Section> = emptyList()
 )

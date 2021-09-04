@@ -12,7 +12,7 @@ class ObservePiecesInStudying @Inject constructor(
 ) : ObserveUserCase<Unit, List<Piece>>() {
 
     override fun createObservable(params: Unit): Flow<List<Piece>> {
-        return repoPractice.getPracticesItemsFlow()
+        return repoPractice.practicesItemsFlow()
             .map { practices ->
                 practices.map { it.piece }.distinct()
             }

@@ -21,6 +21,9 @@ data class Section(
     @ColumnInfo(name = "section_description") val description: String = "",
 ) : AppEntity, Parcelable {
 
+    val isChild: Boolean
+        get() = parentId > 0
+
     fun getLevel(sections: List<Section>) = generateSequence(this) { section ->
         sections.find { it.id == section.parentId }
     }.count() - 1
@@ -34,9 +37,9 @@ data class Section(
         return allChildren
     }
 
-    fun hierarchicalSort(tasks: List<Section>): String {
-        return generateSequence(this) { task ->
-            tasks.find { it.id == task.parentId }
+    fun hierarchicalSort(sections: List<Section>): String {
+        return generateSequence(this) { section ->
+            sections.find { it.id == section.parentId }
         }.toList().reversed().joinToString { "${it.order}:" + it.id }
     }
 

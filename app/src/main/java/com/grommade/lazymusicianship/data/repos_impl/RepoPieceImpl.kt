@@ -20,6 +20,10 @@ class RepoPieceImpl @Inject constructor(
     private val dispatchers: AppCoroutineDispatchers
 ) : RepoPiece {
 
+    override fun getPiecesFlow() = pieceDao.getPiecesFlow()
+
+    override fun getPiecesWithRecentnessFlow() = pieceDao.getPiecesWithRecentnessFlow()
+
     override suspend fun save(piece: Piece): Long = withContext(dispatchers.io) {
         pieceDao.insertOrUpdate(piece)
     }
@@ -46,8 +50,4 @@ class RepoPieceImpl @Inject constructor(
     override suspend fun getPiece(id: Long) = withContext(dispatchers.io) {
         pieceDao.getPiece(id)
     }
-
-    override fun getPiecesFlow() = pieceDao.getPiecesFlow()
-
-    override fun getPiecesWithRecentnessFlow() = pieceDao.getPiecesWithRecentnessFlow()
 }

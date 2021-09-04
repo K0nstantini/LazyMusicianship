@@ -62,12 +62,12 @@
     <string name="main_menu_states">States</string>
     <string name="main_menu_settings">Settings</string>
 
-    <!--    Practice-->
-    <string name="practice_value_section">"Section: %s"</string>
-    <string name="practice_value_sections">"Sections: %s - %s"</string>
-    <string name="practice_value_state">"State: %s"</string>
-    <string name="practice_value_tempo">"Tempo: %s"</string>
-    <string name="practice_value_count_times">"Times: %s"</string>
+    <!--    ================================ Practice List ==================================================== -->
+
+    <string name="practice_date_today">"Today"</string>
+    <string name="practice_date_yesterday">"Yesterday"</string>
+    <string name="practice_tempo">%s bpm</string>
+    <string name="practice_count_times">%s times</string>
 
     <!--    Practice details-->
     <string name="practice_title_date">Date</string>

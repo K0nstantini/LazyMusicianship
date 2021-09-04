@@ -404,7 +404,7 @@ private fun DrawScope.drawVerticalLines(
             )
         }
 
-        cSection = sections.getParent(cSection)
+        cSection = sections.parent(cSection)
     }
 
     if (sections.hasChildren(section)) {

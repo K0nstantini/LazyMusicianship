@@ -26,5 +26,8 @@ fun List<Section>.children(section: Section) =
     filter { it.parentId == section.id }
 
 
-fun List<Section>.getParent(section: Section) =
+fun List<Section>.parent(section: Section) =
     find { it.id == section.parentId }
+
+fun List<Section>.parents(section: Section) =
+    generateSequence(section) { s -> find { it.id == s.parentId } }.toList().reversed()

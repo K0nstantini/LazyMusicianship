@@ -13,7 +13,9 @@ class RepoPracticeImpl @Inject constructor(
     private val dispatchers: AppCoroutineDispatchers
 ) : RepoPractice {
 
-    override fun getPracticesItemsFlow() = practiceDao.getPracticesItemsFlow()
+    override fun practiceWithDetailsFlow() = practiceDao.practiceWithDetailsFlow()
+
+    override fun practicesItemsFlow() = practiceDao.getPracticesItemsFlow()
 
     override fun getTimesByDaysFlow(startDate: LocalDate, endDate: LocalDate) =
         practiceDao.getTimesByDaysFlow(startDate, endDate)

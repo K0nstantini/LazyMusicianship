@@ -67,6 +67,8 @@ fun LocalDate.sameYear(date: LocalDate) = date.year == year
 
 fun LocalDate.isToday() = sameDay(LocalDate.now())
 
+fun LocalDate.isYesterday() = sameDay(LocalDate.now().minusDays(1))
+
 fun LocalDate.thisMonth() = sameMonth(LocalDate.now())
 
 fun LocalDate.isEmpty() = when {
