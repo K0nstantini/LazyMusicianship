@@ -76,6 +76,7 @@
     <string name="practice_title_successful">Successful</string>
     <string name="practice_title_tempo">Beat</string>
     <string name="practice_title_number_times">Number times</string>
+    <string name="practice_new_piece">Select piece</string>
 
     <string name="practice_alert_list_pieces">Pieces</string>
     <string name="practice_alert_list_sections">Sections</string>
@@ -132,6 +133,9 @@
 
     <string name="calendar_positive_button">Set Date</string>
     <string name="calendar_negative_button">Cancel</string>
+
+    <!--    App Bar-->
+    <string name="top_bar_save_close_new">"New *   "</string>
 
     <!--    ================================================================================================ -->
 

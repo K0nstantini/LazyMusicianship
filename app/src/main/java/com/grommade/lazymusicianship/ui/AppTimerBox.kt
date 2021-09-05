@@ -27,6 +27,7 @@ import com.grommade.lazymusicianship.ui.components.SetValueBox
 import com.grommade.lazymusicianship.ui.components.material_dialogs.core.MaterialDialog
 import com.grommade.lazymusicianship.ui.theme.DarkRed
 import com.grommade.lazymusicianship.ui.theme.LightPurple1
+import com.grommade.lazymusicianship.ui.theme.LightPurple2
 import com.grommade.lazymusicianship.util.extentions.milliToMinutes
 import com.grommade.lazymusicianship.util.extentions.minutesToMilli
 import com.grommade.lazymusicianship.util.extentions.minutesToStrTime
@@ -47,18 +48,14 @@ fun AppTimerBox(
 
     val scope = rememberCoroutineScope()
 
-    val changeMilli: (Long) -> Unit = {milli ->
+    val changeMilli: (Long) -> Unit = { milli ->
         changeTime(milli.milliToMinutes())
     }
 
-    val iconStartStop = when (timerRunning) {
-        true -> Icons.Default.PauseCircleFilled
-        false -> Icons.Default.PlayCircleFilled
-    }
-
-    val colorRestore = when (timerRunning) {
-        true -> LightPurple1.copy(alpha = 0.3f)
-        false -> LightPurple1
+    val (iconStartStop, colorStartStop, colorRestore) = if (timerRunning) {
+        Triple(Icons.Default.PauseCircleFilled, DarkRed, LightPurple1.copy(alpha = 0.3f))
+    } else {
+        Triple(Icons.Default.PlayCircleFilled, LightPurple2, LightPurple1)
     }
 
     SetValueBox(modifier = modifier) {
@@ -101,7 +98,7 @@ fun AppTimerBox(
                 Icon(
                     imageVector = iconStartStop,
                     contentDescription = stringResource(R.string.cd_play_icon),
-                    tint = DarkRed,
+                    tint = colorStartStop,
                 )
             }
         }

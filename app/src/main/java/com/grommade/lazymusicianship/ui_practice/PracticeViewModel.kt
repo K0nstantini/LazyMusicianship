@@ -3,6 +3,7 @@ package com.grommade.lazymusicianship.ui_practice
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grommade.lazymusicianship.data.entity.Practice
+import com.grommade.lazymusicianship.domain.observers.ObservePieces
 import com.grommade.lazymusicianship.domain.observers.ObservePracticesWithDetails
 import com.grommade.lazymusicianship.domain.use_cases.DeletePractice
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,6 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 class PracticeViewModel @Inject constructor(
     observePractices: ObservePracticesWithDetails,
+    observePieces: ObservePieces,
     private val deletePractice: DeletePractice,
 ) : ViewModel() {
 
@@ -25,16 +27,19 @@ class PracticeViewModel @Inject constructor(
 
     val state = combine(
         observePractices.observe(),
+        observePieces.observe(),
         selectedPractice,
-    ) { practices, selected ->
+    ) { practices, pieces, selected ->
         PracticeViewState(
             practices = practices,
+            allPieces = pieces,
             selected = selected,
         )
     }
 
     init {
         observePractices(Unit)
+        observePieces(Unit)
 
         viewModelScope.launch {
             pendingActions.collect { action ->

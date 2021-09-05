@@ -101,6 +101,7 @@ fun PieceUi(
     Scaffold(
         topBar = {
             SaveCloseTopBar(
+                new = viewState.piece.isNew,
                 saveEnabled = viewState.piece.name.isNotEmpty(),
                 save = { actioner(PieceActions.SaveAndClose) },
                 close = { actioner(PieceActions.Close) }

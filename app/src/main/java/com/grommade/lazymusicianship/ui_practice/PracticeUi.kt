@@ -57,6 +57,15 @@ private fun PracticeUi(
     viewState: PracticeViewState,
     actioner: (PracticeActions) -> Unit
 ) {
+
+    /* val piecesDialog = remember { MaterialDialog() }.apply {
+         BuiltListDialog(
+             title = stringResource(R.string.practice_alert_list_pieces),
+             list = viewState.allPieces.map { it.name },
+             callback = { actioner(PracticeActions.AddNew(viewState.allPieces.getOrElse(it) { Piece() })) }
+         )
+     }*/
+
     Scaffold(
         floatingActionButton = { FloatingAddActionButton { actioner(PracticeActions.AddNew) } },
         modifier = Modifier.fillMaxSize()

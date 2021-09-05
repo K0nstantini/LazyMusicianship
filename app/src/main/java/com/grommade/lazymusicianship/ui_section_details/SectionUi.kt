@@ -62,6 +62,7 @@ fun SectionUi(
     Scaffold(
         topBar = {
             SaveCloseTopBar(
+                new = viewState.section.isNew,
                 saveEnabled = viewState.section.name.isNotEmpty(),
                 save = { actioner(SectionActions.SaveAndClose) },
                 close = { actioner(SectionActions.Close) }

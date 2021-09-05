@@ -6,5 +6,6 @@ sealed class PracticeActions {
     data class Select(val id: Long) : PracticeActions()
     data class Open(val id: Long) : PracticeActions()
     data class Delete(val practice: Practice) : PracticeActions()
+    //    data class AddNew(val piece: Piece) : PracticeActions()
     object AddNew : PracticeActions()
 }

@@ -78,6 +78,7 @@ private fun PracticeDetailsUi(
     Scaffold(
         topBar = {
             SaveCloseTopBar(
+                new = viewState.practiceItem.practice.isNew,
                 saveEnabled = viewState.saveEnabled,
                 save = { actioner(PracticeDetailsActions.SaveAndClose) },
                 close = { actioner(PracticeDetailsActions.Close) }
@@ -114,7 +115,7 @@ private fun PracticeDetailsUi(
             }
 
             PieceItem(
-                pieceName = viewState.practiceItem.piece.name,
+                pieceView = PieceView(viewState.practiceItem.piece),
                 pieces = viewState.allPieces,
                 sections = viewState.allSections,
                 selectedPiece = viewState.selectedPiece,
@@ -123,14 +124,6 @@ private fun PracticeDetailsUi(
                 actioner = actioner
             )
         }
-
-/*Column {
-    PieceItem(
-        pieceName = viewState.practiceItem.piece.name,
-        pieces = viewState.allPieces,
-        changePiece = { piece -> actioner(PracticeDetailsActions.ChangePiece(piece)) }
-    )
-}*/
     }
 }
 
@@ -230,7 +223,7 @@ private fun RowScope.NumberTimesItem(
 
 @Composable
 private fun PieceItem(
-    pieceName: String,
+    pieceView: PieceView,
     pieces: List<Piece>,
     sections: List<Section>,
     selectedPiece: Boolean,
@@ -250,30 +243,34 @@ private fun PieceItem(
             verticalAlignment = Alignment.Bottom,
             modifier = Modifier.padding(top = 8.dp)
         ) {
-            IconMusicNote(color = DarkRed)
-            PieceText(pieceName, pieces) { actioner(PracticeDetailsActions.ChangePiece(it)) }
+            IconMusicNote(color = pieceView.color)
+            PieceText(pieceView, pieces) { actioner(PracticeDetailsActions.ChangePiece(it)) }
 
         }
-        Checkbox(
-            checked = selectedPiece,
-            onCheckedChange = { actioner(PracticeDetailsActions.SelectPiece) },
-            colors = CheckboxDefaults.colors(
-                checkedColor = DarkRed,
-                uncheckedColor = LightPurple1
+        if (!pieceView.piece.isNew) {
+            Checkbox(
+                checked = selectedPiece,
+                onCheckedChange = { actioner(PracticeDetailsActions.SelectPiece) },
+                colors = CheckboxDefaults.colors(
+                    checkedColor = DarkRed,
+                    uncheckedColor = LightPurple1
+                )
             )
-        )
+        }
     }
 
-    Box(modifier = modifier.size(16.dp)) {
-        Canvas(
-            modifier = Modifier.fillMaxSize(),
-            onDraw = {
-                drawLine(
-                    start = Offset(X_LEVEL_1, 0f),
-                    end = Offset(X_LEVEL_1, size.height),
-                )
-            }
-        )
+    if (!pieceView.piece.isNew) {
+        Box(modifier = modifier.size(16.dp)) {
+            Canvas(
+                modifier = Modifier.fillMaxSize(),
+                onDraw = {
+                    drawLine(
+                        start = Offset(X_LEVEL_1, 0f),
+                        end = Offset(X_LEVEL_1, size.height),
+                    )
+                }
+            )
+        }
     }
 
     sections.forEach { section ->
@@ -289,7 +286,7 @@ private fun PieceItem(
 
 @Composable
 private fun PieceText(
-    pieceName: String,
+    pieceView: PieceView,
     pieces: List<Piece>,
     changePiece: (Piece) -> Unit
 ) {
@@ -302,10 +299,10 @@ private fun PieceText(
     }
 
     Text(
-        text = pieceName,
+        text = pieceView.name(),
         fontSize = 16.sp,
         fontWeight = FontWeight.Bold,
-        color = DarkRed,
+        color = pieceView.color,
         modifier = Modifier.clickable(onClick = listDialog::show)
     )
 }
@@ -454,6 +451,14 @@ private fun DrawScope.drawCircle(
         radius = 5f,
         color = if (hasChildren) DarkRed else DarkPurple2,
     )
+}
+
+@Immutable
+private data class PieceView(val piece: Piece) {
+    val color = if (piece.isNew) LightPurple1 else DarkRed
+
+    @Composable
+    fun name() = if (piece.isNew) stringResource(R.string.practice_new_piece) else piece.name
 }
 
 @Preview

@@ -59,6 +59,7 @@ fun StateDetailsUi(
     Scaffold(
         topBar = {
             SaveCloseTopBar(
+                new = viewState.stateStudy.isNew,
                 saveEnabled = viewState.stateStudy.name.isNotEmpty(),
                 save = { actioner(StateDetailsActions.SaveAndClose) },
                 close = { actioner(StateDetailsActions.Close) }
