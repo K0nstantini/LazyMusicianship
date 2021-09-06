@@ -10,6 +10,7 @@ import java.time.LocalDate
 interface RepoPractice {
     suspend fun save(practice: Practice): Long
     suspend fun delete(practice: Practice)
+    suspend fun deleteAll()
     suspend fun getPracticeItem(id: Long): PracticeWithPieceAndSections?
     fun practiceWithDetailsFlow(): Flow<List<PracticeWithDetails>>
     fun practicesItemsFlow(): Flow<List<PracticeWithPieceAndSections>>

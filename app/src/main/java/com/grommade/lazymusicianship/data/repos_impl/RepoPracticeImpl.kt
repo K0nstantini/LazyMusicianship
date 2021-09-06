@@ -28,6 +28,10 @@ class RepoPracticeImpl @Inject constructor(
         practiceDao.delete(practice)
     }
 
+    override suspend fun deleteAll() = withContext(dispatchers.io) {
+        practiceDao.deleteAll()
+    }
+
     override suspend fun getPracticeItem(id: Long) = withContext(dispatchers.io) {
         practiceDao.getPracticeItem(id)
     }

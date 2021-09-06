@@ -37,6 +37,10 @@ class RepoSectionImpl @Inject constructor(
         }
     }
 
+    override suspend fun deleteAll() = withContext(dispatchers.io) {
+        sectionDao.deleteAll()
+    }
+
     override suspend fun getSection(id: Long) = withContext(dispatchers.io) {
         sectionDao.getSection(id)
     }

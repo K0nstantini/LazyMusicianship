@@ -4,6 +4,8 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Checkbox
 import androidx.compose.material.CheckboxDefaults
 import androidx.compose.material.Text
@@ -273,15 +275,18 @@ private fun PieceItem(
         }
     }
 
-    sections.forEach { section ->
-        SectionItem(
-            section = section,
-            sections = sections,
-            selected = selectedSections.contains(section),
-            widthSections = widthSections,
-            modifier = modifier,
-        ) { actioner(PracticeDetailsActions.SelectSection(it)) }
+    LazyColumn {
+        items(sections, key = { it.id }) { section ->
+            SectionItem(
+                section = section,
+                sections = sections,
+                selected = selectedSections.contains(section),
+                widthSections = widthSections,
+                modifier = modifier,
+            ) { actioner(PracticeDetailsActions.SelectSection(it)) }
+        }
     }
+
 }
 
 @Composable

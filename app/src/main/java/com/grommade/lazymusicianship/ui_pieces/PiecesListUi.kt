@@ -35,7 +35,7 @@ import com.grommade.lazymusicianship.util.extentions.diffDays
 import com.grommade.lazymusicianship.util.extentions.isEmpty
 import java.time.LocalDate
 
-private const val Debug = false // fixme
+private const val Debug = true // fixme
 
 @Composable
 fun PiecesListUi(openPiece: (Long) -> Unit) {

@@ -32,6 +32,10 @@ class RepoStateStudyImpl @Inject constructor(
 
     }
 
+    override suspend fun deleteAll() = withContext(dispatchers.io) {
+        stateStudyDao.deleteALl()
+    }
+
     override suspend fun getState(id: Long) = withContext(dispatchers.io) {
         stateStudyDao.getState(id)
     }

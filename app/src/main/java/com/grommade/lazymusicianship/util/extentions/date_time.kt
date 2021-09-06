@@ -13,7 +13,7 @@ import kotlin.math.abs
 import kotlin.math.roundToInt
 
 fun String.toTime() =
-    dropLast(3).toInt() * 60 + this.drop(3).toInt()
+    dropLast(3).toInt() * 60 + drop(3).toInt()
 
 fun Int.minutesToStrTime(): String {
     return (this / MINUTES_IN_HOUR).toString().padStart(2, '0') + ':' +

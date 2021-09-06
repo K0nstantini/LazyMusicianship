@@ -12,6 +12,9 @@ import java.time.LocalDate
 @Dao
 abstract class PracticeDao : EntityDao<Practice>() {
 
+    @Query("DELETE FROM practice_table")
+    abstract suspend fun deleteAll()
+
     @Transaction
     @Query("SELECT * FROM practice_table WHERE practice_id = :id")
     abstract suspend fun getPracticeItem(id: Long): PracticeWithPieceAndSections?
@@ -36,16 +39,6 @@ abstract class PracticeDao : EntityDao<Practice>() {
     @Query("SELECT * FROM practice_table ORDER BY date DESC, practice_id DESC")
     abstract fun practiceWithDetailsFlow(): Flow<List<PracticeWithDetails>>
 
-//    @Transaction
-//    @Query("""
-//        SELECT practice.*, section.*
-//        FROM practice_table as practice
-//        LEFT JOIN section_table as section
-//        ON practice.practice_piece_id = section.section_piece_id
-//        ORDER BY practice.date DESC, practice.practice_id DESC
-//        """
-//    )
-//    abstract fun getPracticesItemsFlow(): Flow<List<PracticeWithPieceAndSections>>
 
     @Query(
         """
