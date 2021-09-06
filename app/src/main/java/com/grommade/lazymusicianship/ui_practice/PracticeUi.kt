@@ -4,7 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -79,9 +79,8 @@ private fun PracticeUi(
                 .fillMaxSize()
                 .padding(top = 16.dp),
         ) {
-            items(viewState.practices, key = { it.practice.id }) {
-
-                if (lastDate != it.practice.date) {
+            itemsIndexed(viewState.practices, key = { _, it -> it.practice.id }) { ind, it ->
+                if (lastDate != it.practice.date || ind == 0) {
                     DateLine(it.practice.date)
                 } else {
                     Divider(color = DarkPurple2.copy(0.5f))
