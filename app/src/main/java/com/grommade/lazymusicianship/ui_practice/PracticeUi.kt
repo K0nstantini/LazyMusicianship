@@ -7,7 +7,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Divider
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -71,8 +73,6 @@ private fun PracticeUi(
         modifier = Modifier.fillMaxSize()
     ) { paddingValues ->
 
-        var lastDate by remember { mutableStateOf<LocalDate?>(null) }
-
         LazyColumn(
             contentPadding = paddingValues,
             modifier = Modifier
@@ -80,12 +80,12 @@ private fun PracticeUi(
                 .padding(top = 16.dp),
         ) {
             itemsIndexed(viewState.practices, key = { _, it -> it.practice.id }) { ind, it ->
-                if (lastDate != it.practice.date || ind == 0) {
+                val lastDate = viewState.practices.getOrElse(ind - 1) {LocalDate.MIN}
+                if (lastDate != it.practice.date) {
                     DateLine(it.practice.date)
                 } else {
                     Divider(color = DarkPurple2.copy(0.5f))
                 }
-                lastDate = it.practice.date
 
                 PracticeItem(
                     practiceDetails = it,
