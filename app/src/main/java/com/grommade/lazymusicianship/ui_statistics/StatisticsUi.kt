@@ -117,11 +117,11 @@ fun Header() {
 
 @Composable
 fun Filters(
-    filter: StatisticsFilter,
+    filter: TimeChartSettings,
     actioner: (StatisticsActions) -> Unit
 ) {
     val (dateStart, dateEnd, mode) = filter
-    val changeFilter = { flt: StatisticsFilter ->
+    val changeFilter = { flt: TimeChartSettings ->
         actioner(StatisticsActions.ChangeFilter(flt))
     }
 

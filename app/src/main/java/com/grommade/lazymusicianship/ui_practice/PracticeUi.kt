@@ -80,7 +80,7 @@ private fun PracticeUi(
                 .padding(top = 16.dp),
         ) {
             itemsIndexed(viewState.practices, key = { _, it -> it.practice.id }) { ind, it ->
-                val lastDate = viewState.practices.getOrElse(ind - 1) {LocalDate.MIN}
+                val lastDate = viewState.practices.getOrNull(ind - 1)?.practice?.date ?: { LocalDate.MIN }
                 if (lastDate != it.practice.date) {
                     DateLine(it.practice.date)
                 } else {

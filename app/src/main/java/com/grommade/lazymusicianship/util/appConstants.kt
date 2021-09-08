@@ -8,6 +8,12 @@ object Keys {
     const val PRACTICE_ID = "practiceId"
 }
 
+object AppPreferences {
+    const val DATE_START_TIME_CHART = "DATE_START_TIME_CHART"
+    const val DATE_END_TIME_CHART = "DATE_END_TIME_CHART"
+    const val TIME_MODE_TIME_CHART = "TIME_MODE_TIME_CHART"
+}
+
 const val MONTHS_IN_YEAR = 12
 const val DAYS_OF_WEEK = 7
 const val HOURS_IN_DAY = 24

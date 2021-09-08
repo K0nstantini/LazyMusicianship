@@ -5,6 +5,7 @@ import com.grommade.lazymusicianship.domain.ObserveUserCase
 import com.grommade.lazymusicianship.domain.repos.RepoPractice
 import com.grommade.lazymusicianship.ui.components.timepicker.yearMonth
 import com.grommade.lazymusicianship.ui_statistics.TimeChartMode
+import com.grommade.lazymusicianship.ui_statistics.TimeChartSettings
 import com.grommade.lazymusicianship.util.extentions.sameWeek
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -16,9 +17,9 @@ class ObserveTimesByPeriod @Inject constructor(
 ) : ObserveUserCase<ObserveTimesByPeriod.Params, List<Pair<LocalDate, Int>>>() {
 
     override fun createObservable(params: Params): Flow<List<Pair<LocalDate, Int>>> {
-        return repoPractice.getTimesByDaysFlow(params.startDate, params.endDate).map { values ->
-            val startDate = getDate(values, params.startDate)
-            val endDate = getDate(values, params.endDate)
+        return repoPractice.getTimesByDaysFlow(params.filter.dateStart, params.filter.dateEnd).map { values ->
+            val startDate = getDate(values, params.filter.dateStart)
+            val endDate = getDate(values, params.filter.dateEnd)
             val rangeDates = if (startDate == null || endDate == null) {
                 emptyList()
             } else {
@@ -27,7 +28,7 @@ class ObserveTimesByPeriod @Inject constructor(
             rangeDates.map { date ->
                 val time = values.find { it.date == date }?.time ?: 0
                 Pair(date, time)
-            }.changeByPeriod(params.mode)
+            }.changeByPeriod(params.filter.timeMode)
         }
     }
 
@@ -74,9 +75,5 @@ class ObserveTimesByPeriod @Inject constructor(
         else -> date
     }
 
-    data class Params(
-        val startDate: LocalDate = LocalDate.MIN,
-        val endDate: LocalDate = LocalDate.MAX,
-        val mode: TimeChartMode = TimeChartMode.BY_DAYS
-    )
+    data class Params(val filter: TimeChartSettings)
 }

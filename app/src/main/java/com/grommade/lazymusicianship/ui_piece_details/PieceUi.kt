@@ -195,7 +195,9 @@ fun AuthorAndArrangerFields(
     piece: Piece,
     actioner: (PieceActions) -> Unit,
 ) {
-    val modifier = Modifier.padding(top = 8.dp)
+    val modifier = Modifier
+        .padding(top = 8.dp)
+        .fillMaxWidth()
 
     AppOutlinedTextField(
         text = piece.author,

@@ -4,23 +4,24 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.grommade.lazymusicianship.domain.observers.ObserveStates
 import com.grommade.lazymusicianship.domain.observers.ObserveTimesByPeriod
+import com.grommade.lazymusicianship.domain.use_cases.GetTimeChartSettings
+import com.grommade.lazymusicianship.domain.use_cases.SaveTimeChartSettings
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class StatisticsViewModel @Inject constructor(
     private val observeTimesByPeriod: ObserveTimesByPeriod,
-    observeStates: ObserveStates,
+    private val timeChartSettings: GetTimeChartSettings,
+    private val saveTimeChartSettings: SaveTimeChartSettings,
+    private val observeStates: ObserveStates,
 ) : ViewModel() {
 
     private val pendingActions = MutableSharedFlow<StatisticsActions>()
 
-    private val filter = MutableStateFlow(StatisticsFilter())
+    private val filter = MutableStateFlow(TimeChartSettings())
 
     val state = combine(
         observeTimesByPeriod.observe(),
@@ -41,8 +42,7 @@ class StatisticsViewModel @Inject constructor(
     }
 
     init {
-        observeTimesByPeriod(ObserveTimesByPeriod.Params())
-        observeStates(Unit)
+        initData()
 
         viewModelScope.launch {
             pendingActions.collect { action ->
@@ -55,9 +55,22 @@ class StatisticsViewModel @Inject constructor(
         }
     }
 
-    private fun changeFilter(filter: StatisticsFilter) {
-        observeTimesByPeriod(ObserveTimesByPeriod.Params(filter.dateStart, filter.dateEnd, filter.timeMode))
-        this.filter.value = filter
+    private fun initData() = viewModelScope.launch {
+        timeChartSettings(Unit).first().let {
+            filter.value = it
+            observeTimesByPeriod(ObserveTimesByPeriod.Params(it))
+        }
+        observeStates(Unit)
+    }
+
+    private fun changeFilter(newFilter: TimeChartSettings) {
+        observeTimesByPeriod(ObserveTimesByPeriod.Params(newFilter))
+        filter.value = newFilter
+        saveFilter()
+    }
+
+    private fun saveFilter() = viewModelScope.launch {
+        saveTimeChartSettings(SaveTimeChartSettings.Params(filter.value)).collect()
     }
 
     fun submitAction(action: StatisticsActions) {
