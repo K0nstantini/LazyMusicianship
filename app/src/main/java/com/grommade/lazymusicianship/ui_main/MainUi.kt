@@ -39,7 +39,6 @@ fun MainUi(
             MainActions.OpenStates -> openStates()
             MainActions.OpenSettings -> {
             }
-            else -> viewModel.submitAction(action)
         }
     }
 }
