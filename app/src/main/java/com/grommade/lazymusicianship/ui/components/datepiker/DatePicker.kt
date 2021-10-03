@@ -82,7 +82,6 @@ fun MaterialDialog.datepicker(
 @Composable
 internal fun DatePickerImpl(title: String, state: DatePickerState) {
     val pagerState = rememberPagerState(
-        pageCount = ((state.yearRange.last - state.yearRange.first) + 1) * 12,
         initialPage = (state.selected.year - state.yearRange.first) * 12 + state.selected.monthValue - 1
     )
 
@@ -91,10 +90,14 @@ internal fun DatePickerImpl(title: String, state: DatePickerState) {
         HorizontalPager(
             state = pagerState,
             verticalAlignment = Alignment.Top,
-            flingBehavior = PagerDefaults.defaultPagerFlingConfig(
-                state = pagerState,
-                snapAnimationSpec = spring(stiffness = 1000f)
-            )
+            flingBehavior = PagerDefaults.flingBehavior(
+                state = pagerState
+            ),
+            count = ((state.yearRange.last - state.yearRange.first) + 1) * 12
+//            flingBehavior = PagerDefaults.defaultPagerFlingConfig(
+//                state = pagerState,
+//                snapAnimationSpec = spring(stiffness = 1000f)
+//            )
         ) { page ->
             val viewDate = remember {
                 LocalDate.of(
@@ -113,8 +116,8 @@ internal fun DatePickerImpl(title: String, state: DatePickerState) {
                             .fillMaxSize()
                             .zIndex(0.7f)
                             .clipToBounds(),
-                        enter = slideInVertically({ -it }),
-                        exit = slideOutVertically({ -it })
+                        enter = slideInVertically(animationSpec = spring(stiffness = 1000f), initialOffsetY = { -it }),
+                        exit = slideOutVertically(animationSpec = spring(stiffness = 1000f), targetOffsetY = { -it })
                     ) {
                         YearPicker(viewDate, state, pagerState)
                     }
