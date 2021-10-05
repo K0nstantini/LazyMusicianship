@@ -66,7 +66,7 @@ dependencies {
     implementation("com.google.android.material:material:1.4.0")
     implementation(Dependencies.Compose.ui)
     implementation(Dependencies.Compose.material)
-    implementation(Dependencies.Compose.preview)
+    implementation(Dependencies.Compose.tooling)
     implementation("androidx.activity:activity-compose:1.3.1")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.3")
@@ -95,9 +95,8 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.2-native-mt")
 
     // Room
-    val room_version = "2.4.0-alpha05"
-    implementation("androidx.room:room-ktx:$room_version")
-    kapt("androidx.room:room-compiler:$room_version")
+    implementation(Dependencies.Room.roomKtx)
+    kapt(Dependencies.Room.roomCompiler)
 
     // Timber
     implementation("com.jakewharton.timber:timber:5.0.1")

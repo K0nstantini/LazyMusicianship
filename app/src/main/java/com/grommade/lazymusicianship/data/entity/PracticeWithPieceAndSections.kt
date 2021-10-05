@@ -3,6 +3,7 @@ package com.grommade.lazymusicianship.data.entity
 import androidx.room.Embedded
 import androidx.room.Relation
 
+// TODO: Del?
 data class PracticeWithPieceAndSections(
     @Embedded
     val practice: Practice = Practice(),

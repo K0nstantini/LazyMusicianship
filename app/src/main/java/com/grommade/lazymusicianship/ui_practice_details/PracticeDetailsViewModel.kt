@@ -7,12 +7,11 @@ import com.grommade.lazymusicianship.data.entity.*
 import com.grommade.lazymusicianship.domain.observers.ObservePieces
 import com.grommade.lazymusicianship.domain.observers.ObserveSections
 import com.grommade.lazymusicianship.domain.observers.ObserveStates
-import com.grommade.lazymusicianship.domain.use_cases.GetPractice
+import com.grommade.lazymusicianship.domain.use_cases.GetPracticeWithDetails
 import com.grommade.lazymusicianship.domain.use_cases.SavePractice
 import com.grommade.lazymusicianship.util.Keys
 import com.grommade.lazymusicianship.util.doIfSuccess
 import com.grommade.lazymusicianship.util.extentions.combine
-import com.grommade.lazymusicianship.util.extentions.sameLevel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -22,7 +21,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PracticeDetailsViewModel @Inject constructor(
-    private val getPractice: GetPractice,
+    private val getPractice: GetPracticeWithDetails,
     private val savePractice: SavePractice,
     private val handle: SavedStateHandle,
     observePieces: ObservePieces,
@@ -32,10 +31,10 @@ class PracticeDetailsViewModel @Inject constructor(
 
     private val pendingActions = MutableSharedFlow<PracticeDetailsActions>()
 
-    private val currentPracticeItem = MutableStateFlow(PracticeWithPieceAndSections())
+    private val currentPracticeItem = MutableStateFlow(PracticeWithDetails())
 
     private val allSections = currentPracticeItem.flatMapLatest { pieceItem ->
-        observeSections(ObserveSections.Params(pieceItem.piece.id))
+        observeSections(ObserveSections.Params(pieceItem.pieceWithSections.piece.id))
         observeSections.observe()
     }
 
@@ -86,42 +85,45 @@ class PracticeDetailsViewModel @Inject constructor(
 
     private suspend fun initPractice() {
         val practiceId = handle.get<Long>(Keys.PRACTICE_ID) ?: 0
-        getPractice(GetPractice.Params(practiceId)).first()
+        getPractice(GetPracticeWithDetails.Params(practiceId)).first()
             .doIfSuccess { item ->
                 currentPracticeItem.value = item
-                selectedPiece.value = item.sectionFrom == null
-                if (item.sectionFrom != null && item.sectionTo != null) {
+                selectedPiece.value = item.sections.isEmpty()
+                selectedSections.value = item.sections
+                /*if (item.sectionFrom != null && item.sectionTo != null) {
                     val sections = allSections.first()
                         .filter { it.parentId == item.sectionFrom.parentId }
                         .sortedBy { it.order }
                     selectedSections.value = sections
                         .filter { it.order in item.sectionFrom.order..item.sectionTo.order }
-                }
+                }*/
             }
     }
 
     private fun changePiece(piece: Piece) {
-        changePractice { copy(pieceId = piece.id, sectionIdFrom = 0, sectionIdTo = 0) }
-        changePracticeItem { copy(piece = piece, sectionFrom = null, sectionTo = null) }
+        changePractice { copy(pieceId = piece.id, sections = emptyList()) }
+        changePracticeItem { copy(pieceWithSections = PieceWithSections(piece)) }
     }
 
-    private fun selectSection(section: Section) {
+    private suspend fun selectSection(section: Section) {
         val sections = selectedSections.value
         if (sections.contains(section)) {
             selectedSections.value = when (val remainingSections = sections - section) {
                 emptyList<Section>() -> emptyList()
-                else -> remainingSections.filterSections(remainingSections.first())
+                else -> remainingSections
             }
         } else {
-            selectedSections.value = sections.filterSections(section) + section
+            selectedSections.value = sections + section
             selectedPiece.value = false
         }
-        val sortedSections = selectedSections.value.sortedBy { it.order }
-        if (sortedSections.isEmpty()) {
+        val allSections = allSections.first()
+        val sortedSections = selectedSections.value.sortedBy { it.getLevel(allSections) + it.order }
+        changePractice { copy(sections = sortedSections.map { it.id }) }
+        /*if (sortedSections.isEmpty()) {
             changePractice { copy(sectionIdFrom = 0L, sectionIdTo = 0L) }
         } else {
             changePractice { copy(sectionIdFrom = sortedSections.first().id, sectionIdTo = sortedSections.last().id) }
-        }
+        }*/
     }
 
     private fun List<Section>.filterSections(section: Section): List<Section> {
@@ -149,12 +151,12 @@ class PracticeDetailsViewModel @Inject constructor(
     }
 
     private fun saveEnabled(): Boolean {
-        val filledFields = with(currentPracticeItem.value) { !piece.isNew && !stateStudy.isNew }
+        val filledFields = with(currentPracticeItem.value) { !pieceWithSections.piece.isNew && !stateStudy.isNew }
         val selectedPieceOrSection = selectedSections.value.isNotEmpty() xor selectedPiece.value
-        return filledFields && selectedPieceOrSection && selectedSections.value.sameLevel() // fixme
+        return filledFields && selectedPieceOrSection
     }
 
-    private fun changePracticeItem(foo: PracticeWithPieceAndSections.() -> PracticeWithPieceAndSections) {
+    private fun changePracticeItem(foo: PracticeWithDetails.() -> PracticeWithDetails) {
         currentPracticeItem.value = foo(currentPracticeItem.value)
     }
 

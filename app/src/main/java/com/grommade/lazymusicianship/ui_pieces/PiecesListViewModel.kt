@@ -6,6 +6,7 @@ import com.grommade.lazymusicianship.data.entity.Piece
 import com.grommade.lazymusicianship.domain.observers.ObservePiecesInStudying
 import com.grommade.lazymusicianship.domain.observers.ObservePiecesWithRecentness
 import com.grommade.lazymusicianship.domain.use_cases.DeletePiece
+import com.grommade.lazymusicianship.domain.use_cases.MigrationDB
 import com.grommade.lazymusicianship.domain.use_cases.PopulateDBWithPieces
 import com.grommade.lazymusicianship.ui.common.SnackBarManager
 import com.grommade.lazymusicianship.util.doIfFailure
@@ -20,7 +21,8 @@ class PiecesListViewModel @Inject constructor(
     private val snackBarManager: SnackBarManager,
     observePieces: ObservePiecesWithRecentness,
     observePiecesInStudying: ObservePiecesInStudying,
-    populateDBWithPieces: PopulateDBWithPieces
+    populateDBWithPieces: PopulateDBWithPieces,
+    migrationDB: MigrationDB,
 ) : ViewModel() {
 
     private val pendingActions = MutableSharedFlow<PiecesListActions>()
@@ -51,6 +53,7 @@ class PiecesListViewModel @Inject constructor(
                     is PiecesListActions.SelectPiece -> selectedPiece.value = action.id
                     is PiecesListActions.Delete -> delete(action.piece)
                     PiecesListActions.PopulateDB -> populateDBWithPieces(Unit).collect()
+                    PiecesListActions.Migration -> migrationDB(Unit).collect()
                     PiecesListActions.ClearError -> snackBarManager.removeCurrentError()
                     else -> {
                     }

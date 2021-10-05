@@ -5,21 +5,21 @@ import androidx.room.Relation
 
 data class PracticeWithDetails(
     @Embedded
-    val practice: Practice,
+    val practice: Practice = Practice(),
 
     @Relation(
         parentColumn = "practice_piece_id",
         entityColumn = "piece_id",
         entity = Piece::class
     )
-    val pieceWithSections: PieceWithSections,
+    val pieceWithSections: PieceWithSections = PieceWithSections(),
 
     @Relation(
         parentColumn = "practice_state_id",
         entityColumn = "state_study_id",
         entity = StateStudy::class
     )
-    val stateStudy: StateStudy,
+    val stateStudy: StateStudy = StateStudy(),
 
     ) {
 
@@ -28,4 +28,7 @@ data class PracticeWithDetails(
 
     val sectionTo
         get() = pieceWithSections.sections.find { it.id == practice.sectionIdTo }
+
+    val sections
+        get() = pieceWithSections.sections.filter { practice.sections.contains(it.id) }
 }

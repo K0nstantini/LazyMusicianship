@@ -35,7 +35,7 @@ import com.grommade.lazymusicianship.util.extentions.diffDays
 import com.grommade.lazymusicianship.util.extentions.isEmpty
 import java.time.LocalDate
 
-private const val Debug = false // fixme
+private const val Debug = true // fixme
 
 @Composable
 fun PiecesListUi(openPiece: (Long) -> Unit) {
@@ -70,7 +70,10 @@ fun PiecesListUi(
     Scaffold(
         topBar = {
             if (Debug) {
-                PiecesListTopBar { actioner(PiecesListActions.PopulateDB) }
+                PiecesListTopBar(
+                    populateDB = { actioner(PiecesListActions.PopulateDB) },
+                    migration = { actioner(PiecesListActions.Migration) }
+                )
             }
         },
         modifier = Modifier.fillMaxSize(),
@@ -104,18 +107,24 @@ fun PiecesListUi(
 }
 
 @Composable
-fun PiecesListTopBar(populateDB: () -> Unit) {
+fun PiecesListTopBar(
+    populateDB: () -> Unit,
+    migration: () -> Unit
+) {
     TopAppBar(
         title = { Text(stringResource(R.string.pieces_title)) },
         modifier = Modifier.fillMaxWidth(),
         backgroundColor = MaterialTheme.colors.surface.copy(alpha = 0.97f),
         contentColor = MaterialTheme.colors.onSurface,
-        actions = { PiecesListDropdownMenu(populateDB) }
+        actions = { PiecesListDropdownMenu(populateDB, migration) }
     )
 }
 
 @Composable
-fun PiecesListDropdownMenu(populateDB: () -> Unit) {
+fun PiecesListDropdownMenu(
+    populateDB: () -> Unit,
+    migration: () -> Unit
+) {
     var expanded by remember { mutableStateOf(false) }
 
     Box {
@@ -129,6 +138,12 @@ fun PiecesListDropdownMenu(populateDB: () -> Unit) {
                 populateDB()
             }) {
                 Text("Fill in")
+            }
+            DropdownMenuItem(onClick = {
+                expanded = false
+                migration()
+            }) {
+                Text("Migration")
             }
         }
     }

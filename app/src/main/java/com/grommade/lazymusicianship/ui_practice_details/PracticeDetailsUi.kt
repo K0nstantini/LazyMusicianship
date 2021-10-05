@@ -117,7 +117,7 @@ private fun PracticeDetailsUi(
             }
 
             PieceItem(
-                pieceView = PieceView(viewState.practiceItem.piece),
+                pieceView = PieceView(viewState.practiceItem.pieceWithSections.piece),
                 pieces = viewState.allPieces,
                 sections = viewState.allSections,
                 selectedPiece = viewState.selectedPiece,
@@ -256,7 +256,7 @@ private fun PieceItem(
                 colors = CheckboxDefaults.colors(
                     checkedColor = DarkRed,
                     uncheckedColor = LightPurple1
-                )
+                ),
             )
         }
     }
@@ -482,9 +482,9 @@ fun PracticeDetailsUiPreview() {
     )
 
     val viewState = PracticeDetailsViewState(
-        practiceItem = PracticeWithPieceAndSections(
+        practiceItem = PracticeWithDetails(
             practice = Practice(id = 1, pieceId = 1, date = LocalDate.now()),
-            piece = Piece(id = 1, name = "I just want you"),
+            pieceWithSections = PieceWithSections(Piece(id = 1, name = "I just want you")),
             stateStudy = StateStudy(id = 1, name = "In tempo", considerTempo = true),
         ),
         allSections = allSections,

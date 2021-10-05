@@ -12,7 +12,8 @@ interface RepoPractice {
     suspend fun delete(practice: Practice)
     suspend fun deleteAll()
     suspend fun getPracticeItem(id: Long): PracticeWithPieceAndSections?
-    fun practiceWithDetailsFlow(): Flow<List<PracticeWithDetails>>
+    suspend fun practiceWithDetails(id: Long): PracticeWithDetails?
+    fun practicesWithDetailsFlow(): Flow<List<PracticeWithDetails>>
     fun practicesItemsFlow(): Flow<List<PracticeWithPieceAndSections>>
     fun getTimesByDaysFlow(startDate: LocalDate, endDate: LocalDate): Flow<List<PracticeDao.TimesByDays>>
 }

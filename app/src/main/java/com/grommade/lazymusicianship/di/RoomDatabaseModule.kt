@@ -76,13 +76,22 @@ object RoomDatabaseModule {
             }
         }
 
+        val MIGRATION_4_5 = object : Migration(4, 5) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+
+                database.execSQL(" ALTER TABLE practice_table ADD COLUMN sections TEXT DEFAULT '' NOT NULL")
+                database.execSQL(" ALTER TABLE practice_table ADD COLUMN practice_description TEXT DEFAULT '' NOT NULL")
+
+            }
+        }
+
         return Room.databaseBuilder(
             context,
             AppDataBase::class.java,
             "lazy_musicianship_2021"
 
         )
-            .addMigrations(MIGRATION_3_4)
+            .addMigrations(MIGRATION_4_5)
 //            .fallbackToDestructiveMigration()
             .addCallback(
                 object : RoomDatabase.Callback() {

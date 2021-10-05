@@ -11,6 +11,6 @@ class ObservePracticesWithDetails @Inject constructor(
 ) : ObserveUserCase<Unit, List<PracticeWithDetails>>() {
 
     override fun createObservable(params: Unit): Flow<List<PracticeWithDetails>> {
-        return repoPractice.practiceWithDetailsFlow()
+        return repoPractice.practicesWithDetailsFlow()
     }
 }

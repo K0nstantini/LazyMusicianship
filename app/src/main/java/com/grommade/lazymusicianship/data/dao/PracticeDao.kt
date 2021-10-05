@@ -37,7 +37,11 @@ abstract class PracticeDao : EntityDao<Practice>() {
 
     @Transaction
     @Query("SELECT * FROM practice_table ORDER BY date DESC, practice_id DESC")
-    abstract fun practiceWithDetailsFlow(): Flow<List<PracticeWithDetails>>
+    abstract fun practicesWithDetailsFlow(): Flow<List<PracticeWithDetails>>
+
+    @Transaction
+    @Query("SELECT * FROM practice_table WHERE practice_id = :id")
+    abstract fun practiceWithDetails(id: Long): PracticeWithDetails?
 
 
     @Query(

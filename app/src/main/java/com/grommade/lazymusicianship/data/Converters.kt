@@ -10,4 +10,13 @@ class Converters {
 
     @TypeConverter
     fun toLocalDate(milli: Long): LocalDate = LocalDate.ofEpochDay(milli)
+
+    @TypeConverter
+    fun fromListLong(value: List<Long>): String = value.joinToString(",")
+
+    @TypeConverter
+    fun toListLong(value: String): List<Long> = when (value) {
+        "" -> emptyList()
+        else -> value.split(",").map { it.toLong() }
+    }
 }

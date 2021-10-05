@@ -13,9 +13,11 @@ data class Practice(
     @ColumnInfo(name = "practice_piece_id") val pieceId: Long = 0L,
     @ColumnInfo(name = "practice_section_id_from") val sectionIdFrom: Long = 0L,
     @ColumnInfo(name = "practice_section_id_to") val sectionIdTo: Long = 0L,
+    val sections: List<Long> = emptyList(),
     @ColumnInfo(name = "practice_state_id") val stateId: Long = 0L,
     val date: LocalDate = LocalDate.now(),
     val elapsedTime: Int = 0,
     @ColumnInfo(name = "practice_tempo") val tempo: Int = 0,
     val countTimes: Int = 0,
+    @ColumnInfo(name = "practice_description") val description: String = ""
 ) : AppEntity

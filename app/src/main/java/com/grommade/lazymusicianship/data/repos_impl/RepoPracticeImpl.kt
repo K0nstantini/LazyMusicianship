@@ -13,7 +13,7 @@ class RepoPracticeImpl @Inject constructor(
     private val dispatchers: AppCoroutineDispatchers
 ) : RepoPractice {
 
-    override fun practiceWithDetailsFlow() = practiceDao.practiceWithDetailsFlow()
+    override fun practicesWithDetailsFlow() = practiceDao.practicesWithDetailsFlow()
 
     override fun practicesItemsFlow() = practiceDao.getPracticesItemsFlow()
 
@@ -35,4 +35,7 @@ class RepoPracticeImpl @Inject constructor(
     override suspend fun getPracticeItem(id: Long) = withContext(dispatchers.io) {
         practiceDao.getPracticeItem(id)
     }
+
+    override suspend fun practiceWithDetails(id: Long) =
+        withContext(dispatchers.io) { practiceDao.practiceWithDetails(id) }
 }
