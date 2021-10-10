@@ -161,12 +161,9 @@ private fun PracticeItem(
     ) {
         Column(modifier = Modifier.padding(start = 16.dp, end = 8.dp)) {
             PieceText(pieceWithSections.piece)
-
-            val (s1, s2) = (sectionFrom to sectionTo)
-            if (s1 != null && s2 != null) {
-                SectionsText(s1, s2, pieceWithSections.sections, selected)
+            if (sections.isNotEmpty()) {
+                SectionsText(sections, pieceWithSections.sections, selected)
             }
-
             StateText(stateStudy, practice.tempo, practice.countTimes)
         }
 
@@ -190,34 +187,99 @@ private fun PieceText(piece: Piece) {
 
 @Composable
 private fun SectionsText(
-    sectionFrom: Section,
-    sectionTo: Section,
     sections: List<Section>,
+    allSections: List<Section>,
     selected: Boolean
 ) {
+    val sectionFrom = sections.first()
+    val sectionTo = sections.last()
 
-    val textSections = when (sectionFrom) {
-        sectionTo -> sectionFrom.name
-        else -> "${sectionFrom.name} - ${sectionTo.name}"
-    }
-
-    val formatTextSections = if (sectionFrom.isChild) "{ $textSections }" else textSections
-
-    Row {
-        sections.parent(sectionFrom)?.let { parent ->
+    if (sections.sameLevel()) {
+        val text = if (sectionFrom == sectionTo) sectionFrom.name else "${sectionFrom.name} - ${sectionTo.name}"
+        if (sectionFrom.isChild) {
+            Row {
+                Text(
+                    text = allSections.parents(sectionFrom).joinToString(" -> ") { it.name },
+                    fontSize = 12.sp,
+                    color = if (selected) LightPurple2 else LightPurple,
+                    modifier = Modifier.padding(end = 8.dp)
+                )
+                Text(
+                    text = "{ $text }",
+                    fontSize = 12.sp,
+                    color = Color(0xFF3286B5),
+                )
+            }
+        } else {
             Text(
-                text = sections.parents(parent).joinToString(" -> ") { it.name },
+                text = text,
                 fontSize = 12.sp,
-                color = if (selected) LightPurple2 else LightPurple,
-                modifier = Modifier.padding(end = 8.dp)
+                color = Color(0xFF3286B5),
             )
         }
-        Text(
-            text = formatTextSections,
-            fontSize = 12.sp,
-            color = Color(0xFF3286B5), // fixme
-        )
+    } else {
+        Row {
+            Column {
+                Text(
+                    text = "From: ",
+                    fontSize = 12.sp,
+                    color = LightPurple2,
+                )
+                Text(
+                    text = "To: ",
+                    fontSize = 12.sp,
+                    color = LightPurple2,
+                )
+            }
+            Row {
+                Column(modifier = Modifier.padding(start = 8.dp)) {
+                    Row {
+                        if (sectionFrom.isChild) {
+                            Text(
+                                text = allSections.parents(sectionFrom).joinToString(" -> ") { it.name },
+                                fontSize = 12.sp,
+                                color = if (selected) LightPurple2 else LightPurple,
+                                modifier = Modifier.padding(end = 8.dp)
+                            )
+                            Text(
+                                text = "{ ${sectionFrom.name} }",
+                                fontSize = 12.sp,
+                                color = Color(0xFF3286B5),
+                            )
+                        } else {
+                            Text(
+                                text = sectionFrom.name,
+                                fontSize = 12.sp,
+                                color = Color(0xFF3286B5),
+                            )
+                        }
+                    }
+                    Row {
+                        if (sectionTo.isChild) {
+                            Text(
+                                text = allSections.parents(sectionTo).joinToString(" -> ") { it.name },
+                                fontSize = 12.sp,
+                                color = if (selected) LightPurple2 else LightPurple,
+                                modifier = Modifier.padding(end = 8.dp)
+                            )
+                            Text(
+                                text = "{ ${sectionTo.name} }",
+                                fontSize = 12.sp,
+                                color = Color(0xFF3286B5),
+                            )
+                        } else {
+                            Text(
+                                text = sectionTo.name,
+                                fontSize = 12.sp,
+                                color = Color(0xFF3286B5),
+                            )
+                        }
+                    }
+                }
+            }
+        }
     }
+
 }
 
 @Composable

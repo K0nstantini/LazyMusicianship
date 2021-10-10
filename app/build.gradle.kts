@@ -77,13 +77,13 @@ dependencies {
     implementation("androidx.constraintlayout:constraintlayout-compose:1.0.0-rc01")
 
     // Lifecycle
-    val lifecycle_version = "2.4.0-rc01"
+    val lifecycleVersion = "2.4.0-rc01"
 //    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
 //    implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:$lifecycle_version"
 
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion")
     implementation(Dependencies.Compose.lifecycle)
-    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
 
 
     // Hilt

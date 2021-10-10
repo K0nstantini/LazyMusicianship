@@ -15,8 +15,6 @@ class RepoPracticeImpl @Inject constructor(
 
     override fun practicesWithDetailsFlow() = practiceDao.practicesWithDetailsFlow()
 
-    override fun practicesItemsFlow() = practiceDao.getPracticesItemsFlow()
-
     override fun getTimesByDaysFlow(startDate: LocalDate, endDate: LocalDate) =
         practiceDao.getTimesByDaysFlow(startDate, endDate)
 
@@ -30,10 +28,6 @@ class RepoPracticeImpl @Inject constructor(
 
     override suspend fun deleteAll() = withContext(dispatchers.io) {
         practiceDao.deleteAll()
-    }
-
-    override suspend fun getPracticeItem(id: Long) = withContext(dispatchers.io) {
-        practiceDao.getPracticeItem(id)
     }
 
     override suspend fun practiceWithDetails(id: Long) =

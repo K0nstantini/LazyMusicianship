@@ -30,4 +30,8 @@ fun List<Section>.parent(section: Section) =
     find { it.id == section.parentId }
 
 fun List<Section>.parents(section: Section) =
-    generateSequence(section) { s -> find { it.id == s.parentId } }.toList().reversed()
+    generateSequence(section) { s -> find { it.id == s.parentId } }
+        .filter { it != section }
+        .toList().reversed()
+
+

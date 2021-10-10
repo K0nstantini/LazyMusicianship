@@ -90,13 +90,6 @@ class PracticeDetailsViewModel @Inject constructor(
                 currentPracticeItem.value = item
                 selectedPiece.value = item.sections.isEmpty()
                 selectedSections.value = item.sections
-                /*if (item.sectionFrom != null && item.sectionTo != null) {
-                    val sections = allSections.first()
-                        .filter { it.parentId == item.sectionFrom.parentId }
-                        .sortedBy { it.order }
-                    selectedSections.value = sections
-                        .filter { it.order in item.sectionFrom.order..item.sectionTo.order }
-                }*/
             }
     }
 
@@ -116,23 +109,13 @@ class PracticeDetailsViewModel @Inject constructor(
             selectedSections.value = sections + section
             selectedPiece.value = false
         }
-        val allSections = allSections.first()
-        val sortedSections = selectedSections.value.sortedBy { it.getLevel(allSections) + it.order }
+        val sortedSections = selectedSections.value.hierarchicalSort(allSections.first())
         changePractice { copy(sections = sortedSections.map { it.id }) }
-        /*if (sortedSections.isEmpty()) {
-            changePractice { copy(sectionIdFrom = 0L, sectionIdTo = 0L) }
-        } else {
-            changePractice { copy(sectionIdFrom = sortedSections.first().id, sectionIdTo = sortedSections.last().id) }
-        }*/
     }
 
-    private fun List<Section>.filterSections(section: Section): List<Section> {
-        val filtered = filter { it.parentId == section.parentId }
-
-        val sectionsAfter = generateSequence(section) { s -> filtered.find { it.order == s.order + 1 } }
-        val sectionsBefore = generateSequence(section) { s -> filtered.find { it.order == s.order - 1 } }
-        val sections = (sectionsAfter + sectionsBefore).toList()
-        return this.filter { sections.contains(it) }
+    private fun List<Section>.hierarchicalSort(allSections: List<Section>): List<Section> {
+        val parentOrder = { id: Long -> allSections.find { it.id == id }?.order ?: 0 }
+        return sortedWith(compareBy({ parentOrder(it.parentId) }, { it.order }))
     }
 
     private fun selectPiece() {
