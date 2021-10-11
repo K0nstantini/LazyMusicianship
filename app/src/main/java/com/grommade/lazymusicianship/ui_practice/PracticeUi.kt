@@ -196,90 +196,74 @@ private fun SectionsText(
 
     if (sections.sameLevel()) {
         val text = if (sectionFrom == sectionTo) sectionFrom.name else "${sectionFrom.name} - ${sectionTo.name}"
-        if (sectionFrom.isChild) {
-            Row {
-                Text(
-                    text = allSections.parents(sectionFrom).joinToString(" -> ") { it.name },
-                    fontSize = 12.sp,
-                    color = if (selected) LightPurple2 else LightPurple,
-                    modifier = Modifier.padding(end = 8.dp)
-                )
-                Text(
-                    text = "{ $text }",
-                    fontSize = 12.sp,
-                    color = Color(0xFF3286B5),
-                )
-            }
-        } else {
-            Text(
-                text = text,
-                fontSize = 12.sp,
-                color = Color(0xFF3286B5),
-            )
-        }
+        SectionsText(allSections, sectionFrom, selected, text)
     } else {
         Row {
-            Column {
-                Text(
-                    text = "From: ",
-                    fontSize = 12.sp,
-                    color = LightPurple2,
-                )
-                Text(
-                    text = "To: ",
-                    fontSize = 12.sp,
-                    color = LightPurple2,
-                )
-            }
+            SectionTextFromTo()
             Row {
                 Column(modifier = Modifier.padding(start = 8.dp)) {
-                    Row {
-                        if (sectionFrom.isChild) {
-                            Text(
-                                text = allSections.parents(sectionFrom).joinToString(" -> ") { it.name },
-                                fontSize = 12.sp,
-                                color = if (selected) LightPurple2 else LightPurple,
-                                modifier = Modifier.padding(end = 8.dp)
-                            )
-                            Text(
-                                text = "{ ${sectionFrom.name} }",
-                                fontSize = 12.sp,
-                                color = Color(0xFF3286B5),
-                            )
-                        } else {
-                            Text(
-                                text = sectionFrom.name,
-                                fontSize = 12.sp,
-                                color = Color(0xFF3286B5),
-                            )
-                        }
-                    }
-                    Row {
-                        if (sectionTo.isChild) {
-                            Text(
-                                text = allSections.parents(sectionTo).joinToString(" -> ") { it.name },
-                                fontSize = 12.sp,
-                                color = if (selected) LightPurple2 else LightPurple,
-                                modifier = Modifier.padding(end = 8.dp)
-                            )
-                            Text(
-                                text = "{ ${sectionTo.name} }",
-                                fontSize = 12.sp,
-                                color = Color(0xFF3286B5),
-                            )
-                        } else {
-                            Text(
-                                text = sectionTo.name,
-                                fontSize = 12.sp,
-                                color = Color(0xFF3286B5),
-                            )
-                        }
-                    }
+                    SectionsText(allSections, sectionFrom, selected)
+                    SectionsText(allSections, sectionTo, selected)
                 }
             }
         }
     }
+}
 
+@Composable
+private fun SectionsText(
+    allSections: List<Section>,
+    section: Section,
+    selected: Boolean,
+    text: String = section.name
+) {
+    if (section.isChild) {
+        Row {
+            SectionTextParent(allSections, section, selected)
+            SectionTextName("{ $text }")
+        }
+    } else {
+        SectionTextName(text)
+    }
+}
+
+@Composable
+private fun SectionTextName(text: String) {
+    Text(
+        text = text,
+        fontSize = 12.sp,
+        color = Color(0xFF3286B5),
+    )
+}
+
+@Composable
+private fun SectionTextParent(
+    allSections: List<Section>,
+    section: Section,
+    selected: Boolean
+) {
+    Text(
+        text = allSections.parents(section).joinToString(" -> ") { it.name },
+        fontSize = 12.sp,
+        color = if (selected) LightPurple2 else LightPurple,
+        modifier = Modifier.padding(end = 8.dp)
+    )
+}
+
+@Composable
+private fun SectionTextFromTo() {
+    Column {
+        Text(
+            text = "From: ",
+            fontSize = 12.sp,
+            color = LightPurple2,
+        )
+        Text(
+            text = "To: ",
+            fontSize = 12.sp,
+            color = LightPurple2,
+        )
+    }
 }
 
 @Composable
